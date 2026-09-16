@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1-10 complete.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The complete server-side workflow is available through Swagger. React and native Android clients begin in Phase 11.
+**Phases 1-11 complete.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web foundation is now scaffolded and connected to the API boundary. Native Android work begins in Phase 15.
 
 ## Architecture
 
@@ -50,7 +50,7 @@ Open `http://localhost:5080/swagger` for interactive documentation, `/api/health
 
 Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`, overridden by user secrets when configured. Private MongoDB URIs and `Jwt:SigningKey` belong in user secrets/environment configuration. Both environments require a valid signing key; production also requires an explicit MongoDB URI. See [authentication instructions](docs/authentication.md) to create your first development Backoffice account and test login. Never commit credentials.
 
-Web run commands and API base URL configuration arrive in Phase 11. Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned client/deployment deliverables; the Phase 1-10 API is available now.
+Web authentication and API workflows continue in Phases 12-14. Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned client/deployment deliverables; the Phase 1-11 foundation is available now.
 
 ## Verification
 
