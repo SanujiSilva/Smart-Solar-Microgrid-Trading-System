@@ -12,6 +12,7 @@ builder.Services.AddStationManagement();
 builder.Services.AddSlotManagement();
 builder.Services.AddReservationManagement();
 builder.Services.AddQrTransactions();
+builder.Services.AddDashboardServices();
 
 var app = builder.Build();
 

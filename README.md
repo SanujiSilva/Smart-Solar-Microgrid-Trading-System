@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1-5 complete.** The API includes MongoDB, secure authentication, Backoffice staff management, prosumer approval/reactivation, and ownership-protected profile/deactivation requests. The full account lifecycle is available through Swagger. Phase 6 (station management) has not started.
+**Phases 1-10 complete.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The complete server-side workflow is available through Swagger. React and native Android clients begin in Phase 11.
 
 ## Architecture
 
@@ -50,7 +50,7 @@ Open `http://localhost:5080/swagger` for interactive documentation, `/api/health
 
 Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`, overridden by user secrets when configured. Private MongoDB URIs and `Jwt:SigningKey` belong in user secrets/environment configuration. Both environments require a valid signing key; production also requires an explicit MongoDB URI. See [authentication instructions](docs/authentication.md) to create your first development Backoffice account and test login. Never commit credentials.
 
-Web run commands and API base URL configuration arrive in Phase 11. Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned deliverables, not currently available features.
+Web run commands and API base URL configuration arrive in Phase 11. Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned client/deployment deliverables; the Phase 1-10 API is available now.
 
 ## Verification
 
@@ -59,6 +59,6 @@ Web run commands and API base URL configuration arrive in Phase 11. Android API 
 3. Check the role boundaries and all twelve business rules in the architecture document.
 4. Run `git diff --check` to check tracked changes for whitespace errors; inspect new files with `git status --short`.
 
-5. Run the build/test commands above, then follow the [Phase 5 walkthrough](docs/user-management.md). See [Phase 5 completion notes](docs/phase-5.md) for coverage across Phases 1-5. Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real MongoDB/authentication/user-management integration tests; otherwise they are explicitly skipped.
+5. Run the build/test commands above, then follow the [Phase 5 walkthrough](docs/user-management.md) and the phase completion records through [Phase 10](docs/phase-10.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real MongoDB/authentication/user-management integration tests; otherwise they are explicitly skipped.
 
-The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Station/slot/reservation features and client applications remain for later phases.
+The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Client applications, SQLite, Maps, and IIS deployment remain for later phases.

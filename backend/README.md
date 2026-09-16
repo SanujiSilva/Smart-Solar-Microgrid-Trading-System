@@ -24,6 +24,14 @@ Restore needs NuGet network access. Configure MongoDB using the [database setup]
 | `/api/auth/me` | Safe current-user DTO; requires bearer token |
 | `/api/users` | Backoffice account lists and staff creation; details/profile/status routes under user ID |
 | `/api/prosumers` | Backoffice prosumer lists/details/reactivation; own profile and deactivation requests under `/me` |
+| `/api/stations` | Station CRUD, schedules, nearby lookup, and staff availability management |
+| `/api/stations/{stationId}/slots` | Authenticated slot reads and Backoffice slot creation |
+| `/api/slots/{id}` | Slot details, Backoffice update, and soft cancellation |
+| `/api/reservations` | Prosumer reservation lifecycle, staff pending access, and reservation details |
+| `/api/reservations/{id}/qr` | Prosumer QR token issuance/reissue for approved reservations |
+| `/api/operator/*` | Grid Operator QR verification and one-time transfer completion |
+| `/api/reservations/search` | Role-scoped reservation filtering and pagination |
+| `/api/reservations/dashboard` | Live role-aware reservation and operational metrics |
 | `/openapi/v1.json` | Generated OpenAPI document in Development |
 | `/swagger` | Interactive Swagger UI in Development |
 | `/api/does-not-exist` | 404 Problem Details with a `traceId` when requesting JSON |
@@ -55,4 +63,4 @@ Swagger UI uses the built-in OpenAPI generator; both are exposed only in Develop
 
 ## Scope
 
-Phases 2-5 establish the API/MongoDB foundation, authentication, and user/prosumer management. AuthService and UserManagementService own business decisions; UserRepository performs async access and revision-checked mutations. CurrentUser uses the server-validated identity. See the [user management contract and walkthrough](../docs/user-management.md). Station/slot/reservation features, web, and Android remain unimplemented.
+Phases 2-10 establish the API/MongoDB foundation, authentication, user/prosumer and station management, slot/reservation workflows, QR transaction verification, and role-scoped dashboards/search. AuthService, UserManagementService, StationService, SlotService, ReservationService, QrTransactionService, and DashboardService own business decisions; repositories perform async access and conditional writes. CurrentUser uses the server-validated identity. See the phase completion records in `docs/` for endpoint contracts and manual checks. Web and Android remain client-phase work.

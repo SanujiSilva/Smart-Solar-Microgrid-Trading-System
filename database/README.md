@@ -63,7 +63,7 @@ MongoDB also creates each collection's `_id_` index. Startup pings the database,
 
 MongoDB does not enforce foreign keys. Services validate references and lifecycle changes. Define additional indexes from actual query patterns rather than adding every possible combination.
 
-The model stores `QrTokenHash` instead of a raw bearer `QrToken`, and excludes it from JSON. Phase 9 will implement unpredictable tokens, verification, and reissue/display semantics. No QR transaction behavior exists yet.
+The model stores `QrTokenHash` instead of a raw bearer `QrToken`, and excludes it from JSON. Phase 9 implements unpredictable token issuance/reissue, central verification, and one-time completion. Only the raw token returned during issuance is suitable for QR display; it is never persisted. Phase 10 reads live reservation/station/slot data for role-scoped search and dashboards.
 
 Phase 4 provides an explicit [development Backoffice bootstrap](../docs/authentication.md) using externally supplied credentials. Broader sample stations, slots, staff, and reservation data remain for later phases. Do not hard-code production passwords.
 

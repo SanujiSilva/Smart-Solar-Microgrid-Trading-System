@@ -161,3 +161,11 @@ Content-Type: application/json
 {
   "qrToken": "{{qrToken}}"
 }
+
+### Authenticated: search reservations
+GET {{baseUrl}}/api/reservations/search?status=APPROVED&page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Authenticated: reservation dashboard
+GET {{baseUrl}}/api/reservations/dashboard
+Authorization: Bearer {{accessToken}}

@@ -11,6 +11,7 @@ public interface ISlotRepository
         CancellationToken cancellationToken);
     Task<bool> TryAdjustCapacityAsync(ObjectId id, decimal delta, bool requireOpen,
         CancellationToken cancellationToken);
+    Task<(long OpenSlotCount, decimal AvailableCapacity)> GetOperationalSummaryAsync(CancellationToken cancellationToken);
     Task CreateAsync(EnergyBookingSlot slot, CancellationToken cancellationToken);
     Task<EnergyBookingSlot?> UpdateAsync(EnergyBookingSlot expected, EnergyBookingSlot replacement,
         CancellationToken cancellationToken);

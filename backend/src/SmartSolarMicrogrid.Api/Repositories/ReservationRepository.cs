@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.Api.Models;
@@ -23,6 +24,36 @@ public sealed class ReservationRepository(MongoDbContext context) : IReservation
         await context.Reservations.Find(x => x.Status == status)
             .SortBy(x => x.ReservationDateTime).ThenBy(x => x.Id)
             .ToListAsync(cancellationToken);
+
+    public async Task<long> CountCompletedAsync(string? prosumerNic, DateTime from, DateTime to,
+        CancellationToken cancellationToken)
+    {
+        var filter = Builders<EnergyReservation>.Filter.Eq(x => x.Status, ReservationStatus.COMPLETED) &
+            Builders<EnergyReservation>.Filter.Gte(x => x.CompletedAt, from) &
+            Builders<EnergyReservation>.Filter.Lt(x => x.CompletedAt, to);
+        if (!string.IsNullOrWhiteSpace(prosumerNic)) filter &= Builders<EnergyReservation>.Filter.Eq(x => x.ProsumerNIC, prosumerNic);
+        return await context.Reservations.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+    }
+
+    public async Task<(List<EnergyReservation> Items, long TotalCount)> SearchAsync(string? prosumerNic,
+        string? reservationCode, ObjectId? stationId, ReservationStatus? status, DateTime? from, DateTime? to,
+        int page, int pageSize, CancellationToken cancellationToken)
+    {
+        var f = Builders<EnergyReservation>.Filter;
+        var filter = f.Empty;
+        if (!string.IsNullOrWhiteSpace(prosumerNic)) filter &= f.Eq(x => x.ProsumerNIC, prosumerNic);
+        if (!string.IsNullOrWhiteSpace(reservationCode))
+            filter &= f.Regex(x => x.ReservationCode,
+                new BsonRegularExpression(Regex.Escape(reservationCode.Trim()), "i"));
+        if (stationId.HasValue) filter &= f.Eq(x => x.StationId, stationId.Value);
+        if (status.HasValue) filter &= f.Eq(x => x.Status, status.Value);
+        if (from.HasValue) filter &= f.Gte(x => x.ReservationDateTime, from.Value);
+        if (to.HasValue) filter &= f.Lt(x => x.ReservationDateTime, to.Value);
+        var count = await context.Reservations.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+        var items = await context.Reservations.Find(filter).SortBy(x => x.ReservationDateTime).ThenBy(x => x.Id)
+            .Skip((page - 1) * pageSize).Limit(pageSize).ToListAsync(cancellationToken);
+        return (items, count);
+    }
 
     public async Task CreateAsync(EnergyReservation reservation, CancellationToken cancellationToken)
     {

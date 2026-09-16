@@ -42,6 +42,14 @@ public sealed class SlotRepository(MongoDbContext context) : ISlotRepository
             new FindOneAndUpdateOptions<EnergyBookingSlot> { ReturnDocument = ReturnDocument.After }, cancellationToken) is not null;
     }
 
+    public async Task<(long OpenSlotCount, decimal AvailableCapacity)> GetOperationalSummaryAsync(
+        CancellationToken cancellationToken)
+    {
+        var values = await context.Slots.Find(x => x.Status == SlotStatus.OPEN)
+            .Project(x => x.AvailableCapacity).ToListAsync(cancellationToken);
+        return (values.Count, values.Sum());
+    }
+
     public async Task CreateAsync(EnergyBookingSlot slot, CancellationToken cancellationToken) =>
         await context.Slots.InsertOneAsync(slot, cancellationToken: cancellationToken);
 
