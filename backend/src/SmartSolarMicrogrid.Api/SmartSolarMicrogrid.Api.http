@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:5080
+
+### API liveness
+GET {{baseUrl}}/api/health
+Accept: application/json
+
+### OpenAPI document (Development only)
+GET {{baseUrl}}/openapi/v1.json
+
+### Consistent unknown-route response
+GET {{baseUrl}}/api/does-not-exist
+Accept: application/json

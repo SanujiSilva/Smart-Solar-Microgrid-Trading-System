@@ -1,11 +1,11 @@
 # Implementation phases
 
-Only Phase 1 is complete. Each subsequent phase requires a separate request.
+Phases 1 and 2 are complete. Each subsequent phase requires a separate request.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Solution architecture and folders | Complete |
-| 2 | ASP.NET Core API foundation | Pending |
+| 2 | ASP.NET Core API foundation | Complete |
 | 3 | MongoDB configuration and models | Pending |
 | 4 | Authentication, JWT and role authorization | Pending |
 | 5 | User/prosumer management | Pending |

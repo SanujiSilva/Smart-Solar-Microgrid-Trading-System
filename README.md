@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phase 1 complete: solution architecture and folders.** No API, web, or Android application has been generated yet. Phase 2 is the ASP.NET Core API foundation.
+**Phases 1 and 2 complete.** The ASP.NET Core API foundation now runs with a health endpoint, development Swagger/OpenAPI, structured errors, validation infrastructure, and integration tests. MongoDB and authentication are not implemented yet. Phase 3 is MongoDB configuration and models.
 
 ## Architecture
 
@@ -28,7 +28,7 @@ The existing repository is the solution root; no additional nested root is neede
 
 ## Prerequisites and setup plan
 
-- Backend: .NET SDK 10 (10.0.302 detected during Phase 1); target .NET 10 in Phase 2.
+- Backend: .NET SDK 10.0.302 or a newer patch in the 10.0.3xx SDK band (`global.json`); targets .NET 10.
 - Database: MongoDB; use a replica set when implementing multi-document transactions for reservations.
 - Web: Node.js/npm; compatible versions will be recorded when React is scaffolded in Phase 11.
 - Android: Android Studio, Android SDK, and its compatible JDK; versions will be recorded in Phase 15.
@@ -37,15 +37,28 @@ The existing repository is the solution root; no additional nested root is neede
 
 ### Configuration and execution
 
-There are no runnable projects yet. Backend run/build commands will be added in Phase 2; MongoDB connection/database configuration in Phase 3; JWT issuer, audience, signing secret, and bootstrap account setup in Phase 4. Keep development secrets in .NET user secrets or environment variables and production secrets in deployment configuration. Never commit credentials.
+Run from the repository root:
+
+```powershell
+dotnet restore backend/SmartSolarMicrogrid.sln
+dotnet build backend/SmartSolarMicrogrid.sln --no-restore --configuration Release
+dotnet test backend/SmartSolarMicrogrid.sln --no-build --configuration Release
+dotnet run --project backend/src/SmartSolarMicrogrid.Api --launch-profile http
+```
+
+Open `http://localhost:5080/swagger` for interactive documentation or `http://localhost:5080/api/health` for API liveness. MongoDB is not required for Phase 2. See [backend instructions](backend/README.md) for configuration, HTTPS, and expected responses.
+
+MongoDB connection/database configuration arrives in Phase 3; JWT issuer, audience, signing secret, and bootstrap account setup in Phase 4. Keep development secrets in .NET user secrets or environment variables and production secrets in deployment configuration. Never commit credentials.
 
 Web run commands and API base URL configuration arrive in Phase 11. Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned deliverables, not currently available features.
 
-## Phase 1 verification
+## Verification
 
 1. Inspect the folder tree above and confirm each reserved directory exists.
 2. Read the architecture and check that both clients reach MongoDB only through the API.
 3. Check the role boundaries and all twelve business rules in the architecture document.
 4. Run `git diff --check` to check tracked changes for whitespace errors; inspect new files with `git status --short`.
 
-Compilation and automated application tests are not applicable until projects exist. See [Phase 1 completion notes](docs/phase-1.md) for scope and remaining work.
+5. Run the build/test commands above, then verify health and Swagger as described in [Phase 2 completion notes](docs/phase-2.md).
+
+The [Phase 1 completion notes](docs/phase-1.md) remain a historical record. Runtime database, authentication, reservation, and client functionality remain for later phases.
