@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1-4 complete.** The API includes MongoDB infrastructure, prosumer registration, login, password hashing, JWT authentication, a protected current-user endpoint, and role policies. New prosumers remain PENDING until approval is implemented. Phase 5 is user/prosumer management.
+**Phases 1-5 complete.** The API includes MongoDB, secure authentication, Backoffice staff management, prosumer approval/reactivation, and ownership-protected profile/deactivation requests. The full account lifecycle is available through Swagger. Phase 6 (station management) has not started.
 
 ## Architecture
 
@@ -59,6 +59,6 @@ Web run commands and API base URL configuration arrive in Phase 11. Android API 
 3. Check the role boundaries and all twelve business rules in the architecture document.
 4. Run `git diff --check` to check tracked changes for whitespace errors; inspect new files with `git status --short`.
 
-5. Run the build/test commands above, then verify login and authorization as described in [Phase 4 completion notes](docs/phase-4.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real database/authentication integration tests; otherwise they are explicitly skipped.
+5. Run the build/test commands above, then follow the [Phase 5 walkthrough](docs/user-management.md). See [Phase 5 completion notes](docs/phase-5.md) for coverage across Phases 1-5. Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real MongoDB/authentication/user-management integration tests; otherwise they are explicitly skipped.
 
-The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), and [Phase 3](docs/phase-3.md) notes remain historical records. User management/approval, domain CRUD, reservation rules, and client functionality remain for later phases.
+The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Station/slot/reservation features and client applications remain for later phases.

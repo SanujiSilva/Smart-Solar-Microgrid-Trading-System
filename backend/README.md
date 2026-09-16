@@ -22,6 +22,8 @@ Restore needs NuGet network access. Configure MongoDB using the [database setup]
 | `/api/auth/login` (POST) | Email/NIC + password login; returns bearer token for eligible accounts |
 | `/api/auth/prosumer/register` (POST) | Validated registration; creates PROSUMER/PENDING |
 | `/api/auth/me` | Safe current-user DTO; requires bearer token |
+| `/api/users` | Backoffice account lists and staff creation; details/profile/status routes under user ID |
+| `/api/prosumers` | Backoffice prosumer lists/details/reactivation; own profile and deactivation requests under `/me` |
 | `/openapi/v1.json` | Generated OpenAPI document in Development |
 | `/swagger` | Interactive Swagger UI in Development |
 | `/api/does-not-exist` | 404 Problem Details with a `traceId` when requesting JSON |
@@ -53,4 +55,4 @@ Swagger UI uses the built-in OpenAPI generator; both are exposed only in Develop
 
 ## Scope
 
-Phases 2-4 establish the API/MongoDB foundation and authentication. AuthService owns registration/login decisions; UserRepository uses async MongoDB operations and indexes. Default controller authorization and named role policies are available for later endpoints. Models stay internal and responses use DTOs. User administration/approval, domain CRUD, reservation rules, web, and Android remain unimplemented.
+Phases 2-5 establish the API/MongoDB foundation, authentication, and user/prosumer management. AuthService and UserManagementService own business decisions; UserRepository performs async access and revision-checked mutations. CurrentUser uses the server-validated identity. See the [user management contract and walkthrough](../docs/user-management.md). Station/slot/reservation features, web, and Android remain unimplemented.

@@ -1,11 +1,14 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.GeoJsonObjectModel;
+using System.Text.Json.Serialization;
 
 namespace SmartSolarMicrogrid.Api.Models;
 
 public sealed class SolarStationInfo : MongoDocument
 {
+    [JsonIgnore]
+    public long Revision { get; set; }
     public required string StationCode { get; set; }
     public required string Name { get; set; }
     public required string Address { get; set; }

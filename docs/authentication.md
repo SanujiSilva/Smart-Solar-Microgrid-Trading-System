@@ -16,7 +16,7 @@ Login and registration share a limit of ten requests per client IP per minute, r
 
 ## Accounts and permissions
 
-New prosumers are PENDING and receive no token. Backoffice approval is Phase 5; Phase 4 does not add an approval endpoint. ACTIVE and DEACTIVATION_REQUESTED accounts may sign in: a deactivation request does not immediately disable an account. PENDING and DEACTIVATED accounts cannot sign in. Unknown roles are rejected.
+New prosumers are PENDING and receive no token. Backoffice now approves them with `PATCH /api/users/{id}/status` (ACTIVE); see [Phase 5 management](user-management.md). ACTIVE and DEACTIVATION_REQUESTED accounts may sign in: a deactivation request does not immediately disable an account. PENDING and DEACTIVATED accounts cannot sign in. Unknown roles are rejected.
 
 All controller endpoints require authentication by default through `MapControllers().RequireAuthorization()`. Only login, registration, and health routes explicitly allow anonymous access. Development Swagger/OpenAPI remains accessible for setup/testing.
 
@@ -27,7 +27,7 @@ All controller endpoints require authentication by default through `MapControlle
 | ProsumerOnly | PROSUMER |
 | Staff | BACKOFFICE, GRID_OPERATOR |
 
-Operators do not receive Backoffice permissions. Apply these policies to domain endpoints in subsequent phases. Role policy probes used by tests exist only in the test assembly; no placeholder administrative endpoints are shipped.
+Operators do not receive Backoffice permissions. Phase 5 applies these policies to real administration and self-service endpoints. Role policy probes used by earlier tests still exist only in the test assembly.
 
 ## Passwords and JWTs
 
@@ -68,7 +68,7 @@ Changing the key invalidates existing tokens. Do not regenerate it on every star
 
 ## Create the first development Backoffice account
 
-The one-shot bootstrap command runs only in Development, initializes MongoDB indexes, hashes the supplied password, creates an ACTIVE/BACKOFFICE user without NIC, and exits without starting HTTP. It refuses to overwrite or reactivate an existing Backoffice account. There are no hard-coded credentials and no automatic account creation on normal startup. Run the command once; later Backoffice user administration belongs to Phase 5.
+The one-shot bootstrap command runs only in Development, initializes MongoDB indexes, hashes the supplied password, creates an ACTIVE/BACKOFFICE user without NIC, and exits without starting HTTP. It refuses to overwrite or reactivate an existing Backoffice account. There are no hard-coded credentials and no automatic account creation on normal startup. Run the command once; subsequent staff accounts can now be created by an authenticated Backoffice user through POST `/api/users`.
 
 In PowerShell at the repository root, collect your own details and send them to user secrets without printing the password:
 
@@ -106,7 +106,7 @@ No account was created in your Atlas database during verification. Integration t
 2. Run `dotnet run --project backend/src/SmartSolarMicrogrid.Api --launch-profile http` and open `http://localhost:5080/swagger`.
 3. Execute POST `/api/auth/login` with your Backoffice email as `identifier` and your password. Expect a bearer token and safe user response.
 4. Click Swagger **Authorize**, paste only the access token, and execute GET `/api/auth/me`. Expect your profile with BACKOFFICE role. Clear authorization and repeat: expect 401.
-5. Register a prosumer with your chosen valid NIC/email/phone and a 12-128 character password. Expect 201 and PENDING, with no token. A login attempt using those correct credentials returns 403 until Phase 5 approval is implemented.
+5. Register a prosumer with your chosen valid NIC/email/phone and a 12-128 character password. Expect 201 and PENDING, with no token. Login returns 403 until a Backoffice user approves the account through PATCH `/api/users/{id}/status` with ACTIVE.
 6. Repeat registration using the same NIC or email: expect 409. Add a role/status property or invalid NIC: expect 400.
 7. Run the real database test suite for all role combinations, expired/invalid tokens, revocation, concurrent registration, hashing, and throttling. These tests do not require you to manually edit account roles/statuses.
 

@@ -26,6 +26,9 @@ public sealed class User : MongoDocument
     [JsonIgnore]
     public int TokenVersion { get; set; }
 
+    [JsonIgnore]
+    public long Revision { get; set; }
+
     [BsonRepresentation(BsonType.String)]
     public UserRole Role { get; set; } = UserRole.PROSUMER;
 

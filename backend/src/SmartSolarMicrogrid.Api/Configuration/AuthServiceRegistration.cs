@@ -23,6 +23,9 @@ public static class AuthServiceRegistration
         services.AddSingleton<PasswordService>();
         services.AddScoped<JwtTokenService>();
         services.AddScoped<AuthService>();
+        services.AddHttpContextAccessor();
+        services.AddScoped<CurrentUser>();
+        services.AddScoped<UserManagementService>();
         services.AddScoped<BackofficeBootstrapService>();
         services.AddScoped<JwtBearerEventsHandler>();
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();

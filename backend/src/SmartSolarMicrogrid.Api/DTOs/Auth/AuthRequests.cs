@@ -19,14 +19,21 @@ public sealed class RegisterProsumerRequest : AccountCredentialsRequest
     public string NIC { get; init; } = "";
 }
 
-public class AccountCredentialsRequest
+public class AccountCredentialsRequest : ContactDetailsRequest
 {
-    [Required, StringLength(150, MinimumLength = 2)]
-    public string FullName { get; init; } = "";
-    [Required, EmailAddress, StringLength(254)]
-    public string Email { get; init; } = "";
-    [Required, Phone, StringLength(25, MinimumLength = 7)]
-    public string Phone { get; init; } = "";
     [Required, StringLength(128, MinimumLength = 12)]
     public string Password { get; init; } = "";
+}
+
+public class ContactDetailsRequest
+{
+    private string fullName = "";
+    private string email = "";
+    private string phone = "";
+    [Required, StringLength(150, MinimumLength = 2)]
+    public string FullName { get => fullName; init => fullName = value?.Trim() ?? ""; }
+    [Required, EmailAddress, StringLength(254)]
+    public string Email { get => email; init => email = value?.Trim() ?? ""; }
+    [Required, Phone, StringLength(25, MinimumLength = 7)]
+    public string Phone { get => phone; init => phone = value?.Trim() ?? ""; }
 }

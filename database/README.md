@@ -1,6 +1,6 @@
 # MongoDB setup and data model
 
-Phase 3 implements MongoDB infrastructure; Phase 4 adds authentication persistence, a unique email index, and Backoffice bootstrap. Domain management and sample operational data remain for later phases.
+Phase 3 implements MongoDB infrastructure; Phase 4 adds authentication persistence; Phase 5 adds user/prosumer management and conditional document updates. Station/booking management and sample operational data remain for later phases.
 
 ## Local setup
 
@@ -30,7 +30,7 @@ The application account needs access to the configured database, including creat
 
 | Collection | Fields |
 | --- | --- |
-| Users | Id, NIC, FullName, Email, Phone, PasswordHash, TokenVersion, Role, Status, CreatedAt, UpdatedAt |
+| Users | Id, NIC, FullName, Email, Phone, PasswordHash, TokenVersion, Revision, Role, Status, CreatedAt, UpdatedAt |
 | SolarStationInfo | Id, StationCode, Name, Address, Location (derived Latitude/Longitude), CapacityKWh, AvailableBatterySlots, Status, OperatingSchedule, CreatedAt, UpdatedAt |
 | EnergyBookingSlots | Id, StationId, StartTime, EndTime, Capacity, AvailableCapacity, Status, CreatedAt, UpdatedAt |
 | EnergyReservations | Id, ReservationCode, ProsumerNIC, StationId, SlotId, EnergyAmount, ReservationDateTime, Status, QrTokenHash, CreatedAt, UpdatedAt, CompletedAt, CompletedByOperatorId |
@@ -38,6 +38,8 @@ The application account needs access to the configured database, including creat
 Internal IDs and references are BSON ObjectIds. Property names are retained in BSON (PascalCase), except `Id` maps to `_id`. C# timestamps are UTC `DateTime` values, stored as BSON dates with millisecond precision. Energy and slot capacity use `decimal`/BSON Decimal128, measured in kWh; battery slot counts remain integers. Future services must set/update timestamps and enforce valid state and capacity changes.
 
 NIC and ProsumerNIC setters trim whitespace and uppercase identifiers. Empty/missing staff NICs are omitted from BSON; a partial unique index applies to string NICs. Registration validates prosumer NICs. AuthService normalizes email, and the unique email index/login lookup use case-insensitive collation. Models are persistence objects, not request DTOs; raw database writes bypass model normalization. NIC edits will not be exposed by future profile DTOs. PasswordHash and TokenVersion are excluded from JSON; controllers use explicit response DTOs. Increment TokenVersion in future password/session revocation operations to reject old JWTs.
+
+Phase 5 management routes keep NIC/role immutable. Administrative status changes increment TokenVersion so deactivated sessions do not revive upon reactivation. Revision is an internal optimistic concurrency counter (also excluded from JSON); profile/status writes compare and increment it atomically. Existing records with no Revision are treated as zero and updated without a destructive migration.
 
 Enums are stored as readable strings. User roles: BACKOFFICE, GRID_OPERATOR, PROSUMER. User statuses: PENDING, ACTIVE, DEACTIVATION_REQUESTED, DEACTIVATED. Reservation statuses: PENDING, APPROVED, CANCELLED, COMPLETED, REJECTED. Station statuses: INACTIVE, ACTIVE, MAINTENANCE, DEACTIVATED. Slot statuses: CLOSED, OPEN, CANCELLED. New model defaults grant no staff role, station availability, or approved booking.
 

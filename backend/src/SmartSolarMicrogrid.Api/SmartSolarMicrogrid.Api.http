@@ -27,3 +27,24 @@ Content-Type: application/json
 ### Current authenticated user: provide accessToken privately; never commit real credentials/tokens.
 GET {{baseUrl}}/api/auth/me
 Authorization: Bearer {{accessToken}}
+
+### Backoffice: pending prosumers (private token/environment variables required)
+GET {{baseUrl}}/api/prosumers?status=PENDING&page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Backoffice: approve the selected user
+PATCH {{baseUrl}}/api/users/{{userId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "status": "ACTIVE"
+}
+
+### Prosumer: request own deactivation
+POST {{baseUrl}}/api/prosumers/me/deactivation-request
+Authorization: Bearer {{prosumerAccessToken}}
+
+### Backoffice: reactivate a deactivated prosumer
+PATCH {{baseUrl}}/api/prosumers/{{prosumerNic}}/activate
+Authorization: Bearer {{accessToken}}
