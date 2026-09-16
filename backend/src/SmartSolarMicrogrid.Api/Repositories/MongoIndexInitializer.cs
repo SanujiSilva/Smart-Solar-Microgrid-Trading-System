@@ -15,7 +15,9 @@ public sealed class MongoIndexInitializer(MongoDbContext context)
                 {
                     Name = "ux_users_nic", Unique = true,
                     PartialFilterExpression = Builders<User>.Filter.Type(x => x.NIC, BsonType.String)
-                })
+                }),
+            new CreateIndexModel<User>(Builders<User>.IndexKeys.Ascending(x => x.Email),
+                new CreateIndexOptions { Name = "ux_users_email", Unique = true, Collation = UserRepository.EmailCollation })
         ], cancellationToken);
 
         await context.Stations.Indexes.CreateManyAsync([

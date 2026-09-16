@@ -1,12 +1,26 @@
 using SmartSolarMicrogrid.Api.Configuration;
+using SmartSolarMicrogrid.Api.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+var bootstrap = args.Contains("--bootstrap-backoffice");
+var builder = WebApplication.CreateBuilder(args.Where(x => x != "--bootstrap-backoffice").ToArray());
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
 builder.Services.AddApiFoundation(builder.Configuration);
 builder.Services.AddMongoDatabase(builder.Configuration);
+builder.Services.AddApiAuthentication(builder.Configuration);
 
 var app = builder.Build();
+
+if (bootstrap)
+{
+    if (!app.Environment.IsDevelopment())
+        throw new InvalidOperationException("Backoffice bootstrap is available only in Development.");
+    await using var scope = app.Services.CreateAsyncScope();
+    await scope.ServiceProvider.GetServices<IHostedService>().OfType<MongoDatabaseInitializer>().Single().StartAsync(CancellationToken.None);
+    await scope.ServiceProvider.GetRequiredService<BackofficeBootstrapService>().CreateAsync(CancellationToken.None);
+    app.Logger.LogInformation("Initial Backoffice account created. Remove Bootstrap secrets after use.");
+    return;
+}
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
@@ -30,7 +44,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.MapControllers();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseRateLimiter();
+app.MapControllers().RequireAuthorization();
 app.Run();
 
 // Exposes the real application entry point to in-memory integration tests.

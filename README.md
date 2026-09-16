@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1-3 complete.** The API has MongoDB configuration, four typed collection models, startup index creation, and database readiness checks alongside the API foundation. Authentication and business endpoints remain for later phases. Phase 4 is authentication, JWT, and role authorization.
+**Phases 1-4 complete.** The API includes MongoDB infrastructure, prosumer registration, login, password hashing, JWT authentication, a protected current-user endpoint, and role policies. New prosumers remain PENDING until approval is implemented. Phase 5 is user/prosumer management.
 
 ## Architecture
 
@@ -37,7 +37,7 @@ The existing repository is the solution root; no additional nested root is neede
 
 ### Configuration and execution
 
-Start a local MongoDB server using the [database setup instructions](database/README.md), then run from the repository root:
+Configure MongoDB using the [database setup instructions](database/README.md) and JWT using [authentication setup](docs/authentication.md), then run from the repository root. This machine already has Atlas and a generated JWT key in development user secrets.
 
 ```powershell
 dotnet restore backend/SmartSolarMicrogrid.sln
@@ -48,7 +48,7 @@ dotnet run --project backend/src/SmartSolarMicrogrid.Api --launch-profile http
 
 Open `http://localhost:5080/swagger` for interactive documentation, `/api/health` for API liveness, and `/api/health/ready` for MongoDB readiness. MongoDB must be available at startup so required indexes can be created. See [backend instructions](backend/README.md) for configuration, HTTPS, and expected responses.
 
-Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`. Supply private MongoDB URIs through user secrets or environment variables; production requires an explicit connection string. JWT issuer, audience, signing secret, and bootstrap account setup arrive in Phase 4. Never commit credentials.
+Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`, overridden by user secrets when configured. Private MongoDB URIs and `Jwt:SigningKey` belong in user secrets/environment configuration. Both environments require a valid signing key; production also requires an explicit MongoDB URI. See [authentication instructions](docs/authentication.md) to create your first development Backoffice account and test login. Never commit credentials.
 
 Web run commands and API base URL configuration arrive in Phase 11. Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned deliverables, not currently available features.
 
@@ -59,6 +59,6 @@ Web run commands and API base URL configuration arrive in Phase 11. Android API 
 3. Check the role boundaries and all twelve business rules in the architecture document.
 4. Run `git diff --check` to check tracked changes for whitespace errors; inspect new files with `git status --short`.
 
-5. Run the build/test commands above, then verify MongoDB readiness and indexes as described in [Phase 3 completion notes](docs/phase-3.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable the real database tests; otherwise they are explicitly skipped.
+5. Run the build/test commands above, then verify login and authorization as described in [Phase 4 completion notes](docs/phase-4.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real database/authentication integration tests; otherwise they are explicitly skipped.
 
-The [Phase 1](docs/phase-1.md) and [Phase 2](docs/phase-2.md) notes remain historical records. Authentication, domain CRUD, reservation rules, and client functionality remain for later phases.
+The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), and [Phase 3](docs/phase-3.md) notes remain historical records. User management/approval, domain CRUD, reservation rules, and client functionality remain for later phases.

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using SmartSolarMicrogrid.Api.Helpers;
 
 namespace SmartSolarMicrogrid.Api.Middleware;
 
@@ -11,15 +12,18 @@ public sealed class GlobalExceptionHandler(
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        logger.LogError(exception, "Unhandled API exception. TraceId: {TraceId}",
-            httpContext.TraceIdentifier);
+        var expected = exception as ApiException;
+        if (expected is null)
+            logger.LogError(exception, "Unhandled API exception. TraceId: {TraceId}", httpContext.TraceIdentifier);
 
-        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        httpContext.Response.StatusCode = expected?.StatusCode ?? StatusCodes.Status500InternalServerError;
+        if (httpContext.Response.StatusCode == StatusCodes.Status401Unauthorized)
+            httpContext.Response.Headers.WWWAuthenticate = "Bearer";
         var problem = new ProblemDetails
         {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "An unexpected error occurred.",
-            Detail = "Please try again. If the problem persists, provide the trace ID to support.",
+            Status = httpContext.Response.StatusCode,
+            Title = expected?.Message ?? "An unexpected error occurred.",
+            Detail = expected is null ? "Please try again. If the problem persists, provide the trace ID to support." : null,
             Instance = httpContext.Request.Path,
             Extensions = { ["traceId"] = Activity.Current?.Id ?? httpContext.TraceIdentifier }
         };

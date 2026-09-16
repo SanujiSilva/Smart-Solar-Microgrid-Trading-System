@@ -22,6 +22,10 @@ public sealed class User : MongoDocument
     [JsonIgnore]
     public string PasswordHash { get; set; } = "";
 
+    // Increment when future password/session revocation operations invalidate existing tokens.
+    [JsonIgnore]
+    public int TokenVersion { get; set; }
+
     [BsonRepresentation(BsonType.String)]
     public UserRole Role { get; set; } = UserRole.PROSUMER;
 

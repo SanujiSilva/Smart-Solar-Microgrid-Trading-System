@@ -132,7 +132,8 @@ public sealed class MongoDatabaseTests : IAsyncLifetime
                 new Dictionary<string, string?>
                 {
                     ["MongoDb:ConnectionString"] = Environment.GetEnvironmentVariable("SMARTSOLAR_TEST_MONGODB_URI"),
-                    ["MongoDb:DatabaseName"] = databaseName
+                    ["MongoDb:DatabaseName"] = databaseName,
+                    ["Jwt:SigningKey"] = AuthTestSettings.SigningKey
                 }));
         });
         using var http = factory.CreateClient();

@@ -1,13 +1,13 @@
 # Implementation phases
 
-Phases 1-3 are complete. Each subsequent phase requires a separate request.
+Phases 1-4 are complete. Each subsequent phase requires a separate request.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Solution architecture and folders | Complete |
 | 2 | ASP.NET Core API foundation | Complete |
 | 3 | MongoDB configuration and models | Complete |
-| 4 | Authentication, JWT and role authorization | Pending |
+| 4 | Authentication, JWT and role authorization | Complete |
 | 5 | User/prosumer management | Pending |
 | 6 | Solar station management | Pending |
 | 7 | Energy booking slots | Pending |

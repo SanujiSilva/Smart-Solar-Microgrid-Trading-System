@@ -12,7 +12,7 @@ public static class ApiServiceRegistration
         this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
-        services.AddOpenApi();
+        services.AddOpenApi(options => options.AddDocumentTransformer<BearerOpenApiTransformer>());
         services.AddHealthChecks();
         services.AddSingleton(TimeProvider.System);
         services.AddProblemDetails(options =>

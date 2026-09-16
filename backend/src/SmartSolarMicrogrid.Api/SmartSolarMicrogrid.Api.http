@@ -14,3 +14,16 @@ Accept: application/json
 ### Consistent unknown-route response
 GET {{baseUrl}}/api/does-not-exist
 Accept: application/json
+
+### Login: supply loginIdentifier/loginPassword through your REST client's private environment.
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "{{loginIdentifier}}",
+  "password": "{{loginPassword}}"
+}
+
+### Current authenticated user: provide accessToken privately; never commit real credentials/tokens.
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}

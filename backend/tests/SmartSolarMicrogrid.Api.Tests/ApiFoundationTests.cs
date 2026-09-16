@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -119,7 +120,7 @@ public sealed class ApiFoundationTests
         {
             builder.UseEnvironment(environment);
             builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(
-                new Dictionary<string, string?> { ["MongoDb:ConnectionString"] = "mongodb://127.0.0.1:1" }));
+                new Dictionary<string, string?> { ["MongoDb:ConnectionString"] = "mongodb://127.0.0.1:1", ["Jwt:SigningKey"] = AuthTestSettings.SigningKey }));
             builder.ConfigureServices(services =>
             {
                 // Foundation tests exercise HTTP infrastructure without a database dependency.
@@ -156,6 +157,7 @@ public sealed class ApiFoundationTests
 
 // Loaded explicitly by tests only; these routes never ship in the API assembly.
 [ApiController]
+[AllowAnonymous]
 [Route("test-probe")]
 public sealed class FoundationProbeController : ControllerBase
 {

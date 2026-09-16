@@ -90,7 +90,7 @@ public sealed class MongoModelTests
 
     internal static User NewUser(string? nic) => new()
     {
-        NIC = nic, FullName = "Test User", Email = "test@example.invalid", Phone = "0000000000",
+        NIC = nic, FullName = "Test User", Email = $"{Guid.NewGuid():N}@example.invalid", Phone = "0000000000",
         PasswordHash = "test-hash-not-a-password"
     };
 

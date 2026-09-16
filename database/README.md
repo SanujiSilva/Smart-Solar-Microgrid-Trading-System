@@ -1,6 +1,6 @@
 # MongoDB setup and data model
 
-Phase 3 implements typed document models, MongoDB configuration, named indexes, startup initialization, and readiness. Authentication, domain operations, and seed data remain for later phases.
+Phase 3 implements MongoDB infrastructure; Phase 4 adds authentication persistence, a unique email index, and Backoffice bootstrap. Domain management and sample operational data remain for later phases.
 
 ## Local setup
 
@@ -30,14 +30,14 @@ The application account needs access to the configured database, including creat
 
 | Collection | Fields |
 | --- | --- |
-| Users | Id, NIC, FullName, Email, Phone, PasswordHash, Role, Status, CreatedAt, UpdatedAt |
+| Users | Id, NIC, FullName, Email, Phone, PasswordHash, TokenVersion, Role, Status, CreatedAt, UpdatedAt |
 | SolarStationInfo | Id, StationCode, Name, Address, Location (derived Latitude/Longitude), CapacityKWh, AvailableBatterySlots, Status, OperatingSchedule, CreatedAt, UpdatedAt |
 | EnergyBookingSlots | Id, StationId, StartTime, EndTime, Capacity, AvailableCapacity, Status, CreatedAt, UpdatedAt |
 | EnergyReservations | Id, ReservationCode, ProsumerNIC, StationId, SlotId, EnergyAmount, ReservationDateTime, Status, QrTokenHash, CreatedAt, UpdatedAt, CompletedAt, CompletedByOperatorId |
 
 Internal IDs and references are BSON ObjectIds. Property names are retained in BSON (PascalCase), except `Id` maps to `_id`. C# timestamps are UTC `DateTime` values, stored as BSON dates with millisecond precision. Energy and slot capacity use `decimal`/BSON Decimal128, measured in kWh; battery slot counts remain integers. Future services must set/update timestamps and enforce valid state and capacity changes.
 
-NIC and ProsumerNIC setters trim whitespace and uppercase identifiers. Empty/missing staff NICs are omitted from BSON; a partial unique index applies to string NICs. Prosumer registration must require a valid NIC in its later phase. Models are persistence objects, not request DTOs; raw database writes bypass model normalization. NIC edits will not be exposed by future profile DTOs. Password hashes remain persisted server-side and are excluded from JSON as an additional safeguard; controllers must still use response DTOs.
+NIC and ProsumerNIC setters trim whitespace and uppercase identifiers. Empty/missing staff NICs are omitted from BSON; a partial unique index applies to string NICs. Registration validates prosumer NICs. AuthService normalizes email, and the unique email index/login lookup use case-insensitive collation. Models are persistence objects, not request DTOs; raw database writes bypass model normalization. NIC edits will not be exposed by future profile DTOs. PasswordHash and TokenVersion are excluded from JSON; controllers use explicit response DTOs. Increment TokenVersion in future password/session revocation operations to reject old JWTs.
 
 Enums are stored as readable strings. User roles: BACKOFFICE, GRID_OPERATOR, PROSUMER. User statuses: PENDING, ACTIVE, DEACTIVATION_REQUESTED, DEACTIVATED. Reservation statuses: PENDING, APPROVED, CANCELLED, COMPLETED, REJECTED. Station statuses: INACTIVE, ACTIVE, MAINTENANCE, DEACTIVATED. Slot statuses: CLOSED, OPEN, CANCELLED. New model defaults grant no staff role, station availability, or approved booking.
 
@@ -48,6 +48,7 @@ Stations persist one GeoJSON `Location` with `[longitude, latitude]`; `Latitude`
 | Collection | Index name | Fields / behavior |
 | --- | --- | --- |
 | Users | ux_users_nic | NIC ascending, unique, partial filter NIC type string |
+| Users | ux_users_email | Email ascending, unique, collation en/secondary (case insensitive) |
 | SolarStationInfo | ux_stations_code | StationCode ascending, unique |
 | SolarStationInfo | ix_stations_location | Location 2dsphere |
 | EnergyBookingSlots | ix_slots_station_start | StationId + StartTime ascending |
@@ -62,7 +63,7 @@ MongoDB does not enforce foreign keys. Services validate references and lifecycl
 
 The model stores `QrTokenHash` instead of a raw bearer `QrToken`, and excludes it from JSON. Phase 9 will implement unpredictable tokens, verification, and reissue/display semantics. No QR transaction behavior exists yet.
 
-Future development seeding must be explicit and environment-gated, with credentials supplied through configuration. Seed roles, stations, slots, and representative reservation states without hard-coded production passwords.
+Phase 4 provides an explicit [development Backoffice bootstrap](../docs/authentication.md) using externally supplied credentials. Broader sample stations, slots, staff, and reservation data remain for later phases. Do not hard-code production passwords.
 
 ## Verification
 

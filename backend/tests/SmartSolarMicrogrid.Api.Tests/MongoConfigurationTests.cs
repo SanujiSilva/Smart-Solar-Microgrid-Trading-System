@@ -80,6 +80,7 @@ public sealed class MongoConfigurationTests
                 new Dictionary<string, string?>
                 {
                     ["MongoDb:ConnectionString"] = "mongodb://127.0.0.1:1",
+                    ["Jwt:SigningKey"] = AuthTestSettings.SigningKey,
                     ["MongoDb:TimeoutSeconds"] = "1",
                     ["MongoDb:InitializationTimeoutSeconds"] = "2"
                 }));
