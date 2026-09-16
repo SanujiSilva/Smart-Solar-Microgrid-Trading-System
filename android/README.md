@@ -1,6 +1,6 @@
 # Smart Solar Microgrid Android client
 
-Phase 15 provides the native Android project foundation using Kotlin, XML layouts, AndroidX, Material 3, and view binding. It uses the package `com.smartsolar.microgrid` and targets the central API through a non-secret emulator base URL.
+Phase 15 provides the native Android project foundation using Kotlin, XML layouts, AndroidX, Material 3, and view binding. Phase 16 adds SQLiteOpenHelper-based local reference persistence for the authenticated user profile and station cache. It uses the package `com.smartsolar.microgrid` and targets the central API through a non-secret emulator base URL.
 
 ## Structure
 
@@ -15,4 +15,4 @@ Open the `android` folder in Android Studio with an Android SDK and Gradle-compa
 
 The emulator API base is `http://10.0.2.2:5080/api/`; update `ApiConfig.BASE_URL` for a physical device or another API host in later integration work. Do not place credentials or bearer tokens in this configuration.
 
-SQLite, Retrofit, Google Maps, QR rendering/scanning, authentication screens, and prosumer/operator workflows are intentionally reserved for Phases 16-21.
+The SQLite database stores only server-returned display/session reference data and station cache data with fetch timestamps. It never stores passwords, MongoDB data access, reservation authorization decisions, or bearer tokens. Phase 17 adds Retrofit authentication and secure token handling; Maps, QR rendering/scanning, and prosumer/operator workflows remain reserved for Phases 18-21.
