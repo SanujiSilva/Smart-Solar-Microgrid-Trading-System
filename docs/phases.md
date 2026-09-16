@@ -1,6 +1,6 @@
 # Implementation phases
 
-Phases 1-7 are complete. Each subsequent phase requires a separate request.
+Phases 1-8 are complete. Each subsequent phase requires a separate request.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
@@ -11,7 +11,7 @@ Phases 1-7 are complete. Each subsequent phase requires a separate request.
 | 5 | User/prosumer management | Complete |
 | 6 | Solar station management | Complete |
 | 7 | Energy booking slots | Complete |
-| 8 | Reservation service and seven-day/twelve-hour rules | Pending |
+| 8 | Reservation service and seven-day/twelve-hour rules | Complete |
 | 9 | QR transaction service | Pending |
 | 10 | Dashboard/search endpoints | Pending |
 | 11 | React web project | Pending |

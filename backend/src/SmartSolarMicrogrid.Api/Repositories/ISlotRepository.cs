@@ -9,6 +9,8 @@ public interface ISlotRepository
     Task<EnergyBookingSlot?> FindAsync(ObjectId id, CancellationToken cancellationToken);
     Task<bool> HasOverlapAsync(ObjectId stationId, DateTime startTime, DateTime endTime, ObjectId? excludedId,
         CancellationToken cancellationToken);
+    Task<bool> TryAdjustCapacityAsync(ObjectId id, decimal delta, bool requireOpen,
+        CancellationToken cancellationToken);
     Task CreateAsync(EnergyBookingSlot slot, CancellationToken cancellationToken);
     Task<EnergyBookingSlot?> UpdateAsync(EnergyBookingSlot expected, EnergyBookingSlot replacement,
         CancellationToken cancellationToken);

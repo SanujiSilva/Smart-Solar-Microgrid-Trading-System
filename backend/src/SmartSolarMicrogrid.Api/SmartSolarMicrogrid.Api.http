@@ -108,3 +108,34 @@ Content-Type: application/json
 ### Backoffice: cancel a slot (soft delete)
 DELETE {{baseUrl}}/api/slots/{{slotId}}
 Authorization: Bearer {{accessToken}}
+
+### Prosumer: create a reservation
+POST {{baseUrl}}/api/reservations
+Authorization: Bearer {{prosumerAccessToken}}
+Content-Type: application/json
+
+{
+  "slotId": "{{slotId}}",
+  "energyAmount": 5.5
+}
+
+### Prosumer: view own reservations
+GET {{baseUrl}}/api/reservations/my
+Authorization: Bearer {{prosumerAccessToken}}
+
+### Prosumer: update a reservation (at least 12 hours before the slot)
+PUT {{baseUrl}}/api/reservations/{{reservationId}}
+Authorization: Bearer {{prosumerAccessToken}}
+Content-Type: application/json
+
+{
+  "energyAmount": 4.25
+}
+
+### Prosumer: cancel a reservation (at least 12 hours before the slot)
+DELETE {{baseUrl}}/api/reservations/{{reservationId}}
+Authorization: Bearer {{prosumerAccessToken}}
+
+### Staff: view pending reservations
+GET {{baseUrl}}/api/reservations/pending
+Authorization: Bearer {{accessToken}}

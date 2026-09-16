@@ -29,6 +29,19 @@ public sealed class SlotRepository(MongoDbContext context) : ISlotRepository
         return await context.Slots.Find(filter).Limit(1).AnyAsync(cancellationToken);
     }
 
+    public async Task<bool> TryAdjustCapacityAsync(ObjectId id, decimal delta, bool requireOpen,
+        CancellationToken cancellationToken)
+    {
+        var filter = Builders<EnergyBookingSlot>.Filter.Eq(x => x.Id, id) &
+            Builders<EnergyBookingSlot>.Filter.Ne(x => x.Status, SlotStatus.CANCELLED);
+        if (delta < 0) filter &= Builders<EnergyBookingSlot>.Filter.Gte(x => x.AvailableCapacity, -delta);
+        if (requireOpen) filter &= Builders<EnergyBookingSlot>.Filter.Eq(x => x.Status, SlotStatus.OPEN);
+        var update = Builders<EnergyBookingSlot>.Update
+            .Inc(x => x.AvailableCapacity, delta).Set(x => x.UpdatedAt, DateTime.UtcNow);
+        return await context.Slots.FindOneAndUpdateAsync(filter, update,
+            new FindOneAndUpdateOptions<EnergyBookingSlot> { ReturnDocument = ReturnDocument.After }, cancellationToken) is not null;
+    }
+
     public async Task CreateAsync(EnergyBookingSlot slot, CancellationToken cancellationToken) =>
         await context.Slots.InsertOneAsync(slot, cancellationToken: cancellationToken);
 
