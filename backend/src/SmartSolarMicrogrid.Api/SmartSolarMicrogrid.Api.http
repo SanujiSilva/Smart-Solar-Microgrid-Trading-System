@@ -139,3 +139,25 @@ Authorization: Bearer {{prosumerAccessToken}}
 ### Staff: view pending reservations
 GET {{baseUrl}}/api/reservations/pending
 Authorization: Bearer {{accessToken}}
+
+### Prosumer: issue or reissue the approved reservation QR token
+GET {{baseUrl}}/api/reservations/{{reservationId}}/qr
+Authorization: Bearer {{prosumerAccessToken}}
+
+### Grid Operator: verify a scanned QR token
+POST {{baseUrl}}/api/operator/verify-qr
+Authorization: Bearer {{operatorAccessToken}}
+Content-Type: application/json
+
+{
+  "qrToken": "{{qrToken}}"
+}
+
+### Grid Operator: complete the energy transfer
+POST {{baseUrl}}/api/operator/complete-transfer
+Authorization: Bearer {{operatorAccessToken}}
+Content-Type: application/json
+
+{
+  "qrToken": "{{qrToken}}"
+}

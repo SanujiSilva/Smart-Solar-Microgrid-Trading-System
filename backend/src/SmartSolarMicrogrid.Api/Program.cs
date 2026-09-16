@@ -11,6 +11,7 @@ builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddStationManagement();
 builder.Services.AddSlotManagement();
 builder.Services.AddReservationManagement();
+builder.Services.AddQrTransactions();
 
 var app = builder.Build();
 
