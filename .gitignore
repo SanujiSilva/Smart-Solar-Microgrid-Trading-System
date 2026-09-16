@@ -1,0 +1,28 @@
+# .NET and IDE output
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+TestResults/
+
+# Web output
+**/node_modules/
+**/dist/
+**/coverage/
+
+# Android output and local configuration
+**/.gradle/
+**/build/
+**/local.properties
+*.jks
+*.keystore
+.idea/
+
+# Local secrets (commit safe examples explicitly)
+.env
+.env.*
+!.env.example
+**/appsettings.Local.json
+**/secrets.properties
+*.log
