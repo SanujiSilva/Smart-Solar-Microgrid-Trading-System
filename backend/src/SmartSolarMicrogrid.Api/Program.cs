@@ -9,6 +9,7 @@ builder.Services.AddApiFoundation(builder.Configuration);
 builder.Services.AddMongoDatabase(builder.Configuration);
 builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddStationManagement();
+builder.Services.AddSlotManagement();
 
 var app = builder.Build();
 

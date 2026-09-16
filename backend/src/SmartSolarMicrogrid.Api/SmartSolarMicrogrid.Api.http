@@ -48,3 +48,63 @@ Authorization: Bearer {{prosumerAccessToken}}
 ### Backoffice: reactivate a deactivated prosumer
 PATCH {{baseUrl}}/api/prosumers/{{prosumerNic}}/activate
 Authorization: Bearer {{accessToken}}
+
+### Backoffice: create a solar station (private token/environment variables required)
+POST {{baseUrl}}/api/stations
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "stationCode": "COLOMBO-01",
+  "name": "Colombo Solar Station",
+  "address": "Colombo, Sri Lanka",
+  "latitude": 6.9271,
+  "longitude": 79.8612,
+  "capacityKWh": 250,
+  "availableBatterySlots": 12,
+  "status": "ACTIVE",
+  "operatingSchedule": {
+    "timeZoneId": "Asia/Colombo",
+    "weeklyPeriods": [
+      { "day": "Monday", "openMinuteOfDay": 480, "closeMinuteOfDay": 1080 }
+    ]
+  }
+}
+
+### Authenticated: find nearby active stations
+GET {{baseUrl}}/api/stations/nearby?latitude=6.9271&longitude=79.8612&radiusKm=10&limit=20
+Authorization: Bearer {{accessToken}}
+
+### Authenticated: list slots for a station
+GET {{baseUrl}}/api/stations/{{stationId}}/slots
+Authorization: Bearer {{accessToken}}
+
+### Backoffice: create an energy booking slot
+POST {{baseUrl}}/api/stations/{{stationId}}/slots
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "startTime": "2026-09-20T08:00:00Z",
+  "endTime": "2026-09-20T09:00:00Z",
+  "capacity": 25,
+  "availableCapacity": 25,
+  "status": "OPEN"
+}
+
+### Backoffice: update a slot
+PUT {{baseUrl}}/api/slots/{{slotId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "startTime": "2026-09-20T08:00:00Z",
+  "endTime": "2026-09-20T09:00:00Z",
+  "capacity": 25,
+  "availableCapacity": 25,
+  "status": "OPEN"
+}
+
+### Backoffice: cancel a slot (soft delete)
+DELETE {{baseUrl}}/api/slots/{{slotId}}
+Authorization: Bearer {{accessToken}}
