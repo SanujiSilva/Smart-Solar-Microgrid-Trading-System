@@ -1,63 +1,44 @@
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom'
-import { apiClient } from './lib/api'
+import { BrowserRouter, Navigate, NavLink, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './auth/AuthProvider'
+import { type UserRole } from './auth/authContext'
+import { useAuth } from './auth/useAuth'
+import { LoginPage } from './pages/LoginPage'
+import { RoleHomePage } from './pages/RoleHomePage'
+import { ProtectedRoute } from './routes/ProtectedRoute'
 import './App.css'
 
-function FoundationPage() {
-  const apiUrl = apiClient.defaults.baseURL ?? '/api'
+const roleLinks: Record<UserRole, { label: string; path: string }[]> = {
+  BACKOFFICE: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'Users', path: '/users' }, { label: 'Stations', path: '/stations' }],
+  GRID_OPERATOR: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'Stations', path: '/stations' }, { label: 'Reservations', path: '/reservations' }],
+  PROSUMER: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'My reservations', path: '/reservations' }, { label: 'Nearby stations', path: '/stations' }],
+}
 
-  return (
-    <section className="foundation-page">
-      <div className="eyebrow">Phase 11 / web foundation</div>
-      <h1>Smart Solar<br /><span>Microgrid</span></h1>
-      <p className="lead-copy">The web client is connected to the central API boundary and ready for authenticated role workflows.</p>
-      <div className="foundation-grid">
-        <article className="status-panel status-panel--primary">
-          <div className="status-mark" aria-hidden="true">01</div>
-          <div>
-            <div className="panel-label">Client stack</div>
-            <h2>React + Bootstrap</h2>
-            <p>Responsive presentation layer with routing, reusable API access, and no client-side business rules.</p>
-          </div>
-        </article>
-        <article className="status-panel">
-          <div className="panel-label">API base URL</div>
-          <code>{apiUrl}</code>
-          <p>Configured with <code>VITE_API_BASE_URL</code> when provided.</p>
-        </article>
-        <article className="status-panel">
-          <div className="panel-label">Next delivery</div>
-          <h2>Authentication shell</h2>
-          <p>Login, protected routing, and role-aware navigation arrive in Phase 12.</p>
-        </article>
-      </div>
-    </section>
-  )
+function WorkspaceFrame() {
+  const { user, logout } = useAuth()
+  if (!user) return null
+  return <div className="app-frame workspace-frame">
+    <header className="topbar">
+      <NavLink className="brand" to="/dashboard" aria-label="Smart Solar Microgrid dashboard"><span className="brand-symbol" aria-hidden="true">S</span><span>SMART SOLAR <b>MICROGRID</b></span></NavLink>
+      <div className="workspace-actions"><span className="user-chip">{user.fullName} <b>{user.role}</b></span><button className="logout-button" type="button" onClick={logout}>Sign out</button></div>
+    </header>
+    <div className="workspace-body">
+      <aside className="side-nav" aria-label="Role navigation">
+        <div className="side-caption">Workspace</div>
+        {roleLinks[user.role].map((link) => <NavLink key={link.path} className={({ isActive }) => isActive ? 'side-link is-active' : 'side-link'} to={link.path}>{link.label}</NavLink>)}
+      </aside>
+      <main className="workspace-content"><Routes><Route path="dashboard" element={<RoleHomePage />} /><Route path="*" element={<RoleHomePage />} /></Routes></main>
+    </div>
+    <footer className="footer-line"><span>Authenticated session</span><span>API authority</span><span>{user.status}</span></footer>
+  </div>
 }
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="app-frame">
-        <header className="topbar">
-          <NavLink className="brand" to="/" aria-label="Smart Solar Microgrid home">
-            <span className="brand-symbol" aria-hidden="true">S</span>
-            <span>SMART SOLAR <b>MICROGRID</b></span>
-          </NavLink>
-          <nav className="topnav" aria-label="Primary navigation">
-            <NavLink className={({ isActive }) => isActive ? 'topnav-link is-active' : 'topnav-link'} to="/">Foundation</NavLink>
-            <span className="phase-chip">API connected</span>
-          </nav>
-        </header>
-        <main>
-          <Routes>
-            <Route path="*" element={<FoundationPage />} />
-          </Routes>
-        </main>
-        <footer className="footer-line">
-          <span>REST / JSON</span><span>ASP.NET Core API</span><span>MongoDB authoritative</span>
-        </footer>
-      </div>
-    </BrowserRouter>
+    <AuthProvider><BrowserRouter><Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}><Route element={<WorkspaceFrame />}><Route path="/*" element={null} /></Route></Route>
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes></BrowserRouter></AuthProvider>
   )
 }
 
