@@ -4,6 +4,7 @@ import { type UserRole } from './auth/authContext'
 import { useAuth } from './auth/useAuth'
 import { LoginPage } from './pages/LoginPage'
 import { BackofficePage } from './pages/BackofficePage'
+import { OperatorPage } from './pages/OperatorPage'
 import { RoleHomePage } from './pages/RoleHomePage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import './App.css'
@@ -27,7 +28,7 @@ function WorkspaceFrame() {
         <div className="side-caption">Workspace</div>
         {roleLinks[user.role].map((link) => <NavLink key={link.path} className={({ isActive }) => isActive ? 'side-link is-active' : 'side-link'} to={link.path}>{link.label}</NavLink>)}
       </aside>
-      <main className="workspace-content"><Routes><Route path="*" element={user.role === 'BACKOFFICE' ? <BackofficePage /> : <RoleHomePage />} /></Routes></main>
+      <main className="workspace-content"><Routes><Route path="*" element={user.role === 'BACKOFFICE' ? <BackofficePage /> : user.role === 'GRID_OPERATOR' ? <OperatorPage /> : <RoleHomePage />} /></Routes></main>
     </div>
     <footer className="footer-line"><span>Authenticated session</span><span>API authority</span><span>{user.status}</span></footer>
   </div>

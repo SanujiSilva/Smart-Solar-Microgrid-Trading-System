@@ -1,6 +1,6 @@
 # Implementation phases
 
-Phases 1-13 are complete. Each subsequent phase requires a separate request.
+Phases 1-14 are complete. Each subsequent phase requires a separate request.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
@@ -17,7 +17,7 @@ Phases 1-13 are complete. Each subsequent phase requires a separate request.
 | 11 | React web project | Complete |
 | 12 | Web authentication and role navigation | Complete |
 | 13 | Backoffice interfaces | Complete |
-| 14 | Grid Operator web interfaces | Pending |
+| 14 | Grid Operator web interfaces | Complete |
 | 15 | Native Android project | Pending |
 | 16 | SQLite implementation | Pending |
 | 17 | Android API integration and authentication | Pending |

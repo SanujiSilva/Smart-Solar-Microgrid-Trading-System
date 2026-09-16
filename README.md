@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1-13 complete.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client now includes API-backed login, protected routes, role-aware navigation, and Backoffice management views. Native Android work begins in Phase 15.
+**Phases 1-14 complete.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client now includes API-backed login, protected routes, role-aware navigation, Backoffice management views, and Grid Operator operational views. Native Android work begins in Phase 15.
 
 ## Architecture
 
@@ -50,7 +50,7 @@ Open `http://localhost:5080/swagger` for interactive documentation, `/api/health
 
 Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`, overridden by user secrets when configured. Private MongoDB URIs and `Jwt:SigningKey` belong in user secrets/environment configuration. Both environments require a valid signing key; production also requires an explicit MongoDB URI. See [authentication instructions](docs/authentication.md) to create your first development Backoffice account and test login. Never commit credentials.
 
-Grid Operator feature screens continue in Phase 14. Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned client/deployment deliverables; the Phase 1-13 foundation is available now.
+Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned client/deployment deliverables; the Phase 1-14 foundation is available now. QR scanning and transfer completion UI remain Phase 21 scope.
 
 ## Verification
 
