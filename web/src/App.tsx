@@ -3,12 +3,13 @@ import { AuthProvider } from './auth/AuthProvider'
 import { type UserRole } from './auth/authContext'
 import { useAuth } from './auth/useAuth'
 import { LoginPage } from './pages/LoginPage'
+import { BackofficePage } from './pages/BackofficePage'
 import { RoleHomePage } from './pages/RoleHomePage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import './App.css'
 
 const roleLinks: Record<UserRole, { label: string; path: string }[]> = {
-  BACKOFFICE: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'Users', path: '/users' }, { label: 'Stations', path: '/stations' }],
+  BACKOFFICE: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'Users', path: '/users' }, { label: 'Prosumers', path: '/prosumers' }, { label: 'Stations', path: '/stations' }, { label: 'Reservations', path: '/reservations' }],
   GRID_OPERATOR: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'Stations', path: '/stations' }, { label: 'Reservations', path: '/reservations' }],
   PROSUMER: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'My reservations', path: '/reservations' }, { label: 'Nearby stations', path: '/stations' }],
 }
@@ -26,7 +27,7 @@ function WorkspaceFrame() {
         <div className="side-caption">Workspace</div>
         {roleLinks[user.role].map((link) => <NavLink key={link.path} className={({ isActive }) => isActive ? 'side-link is-active' : 'side-link'} to={link.path}>{link.label}</NavLink>)}
       </aside>
-      <main className="workspace-content"><Routes><Route path="dashboard" element={<RoleHomePage />} /><Route path="*" element={<RoleHomePage />} /></Routes></main>
+      <main className="workspace-content"><Routes><Route path="*" element={user.role === 'BACKOFFICE' ? <BackofficePage /> : <RoleHomePage />} /></Routes></main>
     </div>
     <footer className="footer-line"><span>Authenticated session</span><span>API authority</span><span>{user.status}</span></footer>
   </div>
