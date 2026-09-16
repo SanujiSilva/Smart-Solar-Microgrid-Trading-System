@@ -7,11 +7,15 @@
         android:label="Smart Solar Microgrid"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartSolarMicrogrid">
+        <activity android:name=".RegisterActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".NearbyStationsActivity" android:exported="false" />
+        <activity android:name=".LoginActivity" android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

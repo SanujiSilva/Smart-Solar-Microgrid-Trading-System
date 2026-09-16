@@ -10,9 +10,12 @@ TestResults/
 **/node_modules/
 **/dist/
 **/coverage/
+**/playwright-report/
+**/test-results/
 
 # Android output and local configuration
 **/.gradle/
+**/.kotlin/
 **/build/
 **/local.properties
 *.jks

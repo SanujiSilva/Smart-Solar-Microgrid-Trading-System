@@ -48,12 +48,13 @@ public sealed class DashboardService(IReservationRepository reservations, IStati
         var approvedFuture = await CountAsync(prosumerNic, ReservationStatus.APPROVED, now, null, cancellationToken);
         var todayReservations = await CountAsync(prosumerNic, null, today, tomorrow, cancellationToken);
         var completed = await reservations.CountCompletedAsync(prosumerNic, today, tomorrow, cancellationToken);
-        var recent = await reservations.SearchAsync(prosumerNic, null, null, null, null, null, 1, 5, cancellationToken);
+        var recent = await reservations.RecentAsync(prosumerNic, cancellationToken);
+        var active = pending + await CountAsync(prosumerNic, ReservationStatus.APPROVED, null, null, cancellationToken);
         var activeStations = await stations.SearchAsync(StationStatus.ACTIVE, null, 1, 1, cancellationToken);
         var slotSummary = await slots.GetOperationalSummaryAsync(cancellationToken);
         return new(actor.Role.ToString(), pending, approvedFuture, todayReservations, completed,
             activeStations.TotalCount, slotSummary.OpenSlotCount, slotSummary.AvailableCapacity,
-            recent.Items.Select(ReservationResponse.From).ToList());
+            recent.Select(ReservationResponse.From).ToList(), active);
     }
 
     private async Task<long> CountAsync(string? prosumerNic, ReservationStatus? status,

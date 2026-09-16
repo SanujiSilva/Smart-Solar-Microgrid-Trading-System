@@ -7,14 +7,14 @@ using SmartSolarMicrogrid.Api.Models;
 
 namespace SmartSolarMicrogrid.Api.Repositories;
 
-public sealed class StationRepository(MongoDbContext context) : IStationRepository
+public sealed class StationRepository(MongoDbContext context, MongoOperation operation) : IStationRepository
 {
     public async Task<SolarStationInfo?> FindAsync(ObjectId id, CancellationToken cancellationToken) =>
-        await context.Stations.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
+        await context.Stations.Query(operation, x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
     public async Task CreateAsync(SolarStationInfo station, CancellationToken cancellationToken)
     {
-        try { await context.Stations.InsertOneAsync(station, cancellationToken: cancellationToken); }
+        try { await context.Stations.Insert(operation, station, cancellationToken: cancellationToken); }
         catch (MongoWriteException exception) when (exception.WriteError.Category == ServerErrorCategory.DuplicateKey)
         { throw new ApiException(409, "A station with this station code already exists."); }
     }
@@ -30,8 +30,8 @@ public sealed class StationRepository(MongoDbContext context) : IStationReposito
             var text = new BsonRegularExpression(Regex.Escape(search.Trim()), "i");
             filter &= f.Or(f.Regex(x => x.StationCode, text), f.Regex(x => x.Name, text), f.Regex(x => x.Address, text));
         }
-        var count = await context.Stations.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-        var items = await context.Stations.Find(filter).SortBy(x => x.StationCode).ThenBy(x => x.Id)
+        var count = await context.Stations.Count(operation, filter, cancellationToken: cancellationToken);
+        var items = await context.Stations.Query(operation, filter).SortBy(x => x.StationCode).ThenBy(x => x.Id)
             .Skip((page - 1) * pageSize).Limit(pageSize).ToListAsync(cancellationToken);
         return (items, count);
     }
@@ -42,11 +42,11 @@ public sealed class StationRepository(MongoDbContext context) : IStationReposito
         var filter = f.Eq(x => x.Status, StationStatus.ACTIVE) & f.NearSphere(x => x.Location,
             new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new(longitude, latitude)), maxDistance: radiusKm * 1000);
         // $nearSphere returns nearest first using the existing 2dsphere index.
-        return await context.Stations.Find(filter).Limit(limit).ToListAsync(cancellationToken);
+        return await context.Stations.Query(operation, filter).Limit(limit).ToListAsync(cancellationToken);
     }
 
     public async Task<bool> HasUnresolvedReservationsAsync(ObjectId stationId, CancellationToken cancellationToken) =>
-        await context.Reservations.Find(x => x.StationId == stationId &&
+        await context.Reservations.Query(operation, x => x.StationId == stationId &&
             (x.Status == ReservationStatus.PENDING || x.Status == ReservationStatus.APPROVED)).AnyAsync(cancellationToken);
 
     public async Task<SolarStationInfo?> UpdateAsync(SolarStationInfo expected, SolarStationInfo replacement, CancellationToken cancellationToken)
@@ -60,7 +60,7 @@ public sealed class StationRepository(MongoDbContext context) : IStationReposito
             .Set(x => x.AvailableBatterySlots, replacement.AvailableBatterySlots).Set(x => x.Status, replacement.Status)
             .Set(x => x.OperatingSchedule, replacement.OperatingSchedule).Set(x => x.UpdatedAt, replacement.UpdatedAt)
             .Inc(x => x.Revision, 1);
-        return await context.Stations.FindOneAndUpdateAsync(f.Eq(x => x.Id, expected.Id) & revision, update,
+        return await context.Stations.Change(operation, f.Eq(x => x.Id, expected.Id) & revision, update,
             new FindOneAndUpdateOptions<SolarStationInfo> { ReturnDocument = ReturnDocument.After }, cancellationToken);
     }
 }

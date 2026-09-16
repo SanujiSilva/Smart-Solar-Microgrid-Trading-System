@@ -8,4 +8,4 @@ public sealed record ReservationSearchResponse(IReadOnlyList<ReservationResponse
 public sealed record ReservationDashboardResponse(string Role, long PendingReservations,
     long ApprovedFutureReservations, long TodayReservations, long CompletedTransfers,
     long ActiveStations, long OpenSlots, decimal AvailableSlotCapacity,
-    IReadOnlyList<ReservationResponse> RecentReservations);
+    IReadOnlyList<ReservationResponse> RecentReservations, long ActiveReservations);

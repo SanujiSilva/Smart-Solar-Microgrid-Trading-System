@@ -12,7 +12,7 @@ import './App.css'
 const roleLinks: Record<UserRole, { label: string; path: string }[]> = {
   BACKOFFICE: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'Users', path: '/users' }, { label: 'Prosumers', path: '/prosumers' }, { label: 'Stations', path: '/stations' }, { label: 'Reservations', path: '/reservations' }],
   GRID_OPERATOR: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'Stations', path: '/stations' }, { label: 'Reservations', path: '/reservations' }],
-  PROSUMER: [{ label: 'Dashboard', path: '/dashboard' }, { label: 'My reservations', path: '/reservations' }, { label: 'Nearby stations', path: '/stations' }],
+  PROSUMER: [{ label: 'Account', path: '/dashboard' }],
 }
 
 function WorkspaceFrame() {

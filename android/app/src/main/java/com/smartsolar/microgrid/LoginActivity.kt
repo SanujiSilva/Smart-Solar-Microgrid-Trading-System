@@ -9,6 +9,8 @@ import com.google.gson.JsonParseException
 import com.smartsolar.microgrid.data.auth.AuthRepository
 import com.smartsolar.microgrid.databinding.ActivityLoginBinding
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -20,8 +22,13 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.root.applyAccountInsets()
         authRepository = AuthRepository(this)
+        lifecycleScope.coroutineContext[Job]?.invokeOnCompletion { authRepository.close() }
         binding.loginButton.setOnClickListener { submit() }
+        binding.registerButton.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
+        }
         restoreExistingSession()
     }
 
@@ -29,7 +36,15 @@ class LoginActivity : AppCompatActivity() {
         if (!authRepository.hasSession()) return
         setLoading(true)
         lifecycleScope.launch {
-            if (authRepository.restoreSession() != null) openMain() else setLoading(false)
+            try {
+                if (authRepository.restoreSession() != null) openMain()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                showError(accountError(error))
+            } finally {
+                setLoading(false)
+            }
         }
     }
 
@@ -45,7 +60,9 @@ class LoginActivity : AppCompatActivity() {
             try {
                 authRepository.login(identifier, password)
                 openMain()
-            } catch (error: Throwable) {
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
                 setLoading(false)
                 showError(errorMessage(error))
             }
@@ -54,6 +71,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setLoading(loading: Boolean) {
         binding.loginButton.isEnabled = !loading
+        binding.registerButton.isEnabled = !loading
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
         if (loading) binding.errorText.visibility = View.GONE
     }

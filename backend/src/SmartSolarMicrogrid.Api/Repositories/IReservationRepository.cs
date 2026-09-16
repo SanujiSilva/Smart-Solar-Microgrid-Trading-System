@@ -5,6 +5,7 @@ namespace SmartSolarMicrogrid.Api.Repositories;
 
 public interface IReservationRepository
 {
+    Task<List<EnergyReservation>> RecentAsync(string? prosumerNic, CancellationToken cancellationToken);
     Task<EnergyReservation?> FindAsync(ObjectId id, CancellationToken cancellationToken);
     Task<EnergyReservation?> FindByQrTokenHashAsync(string tokenHash, CancellationToken cancellationToken);
     Task<List<EnergyReservation>> ListByProsumerAsync(string nic, CancellationToken cancellationToken);

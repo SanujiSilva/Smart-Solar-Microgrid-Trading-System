@@ -9,6 +9,15 @@ public sealed class CreateSlotRequest : SlotDetailsRequest;
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed class UpdateSlotRequest : SlotDetailsRequest;
 
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed class SlotAvailabilityRequest
+{
+    [Required, Range(typeof(decimal), "0", "1000000000")]
+    public decimal? AvailableCapacity { get; init; }
+    [Required, RegularExpression("OPEN|CLOSED")]
+    public string Status { get; init; } = "OPEN";
+}
+
 public class SlotDetailsRequest
 {
     [Required]

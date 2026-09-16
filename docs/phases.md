@@ -1,6 +1,6 @@
 # Implementation phases
 
-Phases 1-17 are complete. Each subsequent phase requires a separate request.
+Phases 1-18 are complete. See the Phase 18 record for verification and device testing requirements. Each subsequent phase requires a separate request.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
@@ -21,7 +21,7 @@ Phases 1-17 are complete. Each subsequent phase requires a separate request.
 | 15 | Native Android project | Complete |
 | 16 | SQLite implementation | Complete |
 | 17 | Android API integration and authentication | Complete |
-| 18 | Prosumer Android functions | Pending |
+| 18 | Prosumer Android functions | Complete; see [verification](phase-18.md) |
 | 19 | Booking Android functions | Pending |
 | 20 | Google Maps | Pending |
 | 21 | QR generation/scanning and operator workflow | Pending |

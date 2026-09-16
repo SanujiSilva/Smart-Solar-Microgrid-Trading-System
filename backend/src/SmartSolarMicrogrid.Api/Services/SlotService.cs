@@ -27,6 +27,7 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
         var station = await RequireStation(id, cancellationToken);
         RequireUsableStation(station);
         var details = ValidateDetails(request);
+        ValidateStationSlot(station, details);
         if (await slots.HasOverlapAsync(id, details.StartTime, details.EndTime, null, cancellationToken))
             throw new ApiException(409, "The station already has an overlapping active slot.");
 
@@ -56,6 +57,13 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
         var station = await RequireStation(slot.StationId, cancellationToken);
         RequireUsableStation(station);
         var details = ValidateDetails(request);
+        ValidateStationSlot(station, details);
+        var committed = await slots.CommittedCapacityAsync(slot.Id, cancellationToken);
+        if (details.Capacity - details.AvailableCapacity < committed)
+            throw new ApiException(409, "Available capacity cannot include energy already reserved or transferred.");
+        if ((slot.StartTime != details.StartTime || slot.EndTime != details.EndTime) &&
+            await slots.HasActiveReservationsAsync(slot.Id, cancellationToken))
+            throw new ApiException(409, "A slot with active reservations cannot be rescheduled.");
         if (await slots.HasOverlapAsync(slot.StationId, details.StartTime, details.EndTime, slot.Id, cancellationToken))
             throw new ApiException(409, "The station already has an overlapping active slot.");
 
@@ -75,6 +83,8 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
         currentUser.Require(UserRole.BACKOFFICE);
         var slot = await Find(id, cancellationToken);
         if (slot.Status == SlotStatus.CANCELLED) return SlotResponse.From(slot);
+        if (await slots.HasActiveReservationsAsync(slot.Id, cancellationToken))
+            throw new ApiException(409, "A slot with active reservations cannot be cancelled.");
         slot.Status = SlotStatus.CANCELLED;
         slot.UpdatedAt = clock.GetUtcNow().UtcDateTime;
         var saved = await slots.UpdateAsync(slot, slot, cancellationToken)
@@ -87,6 +97,31 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
         var objectId = ParseId(id, "Slot ID");
         return await slots.FindAsync(objectId, cancellationToken)
             ?? throw new ApiException(404, "The slot was not found.");
+    }
+
+    public async Task<SlotResponse> UpdateAvailabilityAsync(string id, SlotAvailabilityRequest request,
+        CancellationToken cancellationToken)
+    {
+        var actor = currentUser.Get();
+        if (actor.Role is not (UserRole.BACKOFFICE or UserRole.GRID_OPERATOR))
+            throw new ApiException(403, "Staff access is required.");
+        var slot = await Find(id, cancellationToken);
+        RequireUsableStation(await RequireStation(slot.StationId, cancellationToken));
+        if (slot.Status == SlotStatus.CANCELLED) throw new ApiException(409, "A cancelled slot cannot be changed.");
+        var committed = await slots.CommittedCapacityAsync(slot.Id, cancellationToken);
+        if (request.AvailableCapacity is null || request.AvailableCapacity < 0 || request.AvailableCapacity > slot.Capacity - committed)
+            throw new ApiException(409, "Availability cannot exceed capacity minus reserved/transferred energy.");
+        slot.AvailableCapacity = request.AvailableCapacity.Value;
+        slot.Status = Enum.Parse<SlotStatus>(request.Status);
+        slot.UpdatedAt = clock.GetUtcNow().UtcDateTime;
+        return SlotResponse.From(await slots.UpdateAsync(slot, slot, cancellationToken)
+            ?? throw new ApiException(409, "Slot changed. Reload and retry."));
+    }
+
+    private static void ValidateStationSlot(SolarStationInfo station, SlotDetails details)
+    {
+        if (details.Capacity > station.CapacityKWh) throw new ApiException(409, "Slot capacity exceeds station capacity.");
+        StationBookingRules.RequireSchedule(station, details.StartTime, details.EndTime);
     }
 
     private async Task<SolarStationInfo> RequireStation(ObjectId id, CancellationToken cancellationToken) =>

@@ -11,7 +11,9 @@ public static class ApiServiceRegistration
     public static IServiceCollection AddApiFoundation(
         this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers();
+        services.AddScoped<Repositories.MongoOperation>();
+        services.AddScoped<TradingTransactionFilter>();
+        services.AddControllers(options => options.Filters.AddService<TradingTransactionFilter>());
         services.AddOpenApi(options => options.AddDocumentTransformer<BearerOpenApiTransformer>());
         services.AddHealthChecks();
         services.AddSingleton(TimeProvider.System);

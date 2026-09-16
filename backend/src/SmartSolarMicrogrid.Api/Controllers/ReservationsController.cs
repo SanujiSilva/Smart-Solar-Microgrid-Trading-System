@@ -39,7 +39,15 @@ public sealed class ReservationsController(ReservationService reservations) : Co
     public async Task<ActionResult<ReservationResponse>> Update(string id, UpdateReservationRequest request,
         CancellationToken cancellationToken) => Ok(await reservations.UpdateAsync(id, request, cancellationToken));
 
-    [HttpDelete("{id}"), Authorize(Policy = AuthPolicies.ProsumerOnly)]
+    [HttpPatch("{id}/approve"), Authorize(Policy = AuthPolicies.BackofficeOnly)]
+    public async Task<ActionResult<ReservationResponse>> Approve(string id, CancellationToken cancellationToken) =>
+        Ok(await reservations.ReviewAsync(id, true, cancellationToken));
+
+    [HttpPatch("{id}/reject"), Authorize(Policy = AuthPolicies.BackofficeOnly)]
+    public async Task<ActionResult<ReservationResponse>> Reject(string id, CancellationToken cancellationToken) =>
+        Ok(await reservations.ReviewAsync(id, false, cancellationToken));
+
+    [HttpDelete("{id}")]
     public async Task<ActionResult<ReservationResponse>> Delete(string id, CancellationToken cancellationToken) =>
         Ok(await reservations.CancelAsync(id, cancellationToken));
 }

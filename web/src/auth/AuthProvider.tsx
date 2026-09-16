@@ -14,6 +14,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(() => Boolean(sessionStorage.getItem(ACCESS_TOKEN_KEY)))
 
   useEffect(() => {
+    const expired = () => setUser(null)
+    window.addEventListener('smart-solar-session-expired', expired)
+    return () => window.removeEventListener('smart-solar-session-expired', expired)
+  }, [])
+
+  useEffect(() => {
     const token = sessionStorage.getItem(ACCESS_TOKEN_KEY)
     if (!token) return
 

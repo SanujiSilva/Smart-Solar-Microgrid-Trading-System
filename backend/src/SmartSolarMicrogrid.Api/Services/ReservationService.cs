@@ -25,8 +25,8 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
             ?? throw new ApiException(404, "The slot was not found.");
         var station = await stations.FindAsync(slot.StationId, cancellationToken)
             ?? throw new ApiException(404, "The station was not found.");
-        if (station.Status == StationStatus.DEACTIVATED)
-            throw new ApiException(409, "Reservations cannot be created for a deactivated station.");
+        StationBookingRules.RequireAvailable(station);
+        StationBookingRules.RequireSchedule(station, slot.StartTime, slot.EndTime);
         ValidateBookingWindow(slot.StartTime, clock.GetUtcNow().UtcDateTime);
 
         var amount = request.EnergyAmount.Value;
@@ -42,15 +42,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
             ReservationDateTime = slot.StartTime, Status = ReservationStatus.PENDING,
             CreatedAt = now, UpdatedAt = now
         };
-        try
-        {
-            await reservations.CreateAsync(reservation, cancellationToken);
-        }
-        catch
-        {
-            await slots.TryAdjustCapacityAsync(slot.Id, amount, false, CancellationToken.None);
-            throw;
-        }
+        await reservations.CreateAsync(reservation, cancellationToken);
         return ReservationResponse.From(reservation);
     }
 
@@ -98,24 +90,19 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
 
         reservation.EnergyAmount = amount;
         reservation.UpdatedAt = clock.GetUtcNow().UtcDateTime;
-        try
-        {
-            var saved = await reservations.UpdateAsync(reservation, cancellationToken)
+        var saved = await reservations.UpdateAsync(reservation, cancellationToken)
                 ?? throw new ApiException(409, "The reservation changed during this request. Reload and try again.");
             return ReservationResponse.From(saved);
-        }
-        catch
-        {
-            if (delta != 0) await slots.TryAdjustCapacityAsync(reservation.SlotId, -delta, false, CancellationToken.None);
-            throw;
-        }
+
     }
 
     public async Task<ReservationResponse> CancelAsync(string id, CancellationToken cancellationToken)
     {
-        var actor = currentUser.Require(UserRole.PROSUMER);
+        var actor = currentUser.Get();
         var reservation = await FindAsync(id, cancellationToken);
-        EnsureOwner(actor, reservation);
+        if (actor.Role == UserRole.PROSUMER) EnsureOwner(actor, reservation);
+        else if (actor.Role is not (UserRole.BACKOFFICE or UserRole.GRID_OPERATOR))
+            throw new ApiException(403, "Staff or reservation owner access is required.");
         EnsureEditable(reservation);
         EnsureNotice(reservation, clock.GetUtcNow().UtcDateTime, "cancelled");
         if (!await slots.TryAdjustCapacityAsync(reservation.SlotId, reservation.EnergyAmount, false, cancellationToken))
@@ -123,17 +110,10 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
 
         reservation.Status = ReservationStatus.CANCELLED;
         reservation.UpdatedAt = clock.GetUtcNow().UtcDateTime;
-        try
-        {
-            var saved = await reservations.UpdateAsync(reservation, cancellationToken)
+        var saved = await reservations.UpdateAsync(reservation, cancellationToken)
                 ?? throw new ApiException(409, "The reservation changed during this request. Reload and try again.");
             return ReservationResponse.From(saved);
-        }
-        catch
-        {
-            await slots.TryAdjustCapacityAsync(reservation.SlotId, -reservation.EnergyAmount, false, CancellationToken.None);
-            throw;
-        }
+
     }
 
     private async Task<ReservationListResponse> ListByStatusAsync(ReservationStatus status,
@@ -144,6 +124,35 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
             throw new ApiException(403, "Staff access is required.");
         var items = await reservations.ListByStatusAsync(status, cancellationToken);
         return new(items.Select(ReservationResponse.From).ToList());
+    }
+
+    public async Task<ReservationResponse> ReviewAsync(string id, bool approve, CancellationToken cancellationToken)
+    {
+        currentUser.Require(UserRole.BACKOFFICE);
+        var reservation = await FindAsync(id, cancellationToken);
+        if (reservation.Status != ReservationStatus.PENDING)
+            throw new ApiException(409, "Only pending reservations can be reviewed.");
+        if (approve)
+        {
+            var station = await stations.FindAsync(reservation.StationId, cancellationToken)
+                ?? throw new ApiException(404, "Station was not found.");
+            var slot = await slots.FindAsync(reservation.SlotId, cancellationToken)
+                ?? throw new ApiException(404, "Slot was not found.");
+            StationBookingRules.RequireAvailable(station);
+            StationBookingRules.RequireSchedule(station, slot.StartTime, slot.EndTime);
+            ValidateBookingWindow(reservation.ReservationDateTime, clock.GetUtcNow().UtcDateTime);
+            if (slot.Status != SlotStatus.OPEN) throw new ApiException(409, "The slot is not open.");
+            reservation.Status = ReservationStatus.APPROVED;
+        }
+        else
+        {
+            if (!await slots.TryAdjustCapacityAsync(reservation.SlotId, reservation.EnergyAmount, false, cancellationToken))
+                throw new ApiException(409, "The slot cannot receive the released capacity.");
+            reservation.Status = ReservationStatus.REJECTED;
+        }
+        reservation.UpdatedAt = clock.GetUtcNow().UtcDateTime;
+        return ReservationResponse.From(await reservations.UpdateAsync(reservation, cancellationToken)
+            ?? throw new ApiException(409, "The reservation changed. Reload and retry."));
     }
 
     private async Task<EnergyReservation> FindAsync(string id, CancellationToken cancellationToken) =>

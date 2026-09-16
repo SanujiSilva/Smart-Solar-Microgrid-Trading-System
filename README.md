@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1-17 complete.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client includes API-backed role workflows, and the native Kotlin/XML Android client now has SQLite reference storage plus Retrofit authentication with secure token handling. Android feature integration continues in Phases 18-21.
+**Phases 1-18 implemented.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client includes API-backed role workflows. The native Kotlin/XML Android client includes SQLite reference storage, secure authentication, prosumer registration, live dashboard, profile editing, deactivation requests and sign-out. See [Phase 18 verification and manual tests](docs/phase-18.md). Booking, Maps and Android QR/operator integration continue in Phases 19-21.
 
 ## Architecture
 
@@ -50,7 +50,7 @@ Open `http://localhost:5080/swagger` for interactive documentation, `/api/health
 
 Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`, overridden by user secrets when configured. Private MongoDB URIs and `Jwt:SigningKey` belong in user secrets/environment configuration. Both environments require a valid signing key; production also requires an explicit MongoDB URI. See [authentication instructions](docs/authentication.md) to create your first development Backoffice account and test login. Never commit credentials.
 
-Maps key configuration arrives in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned client/deployment deliverables; the Phase 1-17 foundation is available now.
+Maps key configuration arrives in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned client/deployment deliverables; Phases 1-18 are implemented now.
 
 ## Verification
 
@@ -61,4 +61,4 @@ Maps key configuration arrives in Phase 20. IIS publishing, HTTPS, and productio
 
 5. Run the build/test commands above, then follow the [Phase 5 walkthrough](docs/user-management.md) and the phase completion records through [Phase 10](docs/phase-10.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real MongoDB/authentication/user-management integration tests; otherwise they are explicitly skipped.
 
-The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Client applications, SQLite, Maps, and IIS deployment remain for later phases.
+The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Android booking, Maps, QR/operator integration and IIS deployment remain for later phases.

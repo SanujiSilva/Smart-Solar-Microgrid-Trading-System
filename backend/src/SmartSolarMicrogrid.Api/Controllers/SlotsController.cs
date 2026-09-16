@@ -10,6 +10,9 @@ namespace SmartSolarMicrogrid.Api.Controllers;
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class SlotsController(SlotService slots) : ControllerBase
 {
+    [HttpPatch("api/slots/{id}/availability"), Authorize(Policy = AuthPolicies.Staff)]
+    public async Task<ActionResult<SlotResponse>> Availability(string id, SlotAvailabilityRequest request,
+        CancellationToken cancellationToken) => Ok(await slots.UpdateAvailabilityAsync(id, request, cancellationToken));
     [HttpGet("api/stations/{stationId}/slots")]
     public async Task<ActionResult<SlotListResponse>> List(string stationId, [FromQuery] SlotListQuery query,
         CancellationToken cancellationToken) => Ok(await slots.ListAsync(stationId, query, cancellationToken));

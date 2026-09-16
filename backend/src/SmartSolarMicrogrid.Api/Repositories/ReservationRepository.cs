@@ -5,23 +5,27 @@ using SmartSolarMicrogrid.Api.Models;
 
 namespace SmartSolarMicrogrid.Api.Repositories;
 
-public sealed class ReservationRepository(MongoDbContext context) : IReservationRepository
+public sealed class ReservationRepository(MongoDbContext context, MongoOperation operation) : IReservationRepository
 {
+    public async Task<List<EnergyReservation>> RecentAsync(string? prosumerNic, CancellationToken cancellationToken) =>
+        await context.Reservations.Query(operation, prosumerNic is null ? Builders<EnergyReservation>.Filter.Empty :
+            Builders<EnergyReservation>.Filter.Eq(x => x.ProsumerNIC, prosumerNic))
+            .SortByDescending(x => x.UpdatedAt).ThenByDescending(x => x.Id).Limit(5).ToListAsync(cancellationToken);
     public async Task<EnergyReservation?> FindAsync(ObjectId id, CancellationToken cancellationToken) =>
-        await context.Reservations.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
+        await context.Reservations.Query(operation, x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<EnergyReservation?> FindByQrTokenHashAsync(string tokenHash,
         CancellationToken cancellationToken) =>
-        await context.Reservations.Find(x => x.QrTokenHash == tokenHash).FirstOrDefaultAsync(cancellationToken);
+        await context.Reservations.Query(operation, x => x.QrTokenHash == tokenHash).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<List<EnergyReservation>> ListByProsumerAsync(string nic, CancellationToken cancellationToken) =>
-        await context.Reservations.Find(x => x.ProsumerNIC == nic)
+        await context.Reservations.Query(operation, x => x.ProsumerNIC == nic)
             .SortByDescending(x => x.ReservationDateTime).ThenByDescending(x => x.Id)
             .ToListAsync(cancellationToken);
 
     public async Task<List<EnergyReservation>> ListByStatusAsync(ReservationStatus status,
         CancellationToken cancellationToken) =>
-        await context.Reservations.Find(x => x.Status == status)
+        await context.Reservations.Query(operation, x => x.Status == status)
             .SortBy(x => x.ReservationDateTime).ThenBy(x => x.Id)
             .ToListAsync(cancellationToken);
 
@@ -32,7 +36,7 @@ public sealed class ReservationRepository(MongoDbContext context) : IReservation
             Builders<EnergyReservation>.Filter.Gte(x => x.CompletedAt, from) &
             Builders<EnergyReservation>.Filter.Lt(x => x.CompletedAt, to);
         if (!string.IsNullOrWhiteSpace(prosumerNic)) filter &= Builders<EnergyReservation>.Filter.Eq(x => x.ProsumerNIC, prosumerNic);
-        return await context.Reservations.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+        return await context.Reservations.Count(operation, filter, cancellationToken: cancellationToken);
     }
 
     public async Task<(List<EnergyReservation> Items, long TotalCount)> SearchAsync(string? prosumerNic,
@@ -49,15 +53,15 @@ public sealed class ReservationRepository(MongoDbContext context) : IReservation
         if (status.HasValue) filter &= f.Eq(x => x.Status, status.Value);
         if (from.HasValue) filter &= f.Gte(x => x.ReservationDateTime, from.Value);
         if (to.HasValue) filter &= f.Lt(x => x.ReservationDateTime, to.Value);
-        var count = await context.Reservations.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-        var items = await context.Reservations.Find(filter).SortBy(x => x.ReservationDateTime).ThenBy(x => x.Id)
+        var count = await context.Reservations.Count(operation, filter, cancellationToken: cancellationToken);
+        var items = await context.Reservations.Query(operation, filter).SortBy(x => x.ReservationDateTime).ThenBy(x => x.Id)
             .Skip((page - 1) * pageSize).Limit(pageSize).ToListAsync(cancellationToken);
         return (items, count);
     }
 
     public async Task CreateAsync(EnergyReservation reservation, CancellationToken cancellationToken)
     {
-        try { await context.Reservations.InsertOneAsync(reservation, cancellationToken: cancellationToken); }
+        try { await context.Reservations.Insert(operation, reservation, cancellationToken: cancellationToken); }
         catch (MongoWriteException exception) when (exception.WriteError.Category == ServerErrorCategory.DuplicateKey)
         { throw new InvalidOperationException("A generated reservation code was duplicated.", exception); }
     }
@@ -67,7 +71,7 @@ public sealed class ReservationRepository(MongoDbContext context) : IReservation
     {
         var update = Builders<EnergyReservation>.Update
             .Set(x => x.QrTokenHash, tokenHash).Set(x => x.UpdatedAt, updatedAt);
-        return await context.Reservations.FindOneAndUpdateAsync(
+        return await context.Reservations.Change(operation, 
             x => x.Id == expected.Id && x.Status == ReservationStatus.APPROVED,
             update, new FindOneAndUpdateOptions<EnergyReservation> { ReturnDocument = ReturnDocument.After }, cancellationToken);
     }
@@ -80,7 +84,7 @@ public sealed class ReservationRepository(MongoDbContext context) : IReservation
             .Set(x => x.CompletedAt, completedAt)
             .Set(x => x.CompletedByOperatorId, operatorId)
             .Set(x => x.UpdatedAt, completedAt);
-        return await context.Reservations.FindOneAndUpdateAsync(
+        return await context.Reservations.Change(operation, 
             x => x.Id == expected.Id && x.Status == ReservationStatus.APPROVED && x.QrTokenHash == expected.QrTokenHash,
             update, new FindOneAndUpdateOptions<EnergyReservation> { ReturnDocument = ReturnDocument.After }, cancellationToken);
     }
@@ -92,7 +96,7 @@ public sealed class ReservationRepository(MongoDbContext context) : IReservation
             .Set(x => x.EnergyAmount, expected.EnergyAmount)
             .Set(x => x.Status, expected.Status)
             .Set(x => x.UpdatedAt, expected.UpdatedAt);
-        return await context.Reservations.FindOneAndUpdateAsync(
+        return await context.Reservations.Change(operation, 
             x => x.Id == expected.Id && x.Status != ReservationStatus.CANCELLED && x.Status != ReservationStatus.COMPLETED,
             update, new FindOneAndUpdateOptions<EnergyReservation> { ReturnDocument = ReturnDocument.After }, cancellationToken);
     }

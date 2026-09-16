@@ -15,7 +15,7 @@ export function RoleHomePage() {
     <section className="workspace-page">
       <div className="eyebrow">Authenticated / {user.role}</div>
       <h1>{roleLabels[user.role]}</h1>
-      <p className="lead-copy">You are signed in as <strong>{user.fullName}</strong>. Feature modules will appear here as their scheduled phases are delivered.</p>
+      <p className="lead-copy">You are signed in as <strong>{user.fullName}</strong>. Use the native Android app for prosumer registration, profile management, nearby stations and your dashboard.</p>
       <div className="workspace-strip">
         <div><span className="panel-label">Account status</span><strong>{user.status}</strong></div>
         <div><span className="panel-label">Server identity</span><strong>{user.email}</strong></div>
