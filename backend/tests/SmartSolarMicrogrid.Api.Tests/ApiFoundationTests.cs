@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using SmartSolarMicrogrid.Api.Configuration;
 using Xunit;
 
 namespace SmartSolarMicrogrid.Api.Tests;
@@ -116,6 +118,14 @@ public sealed class ApiFoundationTests
         new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment(environment);
+            builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(
+                new Dictionary<string, string?> { ["MongoDb:ConnectionString"] = "mongodb://127.0.0.1:1" }));
+            builder.ConfigureServices(services =>
+            {
+                // Foundation tests exercise HTTP infrastructure without a database dependency.
+                var initializer = services.Single(x => x.ImplementationType == typeof(MongoDatabaseInitializer));
+                services.Remove(initializer);
+            });
             if (includeTestController)
             {
                 builder.ConfigureServices(services => services.AddControllers()

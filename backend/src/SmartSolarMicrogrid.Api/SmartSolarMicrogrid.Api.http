@@ -7,6 +7,10 @@ Accept: application/json
 ### OpenAPI document (Development only)
 GET {{baseUrl}}/openapi/v1.json
 
+### MongoDB readiness
+GET {{baseUrl}}/api/health/ready
+Accept: application/json
+
 ### Consistent unknown-route response
 GET {{baseUrl}}/api/does-not-exist
 Accept: application/json

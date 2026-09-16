@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
 builder.Services.AddApiFoundation(builder.Configuration);
+builder.Services.AddMongoDatabase(builder.Configuration);
 
 var app = builder.Build();
 

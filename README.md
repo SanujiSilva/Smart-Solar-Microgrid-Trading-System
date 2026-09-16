@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1 and 2 complete.** The ASP.NET Core API foundation now runs with a health endpoint, development Swagger/OpenAPI, structured errors, validation infrastructure, and integration tests. MongoDB and authentication are not implemented yet. Phase 3 is MongoDB configuration and models.
+**Phases 1-3 complete.** The API has MongoDB configuration, four typed collection models, startup index creation, and database readiness checks alongside the API foundation. Authentication and business endpoints remain for later phases. Phase 4 is authentication, JWT, and role authorization.
 
 ## Architecture
 
@@ -37,7 +37,7 @@ The existing repository is the solution root; no additional nested root is neede
 
 ### Configuration and execution
 
-Run from the repository root:
+Start a local MongoDB server using the [database setup instructions](database/README.md), then run from the repository root:
 
 ```powershell
 dotnet restore backend/SmartSolarMicrogrid.sln
@@ -46,9 +46,9 @@ dotnet test backend/SmartSolarMicrogrid.sln --no-build --configuration Release
 dotnet run --project backend/src/SmartSolarMicrogrid.Api --launch-profile http
 ```
 
-Open `http://localhost:5080/swagger` for interactive documentation or `http://localhost:5080/api/health` for API liveness. MongoDB is not required for Phase 2. See [backend instructions](backend/README.md) for configuration, HTTPS, and expected responses.
+Open `http://localhost:5080/swagger` for interactive documentation, `/api/health` for API liveness, and `/api/health/ready` for MongoDB readiness. MongoDB must be available at startup so required indexes can be created. See [backend instructions](backend/README.md) for configuration, HTTPS, and expected responses.
 
-MongoDB connection/database configuration arrives in Phase 3; JWT issuer, audience, signing secret, and bootstrap account setup in Phase 4. Keep development secrets in .NET user secrets or environment variables and production secrets in deployment configuration. Never commit credentials.
+Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`. Supply private MongoDB URIs through user secrets or environment variables; production requires an explicit connection string. JWT issuer, audience, signing secret, and bootstrap account setup arrive in Phase 4. Never commit credentials.
 
 Web run commands and API base URL configuration arrive in Phase 11. Android API base URL and build instructions arrive in Phase 15, SQLite setup in Phase 16, and Maps key configuration in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned deliverables, not currently available features.
 
@@ -59,6 +59,6 @@ Web run commands and API base URL configuration arrive in Phase 11. Android API 
 3. Check the role boundaries and all twelve business rules in the architecture document.
 4. Run `git diff --check` to check tracked changes for whitespace errors; inspect new files with `git status --short`.
 
-5. Run the build/test commands above, then verify health and Swagger as described in [Phase 2 completion notes](docs/phase-2.md).
+5. Run the build/test commands above, then verify MongoDB readiness and indexes as described in [Phase 3 completion notes](docs/phase-3.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable the real database tests; otherwise they are explicitly skipped.
 
-The [Phase 1 completion notes](docs/phase-1.md) remain a historical record. Runtime database, authentication, reservation, and client functionality remain for later phases.
+The [Phase 1](docs/phase-1.md) and [Phase 2](docs/phase-2.md) notes remain historical records. Authentication, domain CRUD, reservation rules, and client functionality remain for later phases.

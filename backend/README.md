@@ -13,16 +13,17 @@ dotnet test backend/SmartSolarMicrogrid.sln --no-build --configuration Release
 dotnet run --project backend/src/SmartSolarMicrogrid.Api --launch-profile http
 ```
 
-Restore needs NuGet network access. The HTTP profile listens at `http://localhost:5080` in Development. Stop with Ctrl+C. No database or credentials are needed yet.
+Restore needs NuGet network access. Start MongoDB first using the [database setup](../database/README.md). The HTTP profile listens at `http://localhost:5080` in Development. Stop with Ctrl+C. A missing/unreachable database or failed index creation prevents startup.
 
 | URL | Expected behavior |
 | --- | --- |
 | `/api/health` | 200 with `status: Healthy` and current `timestampUtc`; no caching |
+| `/api/health/ready` | 200 when MongoDB responds; 503 `Unhealthy` during an outage |
 | `/openapi/v1.json` | Generated OpenAPI document in Development |
 | `/swagger` | Interactive Swagger UI in Development |
 | `/api/does-not-exist` | 404 Problem Details with a `traceId` when requesting JSON |
 
-The health endpoint checks the API process only, not MongoDB or any future dependency. It is the only application endpoint in Phase 2. Tests inject validation/exception probe controllers from the test assembly; those controllers are not part of the deployed API.
+Liveness checks the process independently of database readiness. Health responses never expose database credentials or topology. Tests inject validation/exception probe controllers from the test assembly; those controllers are not part of the deployed API.
 
 To use local HTTPS, trust the development certificate if necessary and use the HTTPS profile:
 
@@ -40,7 +41,7 @@ HTTPS listens at `https://localhost:7080`. Development allows HTTP for local tes
 - `Cors:AllowedOrigins`: exact HTTP(S) origins without trailing slashes or paths. Invalid origins fail startup. CORS is a browser policy, not authentication.
 - `AllowedHosts`: configure real hostnames when hosting outside localhost.
 - Environment variables override settings, for example `Cors__AllowedOrigins__0` and `AllowedHosts`.
-- Development user secrets are enabled by the project `UserSecretsId`. MongoDB and JWT settings will be introduced in Phases 3 and 4. Do not put secrets in tracked settings or launch profiles.
+- Development user secrets are enabled by the project `UserSecretsId`. `MongoDb:ConnectionString` defaults to loopback only in Development; production requires an explicit URI. Database name/timeouts are in `appsettings.json`. See [MongoDB configuration](../database/README.md) for private URIs and test setup. JWT settings remain Phase 4. Do not put secrets in tracked settings or launch profiles.
 
 Logs are structured JSON on the console; no Windows Event Log write permission is required. Unhandled exceptions are logged server-side, while callers receive a safe 500 response with a trace ID. `[ApiController]` provides automatic 400 validation responses; future request DTOs must declare their validation requirements. JSON follows the framework's camelCase convention.
 
@@ -48,4 +49,4 @@ Swagger UI uses the built-in OpenAPI generator; both are exposed only in Develop
 
 ## Scope
 
-Phase 2 establishes controllers, dependency injection, async health checks, DTO responses, errors, configuration, documentation, and test infrastructure. The reserved service/repository/model folders remain ready for later phases. No MongoDB models, authentication, domain CRUD, reservation rules, web client, or Android application has been implemented.
+Phases 2-3 establish the API foundation and MongoDB persistence infrastructure. One singleton MongoClient provides pooled connections, MongoDbContext exposes typed collections, and an async initializer creates indexes before serving requests. Models stay internal; future controllers must use DTOs and business services. Authentication, domain CRUD, reservation rules, web, and Android remain unimplemented.
