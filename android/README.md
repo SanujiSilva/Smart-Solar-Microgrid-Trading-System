@@ -25,4 +25,6 @@ Phase 20 adds Google Maps to the nearby-station workflow. Set `SMART_SOLAR_MAPS_
 
 Phase 21 adds approved-booking QR display for prosumers and Grid Operator QR verification/completion. The app renders server-issued opaque tokens as QR codes, scans QR codes with ZXing, and keeps manual token entry available for camera-denied or camera-less devices. See [the Phase 21 walkthrough](../docs/phase-21.md).
 
+Phase 22 integrates the Android flows through QR/operator completion and improves shared error messages, login/registration text resources, map result formatting, app icon metadata and lint-level UI polish. See [the Phase 22 walkthrough](../docs/phase-22.md).
+
 The debug manifest permits local HTTP only to `10.0.2.2`. Release requires an HTTPS API host. The API remains authoritative for all account, booking, station availability and QR transfer rules.

@@ -95,6 +95,8 @@ private data class ApiProblem(val title: String?, val detail: String?, val error
 fun accountError(error: Exception): String {
     if (error is IOException) return "Cannot reach the server. Check your connection and try again."
     if (error !is HttpException) return "The request could not be completed. Please try again."
+    if (error.code() == 401) return "Your session expired. Sign in again."
+    if (error.code() == 408) return "The request timed out. Check your connection and try again."
     if (error.code() == 429) return "Too many attempts. Wait a minute and try again."
     if (error.code() == 404) return "The requested record was not found. Refresh and try again."
     if (error.code() == 403) return "Your account cannot perform this action. Contact Backoffice."

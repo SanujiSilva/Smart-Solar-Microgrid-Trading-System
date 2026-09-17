@@ -5,14 +5,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.google.gson.JsonParseException
 import com.smartsolar.microgrid.data.auth.AuthRepository
 import com.smartsolar.microgrid.databinding.ActivityLoginBinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import retrofit2.HttpException
-import java.io.IOException
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -52,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
         val identifier = binding.identifierInput.text?.toString()?.trim().orEmpty()
         val password = binding.passwordInput.text?.toString().orEmpty()
         if (identifier.isBlank() || password.isBlank()) {
-            showError("Enter your email or NIC and password.")
+            showError(getString(R.string.login_fields_required))
             return
         }
         setLoading(true)
@@ -83,13 +81,12 @@ class LoginActivity : AppCompatActivity() {
 
     private fun errorMessage(error: Throwable): String = when (error) {
         is HttpException -> when (error.code()) {
-            401 -> "Invalid identifier or password."
-            403 -> "This account is not active. Contact Backoffice."
-            else -> "The server could not sign you in. Try again."
+            401 -> getString(R.string.invalid_login)
+            403 -> getString(R.string.inactive_login)
+            else -> accountError(error)
         }
-        is IOException -> "The API is unavailable. Check the connection and try again."
-        is JsonParseException -> "The API returned an unexpected response."
-        else -> "Sign-in failed. Try again."
+        is Exception -> accountError(error)
+        else -> getString(R.string.invalid_login)
     }
 
     private fun openMain() {

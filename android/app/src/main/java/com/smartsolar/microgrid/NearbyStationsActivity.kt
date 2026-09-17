@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.smartsolar.microgrid.databinding.ActivityNearbyStationsBinding
+import java.util.Locale
 
 class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityNearbyStationsBinding
@@ -83,7 +84,8 @@ class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
             renderMap(input.latitude, input.longitude, response.items)
             response.items.forEach { station ->
                 binding.results.addView(MaterialButton(this).apply {
-                    text = getString(R.string.station_map_result, station.name, station.availableBatterySlots)
+                    text = resources.getQuantityString(R.plurals.station_map_result_plural,
+                        station.availableBatterySlots, station.name, station.availableBatterySlots)
                     setOnClickListener { showStation(station) }
                 })
             }
@@ -151,8 +153,8 @@ class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
     }
 
     private fun fillCoordinates(latitude: Double, longitude: Double) {
-        binding.latitudeInput.setText(latitude.toString())
-        binding.longitudeInput.setText(longitude.toString())
+        binding.latitudeInput.setText(String.format(Locale.US, "%.6f", latitude))
+        binding.longitudeInput.setText(String.format(Locale.US, "%.6f", longitude))
     }
 
     private fun showStation(station: StationSummary) {

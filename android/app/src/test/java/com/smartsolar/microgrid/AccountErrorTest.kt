@@ -32,4 +32,9 @@ class AccountErrorTest {
         assertFalse(accountError(failure(500, """{"detail":"private diagnostics"}""")).contains("private"))
         assertTrue(accountError(failure(429, "")).contains("Wait a minute"))
     }
+
+    @Test fun explainsSessionAndTimeoutFailures() {
+        assertTrue(accountError(failure(401, "")).contains("Sign in"))
+        assertTrue(accountError(failure(408, "")).contains("timed out"))
+    }
 }

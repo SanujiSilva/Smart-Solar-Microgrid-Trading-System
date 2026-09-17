@@ -70,8 +70,8 @@ class OperatorQrActivity : AccountActivity() {
             listOf(binding.scanButton, binding.verifyButton, binding.completeButton, binding.backButton)) {
             val response = api.verify(QrTokenRequest(token))
             binding.summaryText.text = QrPresentation.reservationSummary(response.reservation)
-            verifiedToken = token
-            binding.completeButton.visibility = View.VISIBLE
+            verifiedToken = if (response.valid) token else null
+            binding.completeButton.visibility = if (response.valid) View.VISIBLE else View.GONE
             binding.messageText.setText(if (response.valid) R.string.qr_verified else R.string.qr_invalid)
         }
     }

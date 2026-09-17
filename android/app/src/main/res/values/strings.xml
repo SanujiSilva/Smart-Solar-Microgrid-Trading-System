@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Smart Solar Microgrid</string>
+    <string name="login_title">Smart Solar\nMicrogrid</string>
+    <string name="login_subtitle">Sign in with your server account</string>
+    <string name="email_or_nic">Email or NIC</string>
+    <string name="password">Password</string>
+    <string name="login_fields_required">Enter your email or NIC and password.</string>
+    <string name="invalid_login">Invalid identifier or password.</string>
+    <string name="inactive_login">This account is not active. Contact Backoffice.</string>
     <string name="full_name">Full name</string>
     <string name="email">Email</string>
     <string name="phone">Phone</string>
@@ -8,6 +15,9 @@
     <string name="confirm_password">Confirm password</string>
     <string name="create_account">Create prosumer account</string>
     <string name="register_help">Register with your NIC. Backoffice approval is required before you can sign in.</string>
+    <string name="registration_submitted">Registration submitted</string>
+    <string name="registration_submitted_body">Your account is pending Backoffice approval. Sign in after it is activated.</string>
+    <string name="return_to_sign_in">Return to sign in</string>
     <string name="back_to_login">Back to sign in</string>
     <string name="my_profile">My profile</string>
     <string name="reload_profile">Reload profile</string>
@@ -29,6 +39,7 @@
     <string name="all_fields_required">Complete all fields.</string>
     <string name="password_mismatch">Passwords do not match.</string>
     <string name="active_bookings">Active bookings: %1$d\nRecent activity</string>
+    <string name="home_activity_summary">%1$s\n\n%2$s</string>
     <string name="recent_booking">%1$s · %2$s\n%3$s\n%4$s kWh</string>
     <string name="no_recent_bookings">No recent bookings.</string>
     <string name="nearby_stations">Nearby stations</string>
@@ -45,7 +56,10 @@
     <string name="location_unavailable">Your current location is not available. Enter coordinates manually or try again outdoors.</string>
     <string name="no_stations">No active stations were found in this area.</string>
     <string name="search_center">Search center</string>
-    <string name="station_map_result">%1$s - %2$d slots</string>
+    <plurals name="station_map_result_plural">
+        <item quantity="one">%1$s - %2$d slot</item>
+        <item quantity="other">%1$s - %2$d slots</item>
+    </plurals>
     <string name="station_details">%1$s\n%2$s\n%3$s\nCapacity: %4$s kWh\nAvailable battery slots: %5$d\nCoordinates: %6$s, %7$s</string>
     <string name="checking_session">Checking your session…</string>
     <string name="sign_in">Sign in</string>

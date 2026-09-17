@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1-21 implemented.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client includes API-backed role workflows. The native Kotlin/XML Android client includes SQLite reference storage, secure authentication, prosumer account functions, booking workflows, Google Maps nearby-station search, approved-booking QR display, and Grid Operator QR transfer completion. See [Phase 21 verification and manual tests](docs/phase-21.md).
+**Phases 1-22 implemented.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client includes API-backed role workflows. The native Kotlin/XML Android client includes SQLite reference storage, secure authentication, prosumer account functions, booking workflows, Google Maps nearby-station search, approved-booking QR display, Grid Operator QR transfer completion, and integrated Android error/UI polish. See [Phase 22 verification and manual tests](docs/phase-22.md).
 
 ## Architecture
 
@@ -61,4 +61,4 @@ IIS publishing, HTTPS, and production configuration instructions arrive in Phase
 
 5. Run the build/test commands above, then follow the [Phase 5 walkthrough](docs/user-management.md) and the phase completion records through [Phase 10](docs/phase-10.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real MongoDB/authentication/user-management integration tests; otherwise they are explicitly skipped.
 
-The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. UI polish, testing consolidation, Android device walkthroughs, and IIS deployment remain for later phases.
+The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Testing consolidation, full Android device walkthroughs, and IIS deployment remain for later phases.

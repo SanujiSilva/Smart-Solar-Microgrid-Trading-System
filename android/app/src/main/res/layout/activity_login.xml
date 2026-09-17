@@ -3,14 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface"
     android:padding="28dp">
 
     <TextView
         android:id="@+id/loginTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Smart Solar\nMicrogrid"
+        android:text="@string/login_title"
         android:textColor="@color/ink"
         android:textSize="34sp"
         android:textStyle="bold"
@@ -23,7 +22,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:text="Sign in with your server account"
+        android:text="@string/login_subtitle"
         android:textColor="@color/muted"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +35,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="42dp"
-        android:hint="Email or NIC"
+        android:hint="@string/email_or_nic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/loginSubtitle">
@@ -54,7 +53,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:hint="Password"
+        android:hint="@string/password"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/identifierLayout">
@@ -82,7 +81,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
-        android:text="Sign in"
+        android:text="@string/sign_in"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/errorText" />

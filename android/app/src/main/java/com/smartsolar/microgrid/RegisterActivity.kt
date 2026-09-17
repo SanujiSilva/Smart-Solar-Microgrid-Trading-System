@@ -34,10 +34,10 @@ class RegisterActivity : AccountActivity() {
             binding.passwordInput.text?.clear()
             binding.confirmPasswordInput.text?.clear()
             MaterialAlertDialogBuilder(this)
-                .setTitle("Registration submitted")
-                .setMessage("Your account is pending Backoffice approval. Sign in after it is activated.")
+                .setTitle(R.string.registration_submitted)
+                .setMessage(R.string.registration_submitted_body)
                 .setCancelable(false)
-                .setPositiveButton("Return to sign in") { _, _ -> finish() }
+                .setPositiveButton(R.string.return_to_sign_in) { _, _ -> finish() }
                 .show()
         }
     }

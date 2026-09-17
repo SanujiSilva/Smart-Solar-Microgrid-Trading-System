@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.view.View
 import com.smartsolar.microgrid.databinding.ActivityMainBinding
 import com.smartsolar.microgrid.qr.OperatorQrActivity
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 class MainActivity : AccountActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -57,13 +61,14 @@ class MainActivity : AccountActivity() {
                 dashboard.pendingReservations, dashboard.approvedFutureReservations,
                 dashboard.todayReservations, dashboard.completedTransfers, dashboard.activeStations,
                 dashboard.openSlots, dashboard.availableSlotCapacity.toPlainString())
-            binding.activityText.text = getString(R.string.active_bookings, dashboard.activeReservations) + "\n\n" +
-                (dashboard.recentReservations.takeIf { it.isNotEmpty() }?.joinToString("\n\n") {
-                    getString(R.string.recent_booking, it.reservationCode, it.status,
-                        java.time.OffsetDateTime.parse(it.reservationDateTime).atZoneSameInstant(java.time.ZoneId.systemDefault())
-                            .format(java.time.format.DateTimeFormatter.ofLocalizedDateTime(java.time.format.FormatStyle.MEDIUM)),
-                        it.energyAmount.toPlainString())
-                } ?: getString(R.string.no_recent_bookings))
+            val recent = dashboard.recentReservations.takeIf { it.isNotEmpty() }?.joinToString("\n\n") {
+                getString(R.string.recent_booking, it.reservationCode, it.status,
+                    OffsetDateTime.parse(it.reservationDateTime).atZoneSameInstant(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)),
+                    it.energyAmount.toPlainString())
+            } ?: getString(R.string.no_recent_bookings)
+            binding.activityText.text = getString(R.string.home_activity_summary,
+                getString(R.string.active_bookings, dashboard.activeReservations), recent)
         }
     }
 }
