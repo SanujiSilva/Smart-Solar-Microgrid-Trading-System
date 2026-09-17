@@ -23,4 +23,6 @@ Phase 19 adds native station/slot selection, booking confirmation, current/pendi
 
 Phase 20 adds Google Maps to the nearby-station workflow. Set `SMART_SOLAR_MAPS_API_KEY` in `android/gradle.properties` or the user-level Gradle properties file before installing an app build that should render map tiles. Keep the key out of source control and restrict it to package `com.smartsolar.microgrid` plus the signing certificate for the build. See [the Phase 20 walkthrough](../docs/phase-20.md).
 
-The debug manifest permits local HTTP only to `10.0.2.2`. Release requires an HTTPS API host. The API remains authoritative for all account, booking and station availability rules. QR/operator workflows remain in Phase 21.
+Phase 21 adds approved-booking QR display for prosumers and Grid Operator QR verification/completion. The app renders server-issued opaque tokens as QR codes, scans QR codes with ZXing, and keeps manual token entry available for camera-denied or camera-less devices. See [the Phase 21 walkthrough](../docs/phase-21.md).
+
+The debug manifest permits local HTTP only to `10.0.2.2`. Release requires an HTTPS API host. The API remains authoritative for all account, booking, station availability and QR transfer rules.

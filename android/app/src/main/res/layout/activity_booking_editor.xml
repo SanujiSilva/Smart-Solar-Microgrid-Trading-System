@@ -28,6 +28,9 @@
         <com.google.android.material.button.MaterialButton android:id="@+id/cancelButton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="@string/cancel_booking" android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/qrButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/show_qr" android:visibility="gone" />
         <com.google.android.material.button.MaterialButton android:id="@+id/refreshButton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="@string/reload_booking"  />

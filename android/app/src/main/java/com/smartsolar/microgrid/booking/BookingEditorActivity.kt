@@ -18,6 +18,7 @@ import com.smartsolar.microgrid.accountError
 import com.smartsolar.microgrid.applyAccountInsets
 import com.smartsolar.microgrid.data.remote.ApiClient
 import com.smartsolar.microgrid.databinding.ActivityBookingEditorBinding
+import com.smartsolar.microgrid.qr.ProsumerQrActivity
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -41,6 +42,12 @@ class BookingEditorActivity : AccountActivity() {
         binding.bookingsButton.setOnClickListener {
             startActivity(Intent(this, BookingsActivity::class.java))
             finish()
+        }
+        binding.qrButton.setOnClickListener {
+            model.state.value.booking?.let { booking ->
+                startActivity(Intent(this, ProsumerQrActivity::class.java)
+                    .putExtra(ProsumerQrActivity.RESERVATION_ID, booking.id))
+            }
         }
         binding.saveButton.setOnClickListener {
             val amount = BookingPresentation.energy(binding.amountInput.text.toString())
@@ -96,6 +103,8 @@ class BookingEditorActivity : AccountActivity() {
         binding.saveButton.isEnabled = !state.busy && !state.uncertain && slot != null && station != null
         binding.cancelButton.visibility = if (booking != null && editableStatus) View.VISIBLE else View.GONE
         binding.cancelButton.isEnabled = !state.busy && !state.uncertain
+        binding.qrButton.visibility = if (booking?.status == "APPROVED") View.VISIBLE else View.GONE
+        binding.qrButton.isEnabled = !state.busy && !state.uncertain
         binding.messageText.text = when {
             state.uncertain && booking == null -> getString(R.string.create_outcome_unknown)
             state.uncertain -> getString(R.string.change_outcome_unknown)

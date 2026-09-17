@@ -75,5 +75,8 @@
         <com.google.android.material.button.MaterialButton android:id="@+id/newBookingButton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="@string/new_booking" android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/operatorQrButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/operator_qr" android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

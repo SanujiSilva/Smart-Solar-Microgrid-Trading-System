@@ -12,6 +12,8 @@ object ApiClient {
 
     fun bookingService(context: Context): BookingApiService = retrofit(context, false).create(BookingApiService::class.java)
 
+    fun qrService(context: Context): QrApiService = retrofit(context, false).create(QrApiService::class.java)
+
     private fun retrofit(context: Context, retryConnections: Boolean = true): Retrofit {
         val tokenStore = SecureTokenStore(context.applicationContext)
         val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }

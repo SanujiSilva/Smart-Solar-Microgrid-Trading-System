@@ -1,6 +1,6 @@
 # Implementation phases
 
-Phases 1-20 are complete. See the Phase 20 record for verification and device testing requirements. Each subsequent phase requires a separate request.
+Phases 1-21 are complete. See the Phase 21 record for verification and device testing requirements. Each subsequent phase requires a separate request.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
@@ -24,7 +24,7 @@ Phases 1-20 are complete. See the Phase 20 record for verification and device te
 | 18 | Prosumer Android functions | Complete; see [verification](phase-18.md) |
 | 19 | Booking Android functions | Complete; see [verification](phase-19.md) |
 | 20 | Google Maps | Complete; see [verification](phase-20.md) |
-| 21 | QR generation/scanning and operator workflow | Pending |
+| 21 | QR generation/scanning and operator workflow | Complete; see [verification](phase-21.md) |
 | 22 | Error handling and UI polish | Pending |
 | 23 | Automated testing | Pending |
 | 24 | IIS deployment and production configuration | Pending |

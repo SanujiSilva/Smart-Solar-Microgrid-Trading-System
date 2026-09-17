@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.smartsolar.microgrid.databinding.ActivityMainBinding
+import com.smartsolar.microgrid.qr.OperatorQrActivity
 
 class MainActivity : AccountActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -19,6 +20,7 @@ class MainActivity : AccountActivity() {
         binding.stationsButton.setOnClickListener { startActivity(Intent(this, NearbyStationsActivity::class.java)) }
         binding.bookingsButton.setOnClickListener { startActivity(Intent(this, com.smartsolar.microgrid.booking.BookingsActivity::class.java)) }
         binding.newBookingButton.setOnClickListener { startActivity(Intent(this, com.smartsolar.microgrid.booking.StationDirectoryActivity::class.java)) }
+        binding.operatorQrButton.setOnClickListener { startActivity(Intent(this, OperatorQrActivity::class.java)) }
     }
 
     override fun onResume() {
@@ -30,6 +32,7 @@ class MainActivity : AccountActivity() {
         binding.profileButton.visibility = View.GONE
         binding.bookingsButton.visibility = View.GONE
         binding.newBookingButton.visibility = View.GONE
+        binding.operatorQrButton.visibility = View.GONE
         binding.summaryText.text = ""
         binding.activityText.text = ""
         request(binding.progressBar, binding.messageText,
@@ -37,6 +40,11 @@ class MainActivity : AccountActivity() {
             val user = account.currentUser()
             binding.welcomeText.text = getString(R.string.welcome_user, user.fullName)
             binding.accountText.text = getString(R.string.account_status, user.role, user.status)
+            if (user.role == "GRID_OPERATOR") {
+                binding.operatorQrButton.visibility = View.VISIBLE
+                binding.summaryText.setText(R.string.operator_home)
+                return@request
+            }
             if (user.role != "PROSUMER") {
                 binding.summaryText.setText(R.string.staff_home)
                 return@request

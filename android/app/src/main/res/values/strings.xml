@@ -21,6 +21,7 @@
     <string name="account_status">%1$s · %2$s</string>
     <string name="dashboard_summary">Your reservations\n\nPending: %1$d\nUpcoming approved: %2$d\nToday (UTC): %3$d\nTransfers completed today (UTC): %4$d\n\nMicrogrid availability\n\nActive stations: %5$d\nOpen slots: %6$d\nAvailable energy: %7$s kWh</string>
     <string name="staff_home">Your staff account is signed in. Use the web portal for staff management.</string>
+    <string name="operator_home">Your Grid Operator account is signed in. Scan approved booking QR codes to verify and complete transfers.</string>
     <string name="deactivation_pending">Your deactivation request is awaiting Backoffice review.</string>
     <string name="contact_required">Enter your full name, email and phone.</string>
     <string name="profile_saved">Profile saved.</string>
@@ -103,6 +104,23 @@
     <string name="booking_not_found">This booking or slot could not be found. Return to your bookings and refresh.</string>
     <string name="create_outcome_unknown">The booking result could not be confirmed. Check My bookings before starting another booking. This request will not be submitted again automatically.</string>
     <string name="change_outcome_unknown">The change could not be confirmed. Reload the latest details before trying another change.</string>
+    <string name="show_qr">Show QR code</string>
+    <string name="booking_qr">Booking QR code</string>
+    <string name="reissue_qr">Refresh QR code</string>
+    <string name="qr_ready">Show this QR code to the Grid Operator at transfer time.</string>
+    <string name="operator_qr">Operator QR transfer</string>
+    <string name="operator_qr_help">Scan an approved booking QR code, verify it with the API, then complete the transfer.</string>
+    <string name="scan_qr">Scan QR code</string>
+    <string name="scan_qr_prompt">Place the booking QR code inside the scanner frame.</string>
+    <string name="scan_cancelled">Scan cancelled.</string>
+    <string name="qr_token">QR token</string>
+    <string name="qr_token_required">Scan a QR code or enter a valid token.</string>
+    <string name="verify_qr">Verify QR token</string>
+    <string name="qr_verified">QR token verified. Review the reservation before completing the transfer.</string>
+    <string name="qr_invalid">The QR token is invalid.</string>
+    <string name="complete_transfer">Complete transfer</string>
+    <string name="confirm_complete_transfer">Complete this energy transfer? This action consumes the QR token and cannot be repeated.</string>
+    <string name="transfer_completed">Transfer completed.</string>
     <string-array name="booking_views"><item>Current bookings</item><item>Pending bookings</item><item>Booking history</item><item>Search bookings</item></string-array>
     <string-array name="booking_statuses"><item>All statuses</item><item>PENDING</item><item>APPROVED</item><item>CANCELLED</item><item>COMPLETED</item><item>REJECTED</item></string-array>
 </resources>
