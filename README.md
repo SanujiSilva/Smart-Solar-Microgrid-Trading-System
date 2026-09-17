@@ -4,7 +4,7 @@ A university enterprise application for managing solar microgrid stations, reser
 
 ## Current progress
 
-**Phases 1-19 implemented.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client includes API-backed role workflows. The native Kotlin/XML Android client includes SQLite reference storage, secure authentication, prosumer account functions and booking workflows: station/slot selection, confirmation, current/pending/history, search, details, modification and cancellation. See [Phase 19 verification and manual tests](docs/phase-19.md). Maps and Android QR/operator integration continue in Phases 20-21.
+**Phases 1-20 implemented.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client includes API-backed role workflows. The native Kotlin/XML Android client includes SQLite reference storage, secure authentication, prosumer account functions, booking workflows and Google Maps nearby-station search. See [Phase 20 verification and manual tests](docs/phase-20.md). Android QR/operator integration continues in Phase 21.
 
 ## Architecture
 
@@ -32,7 +32,7 @@ The existing repository is the solution root; no additional nested root is neede
 - Database: MongoDB; use a replica set when implementing multi-document transactions for reservations.
 - Web: Node.js/npm; compatible versions will be recorded when React is scaffolded in Phase 11.
 - Android: Android Studio, Android SDK, and its compatible JDK; versions will be recorded in Phase 15.
-- Maps: Google Maps Android API key restricted to the application; integration begins in Phase 20.
+- Maps: Google Maps Android API key restricted to the application; configure `SMART_SOLAR_MAPS_API_KEY` as a Gradle property before installing the Android app.
 - Deployment: Windows IIS and a Hosting Bundle matching the backend runtime; setup begins in Phase 24.
 
 ### Configuration and execution
@@ -50,7 +50,7 @@ Open `http://localhost:5080/swagger` for interactive documentation, `/api/health
 
 Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`, overridden by user secrets when configured. Private MongoDB URIs and `Jwt:SigningKey` belong in user secrets/environment configuration. Both environments require a valid signing key; production also requires an explicit MongoDB URI. See [authentication instructions](docs/authentication.md) to create your first development Backoffice account and test login. Never commit credentials.
 
-Maps key configuration arrives in Phase 20. IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned client/deployment deliverables; Phases 1-19 are implemented now.
+IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned deployment deliverables; Phases 1-20 are implemented now.
 
 ## Verification
 
@@ -61,4 +61,4 @@ Maps key configuration arrives in Phase 20. IIS publishing, HTTPS, and productio
 
 5. Run the build/test commands above, then follow the [Phase 5 walkthrough](docs/user-management.md) and the phase completion records through [Phase 10](docs/phase-10.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real MongoDB/authentication/user-management integration tests; otherwise they are explicitly skipped.
 
-The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Maps, Android QR/operator integration and IIS deployment remain for later phases.
+The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Android QR/operator integration and IIS deployment remain for later phases.
