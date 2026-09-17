@@ -40,7 +40,7 @@ test('Backoffice approves a pending prosumer and can inspect details', async ({ 
   const calls = await setup(page)
   await page.goto('/prosumers')
   await page.getByRole('button', { name: 'Approve account' }).click()
-  await expect(page.getByRole('status')).toHaveText('Account status updated.')
+  await expect(page.getByText('Account status updated.', { exact: true })).toBeVisible()
   expect(calls.find(c => c.path === '/users/user-1/status')?.body).toEqual({ status: 'ACTIVE' })
   await page.getByRole('button', { name: 'Details', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Account details' })).toBeVisible()

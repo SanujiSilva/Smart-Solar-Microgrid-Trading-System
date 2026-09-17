@@ -1,6 +1,6 @@
 # Implementation phases
 
-Phases 1-22 are complete. See the Phase 22 record for verification and manual checks. Each subsequent phase requires a separate request.
+Phases 1-23 are complete. See the Phase 23 record for the consolidated automated test runner and verification results. Each subsequent phase requires a separate request.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
@@ -26,7 +26,7 @@ Phases 1-22 are complete. See the Phase 22 record for verification and manual ch
 | 20 | Google Maps | Complete; see [verification](phase-20.md) |
 | 21 | QR generation/scanning and operator workflow | Complete; see [verification](phase-21.md) |
 | 22 | Error handling and UI polish | Complete; see [verification](phase-22.md) |
-| 23 | Automated testing | Pending |
+| 23 | Automated testing | Complete; see [verification](phase-23.md) |
 | 24 | IIS deployment and production configuration | Pending |
 | 25 | Final assignment rubric verification | Pending |
 

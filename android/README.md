@@ -27,4 +27,6 @@ Phase 21 adds approved-booking QR display for prosumers and Grid Operator QR ver
 
 Phase 22 integrates the Android flows through QR/operator completion and improves shared error messages, login/registration text resources, map result formatting, app icon metadata and lint-level UI polish. See [the Phase 22 walkthrough](../docs/phase-22.md).
 
+Phase 23 adds the repository-level automated test runner. From the repository root, run `.\scripts\test-phase23.ps1` to execute backend tests, web build/lint/E2E, and Android build/unit/lint together. See [the Phase 23 walkthrough](../docs/phase-23.md).
+
 The debug manifest permits local HTTP only to `10.0.2.2`. Release requires an HTTPS API host. The API remains authoritative for all account, booking, station availability and QR transfer rules.

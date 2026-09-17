@@ -38,7 +38,7 @@ function App() {
   return (
     <AuthProvider><BrowserRouter><Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route element={<ProtectedRoute />}><Route element={<WorkspaceFrame />}><Route path="/*" element={null} /></Route></Route>
+      <Route element={<ProtectedRoute />}><Route path="/*" element={<WorkspaceFrame />} /></Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes></BrowserRouter></AuthProvider>
   )

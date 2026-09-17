@@ -17,3 +17,15 @@ Build and lint:
 npm run build
 npm run lint
 ```
+
+Browser workflow tests:
+
+```powershell
+npm run test:e2e
+```
+
+The repository-level Phase 23 runner executes the backend, web and Android automated checks together:
+
+```powershell
+..\scripts\test-phase23.ps1
+```
