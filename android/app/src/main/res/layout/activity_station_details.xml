@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true" android:padding="24dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView android:id="@+id/titleText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:paddingVertical="12dp"
+             android:textSize="26sp" />
+        <TextView android:id="@+id/detailsText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:paddingVertical="12dp"
+              />
+        <TextView android:id="@+id/scheduleText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:paddingVertical="12dp"
+              />
+        <TextView android:id="@+id/slotsHeading" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:paddingVertical="12dp"
+            android:text="@string/available_slots" android:textSize="22sp" />
+        <TextView android:id="@+id/slotHelp" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:paddingVertical="12dp"
+            android:text="@string/booking_availability_notice"  />
+        <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:visibility="gone" />
+        <TextView android:id="@+id/messageText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:paddingVertical="12dp"
+             android:accessibilityLiveRegion="polite" />
+        <LinearLayout android:id="@+id/slots" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/refreshButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/refresh"  />
+        <com.google.android.material.button.MaterialButton android:id="@+id/backButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/back_to_stations"  />
+    </LinearLayout>
+</ScrollView>

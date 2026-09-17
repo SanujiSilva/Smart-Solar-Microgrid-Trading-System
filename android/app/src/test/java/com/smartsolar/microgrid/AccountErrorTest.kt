@@ -17,6 +17,11 @@ class AccountErrorTest {
             """{"title":"Email is already registered.","status":409}""")))
     }
 
+    @Test fun bookingErrorRemainsReadableAcrossRepeatedScreenRenders() {
+        val error = failure(409, """{"title":"Reservations require at least 12 hours notice."}""")
+        repeat(3) { assertEquals("Reservations require at least 12 hours notice.", accountError(error)) }
+    }
+
     @Test fun displaysValidationMessagesAndHandlesMalformedResponse() {
         assertEquals("NIC is invalid.\nEmail is invalid.", accountError(failure(400,
             """{"errors":{"NIC":["NIC is invalid."],"Email":["Email is invalid."]}}""")))

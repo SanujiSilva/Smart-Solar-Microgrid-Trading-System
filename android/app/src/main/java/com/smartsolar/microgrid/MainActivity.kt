@@ -17,6 +17,8 @@ class MainActivity : AccountActivity() {
         binding.profileButton.setOnClickListener { startActivity(Intent(this, ProfileActivity::class.java)) }
         binding.logoutButton.setOnClickListener { signOut() }
         binding.stationsButton.setOnClickListener { startActivity(Intent(this, NearbyStationsActivity::class.java)) }
+        binding.bookingsButton.setOnClickListener { startActivity(Intent(this, com.smartsolar.microgrid.booking.BookingsActivity::class.java)) }
+        binding.newBookingButton.setOnClickListener { startActivity(Intent(this, com.smartsolar.microgrid.booking.StationDirectoryActivity::class.java)) }
     }
 
     override fun onResume() {
@@ -26,6 +28,8 @@ class MainActivity : AccountActivity() {
 
     private fun refresh() {
         binding.profileButton.visibility = View.GONE
+        binding.bookingsButton.visibility = View.GONE
+        binding.newBookingButton.visibility = View.GONE
         binding.summaryText.text = ""
         binding.activityText.text = ""
         request(binding.progressBar, binding.messageText,
@@ -38,6 +42,8 @@ class MainActivity : AccountActivity() {
                 return@request
             }
             binding.profileButton.visibility = View.VISIBLE
+            binding.bookingsButton.visibility = View.VISIBLE
+            binding.newBookingButton.visibility = View.VISIBLE
             val dashboard = account.dashboard()
             binding.summaryText.text = getString(R.string.dashboard_summary,
                 dashboard.pendingReservations, dashboard.approvedFutureReservations,

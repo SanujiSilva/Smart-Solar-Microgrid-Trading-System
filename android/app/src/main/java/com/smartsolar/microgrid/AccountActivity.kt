@@ -96,10 +96,12 @@ fun accountError(error: Exception): String {
     if (error is IOException) return "Cannot reach the server. Check your connection and try again."
     if (error !is HttpException) return "The request could not be completed. Please try again."
     if (error.code() == 429) return "Too many attempts. Wait a minute and try again."
+    if (error.code() == 404) return "The requested record was not found. Refresh and try again."
     if (error.code() == 403) return "Your account cannot perform this action. Contact Backoffice."
     if (error.code() in listOf(400, 409)) {
         val problem = runCatching {
-            Gson().fromJson(error.response()?.errorBody()?.string(), ApiProblem::class.java)
+            val body = error.response()?.errorBody()?.source()?.peek()?.use { it.readUtf8() }
+            Gson().fromJson(body, ApiProblem::class.java)
         }.getOrNull()
         return problem?.errors?.values?.flatten()?.joinToString("\n")?.takeIf { it.isNotBlank() }
             ?: problem?.detail ?: problem?.title ?: "Check your details and try again."

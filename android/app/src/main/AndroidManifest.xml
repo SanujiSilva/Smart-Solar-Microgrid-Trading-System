@@ -9,6 +9,10 @@
         android:theme="@style/Theme.SmartSolarMicrogrid">
         <activity android:name=".RegisterActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".booking.StationDirectoryActivity" android:exported="false" />
+        <activity android:name=".booking.StationDetailsActivity" android:exported="false" />
+        <activity android:name=".booking.BookingsActivity" android:exported="false" />
+        <activity android:name=".booking.BookingEditorActivity" android:exported="false" />
         <activity android:name=".NearbyStationsActivity" android:exported="false" />
         <activity android:name=".LoginActivity" android:exported="false" />
         <activity

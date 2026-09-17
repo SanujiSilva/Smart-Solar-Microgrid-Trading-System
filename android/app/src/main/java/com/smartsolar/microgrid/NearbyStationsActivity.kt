@@ -1,6 +1,9 @@
 package com.smartsolar.microgrid
 
 import android.os.Bundle
+import android.content.Intent
+import com.smartsolar.microgrid.booking.StationDetailsActivity
+import com.smartsolar.microgrid.booking.StationDirectoryActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.smartsolar.microgrid.databinding.ActivityNearbyStationsBinding
@@ -39,6 +42,10 @@ class NearbyStationsActivity : AccountActivity() {
                             .setMessage(getString(R.string.station_details, station.stationCode, station.address,
                                 station.status, station.capacityKWh.toString(), station.availableBatterySlots,
                                 station.latitude.toString(), station.longitude.toString()))
+                            .setNeutralButton(R.string.available_slots) { _, _ ->
+                                startActivity(Intent(this@NearbyStationsActivity, StationDetailsActivity::class.java)
+                                    .putExtra(StationDirectoryActivity.STATION_ID, station.id))
+                            }
                             .setPositiveButton(android.R.string.ok, null).show()
                     }
                 })

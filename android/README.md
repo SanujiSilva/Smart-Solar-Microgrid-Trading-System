@@ -19,4 +19,6 @@ The SQLite database stores only server-returned display/session reference data a
 
 Build with the included Gradle 8.9 wrapper and a compatible JDK (Android Studio's bundled JDK was used). Set `ANDROID_HOME` to the full Android SDK; if `ANDROID_SDK_ROOT` is present it must point to the same SDK, not the separate platform-tools directory. Run `.\android\gradlew.bat -p android assembleDebug testDebugUnitTest lintDebug` from the repository root, or use Android Studio. The [Phase 18 record](../docs/phase-18.md#verification) includes environment setup commands.
 
-The debug manifest permits local HTTP only to `10.0.2.2`. Release requires an HTTPS API host. The API remains authoritative for all account rules. Booking/station selection, Maps and QR/operator workflows remain in Phases 19-21.
+Phase 19 adds native station/slot selection, booking confirmation, current/pending/history views, search, details, energy modification and cancellation. See [the Phase 19 walkthrough](../docs/phase-19.md) for test coverage, network recovery behavior and manual steps.
+
+The debug manifest permits local HTTP only to `10.0.2.2`. Release requires an HTTPS API host. The API remains authoritative for all account and booking rules. Maps and QR/operator workflows remain in Phases 20-21.

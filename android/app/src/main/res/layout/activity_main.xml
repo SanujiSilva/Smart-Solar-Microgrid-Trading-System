@@ -69,5 +69,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/sign_out" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/bookingsButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/my_bookings" android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/newBookingButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/new_booking" android:visibility="gone" />
     </LinearLayout>
 </ScrollView>
