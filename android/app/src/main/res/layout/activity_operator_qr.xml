@@ -1,67 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="24dp">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/operator_qr"
-            android:textSize="26sp" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="16dp"
-            android:text="@string/operator_qr_help" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/scanButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/scan_qr" />
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/qr_token">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tokenInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textVisiblePassword|textNoSuggestions" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-        <TextView
-            android:id="@+id/messageText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:accessibilityLiveRegion="polite" />
-        <TextView
-            android:id="@+id/summaryText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="16dp" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/verifyButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/verify_qr" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/completeButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/complete_transfer"
-            android:visibility="gone" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/backButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/back_to_home" />
-    </LinearLayout>
-</ScrollView>
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/solar_screen_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/solarToolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="?attr/actionBarSize" android:background="@color/solar_background" app:title="@string/transfer_title" app:titleTextAppearance="@style/Solar.ToolbarTitle" />
+    <androidx.core.widget.NestedScrollView android:scrollbars="vertical" android:fadeScrollbars="false" android:scrollbarStyle="insideOverlay" android:scrollbarSize="4dp" android:scrollbarThumbVertical="@drawable/solar_scroll_thumb" android:id="@+id/screenScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:padding="@dimen/screen_padding">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/operator_mode" android:layout_marginBottom="@dimen/space_md" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <TextView android:id="@+id/scanStep" android:layout_width="0dp" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/step_scan" android:layout_marginBottom="@dimen/space_md" android:layout_weight="1" android:gravity="center" android:minHeight="@dimen/touch_target" android:padding="@dimen/space_sm" android:background="@drawable/solar_step" />
+                <TextView android:id="@+id/verifyStep" android:layout_width="0dp" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/step_verify" android:layout_marginBottom="@dimen/space_md" android:layout_weight="1" android:gravity="center" android:minHeight="@dimen/touch_target" android:padding="@dimen/space_sm" android:background="@drawable/solar_step" />
+                <TextView android:id="@+id/completeStep" android:layout_width="0dp" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/step_complete" android:layout_marginBottom="@dimen/space_md" android:layout_weight="1" android:gravity="center" android:minHeight="@dimen/touch_target" android:padding="@dimen/space_sm" android:background="@drawable/solar_step" />
+            </LinearLayout>
+            <TextView android:id="@+id/stepText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/qr_step_scan" android:layout_marginBottom="@dimen/space_md" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Section" android:text="@string/scan_booking_heading" android:layout_marginBottom="@dimen/space_md" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/operator_qr_help" android:layout_marginBottom="@dimen/space_md" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/scanButton" style="@style/Widget.Solar.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/scan_qr" app:icon="@drawable/ic_solar_qr" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                    <com.google.android.material.textfield.TextInputLayout android:id="@+id/tokenLayout" style="@style/Widget.Solar.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/qr_token">
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/tokenInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/button_height" android:inputType="textVisiblePassword|textNoSuggestions" android:singleLine="true" android:imeOptions="actionNext" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.button.MaterialButton android:id="@+id/copyTokenButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/copy_token" />
+                    <com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:indeterminate="true" android:visibility="gone" app:indicatorSize="@dimen/progress_size" />
+                    <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" android:accessibilityLiveRegion="polite" android:padding="@dimen/space_lg" android:background="@drawable/solar_banner_info" android:visibility="gone" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/verifyButton" style="@style/Widget.Solar.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/verify_qr" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Section" android:text="@string/booking_details" android:layout_marginBottom="@dimen/space_md" />
+                    <TextView android:id="@+id/summaryText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:text="@string/qr_before_scan" android:layout_marginBottom="@dimen/space_md" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/completion_help" android:layout_marginBottom="@dimen/space_md" />
+                    <com.google.android.material.checkbox.MaterialCheckBox android:id="@+id/confirmCheck" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/touch_target" android:text="@string/transfer_confirmation_check" android:enabled="false" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/completeButton" style="@style/Widget.Solar.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/complete_transfer" android:enabled="false" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/backButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/back_to_home" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/ApiServiceRegistration.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Api Service Registration.
+ */
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using SmartSolarMicrogrid.Api.Middleware;
@@ -11,6 +16,7 @@ public static class ApiServiceRegistration
     public static IServiceCollection AddApiFoundation(
         this IServiceCollection services, IConfiguration configuration)
     {
+        // Add Api Foundation for Api Registration.
         services.AddScoped<Repositories.MongoOperation>();
         services.AddScoped<TradingTransactionFilter>();
         services.AddControllers(options => options.Filters.AddService<TradingTransactionFilter>());

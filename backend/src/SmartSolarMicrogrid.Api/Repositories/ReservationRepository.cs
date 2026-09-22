@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Repositories/ReservationRepository.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: MongoDB persistence and query operations for Reservation Repository.
+ */
 using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -7,22 +12,27 @@ namespace SmartSolarMicrogrid.Api.Repositories;
 
 public sealed class ReservationRepository(MongoDbContext context, MongoOperation operation) : IReservationRepository
 {
+    // Recent for Reservation.
     public async Task<List<EnergyReservation>> RecentAsync(string? prosumerNic, CancellationToken cancellationToken) =>
         await context.Reservations.Query(operation, prosumerNic is null ? Builders<EnergyReservation>.Filter.Empty :
             Builders<EnergyReservation>.Filter.Eq(x => x.ProsumerNIC, prosumerNic))
             .SortByDescending(x => x.UpdatedAt).ThenByDescending(x => x.Id).Limit(5).ToListAsync(cancellationToken);
+    // Find for Reservation.
     public async Task<EnergyReservation?> FindAsync(ObjectId id, CancellationToken cancellationToken) =>
         await context.Reservations.Query(operation, x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
+    // Find By Qr Token Hash for Reservation.
     public async Task<EnergyReservation?> FindByQrTokenHashAsync(string tokenHash,
         CancellationToken cancellationToken) =>
         await context.Reservations.Query(operation, x => x.QrTokenHash == tokenHash).FirstOrDefaultAsync(cancellationToken);
 
+    // List By Prosumer for Reservation.
     public async Task<List<EnergyReservation>> ListByProsumerAsync(string nic, CancellationToken cancellationToken) =>
         await context.Reservations.Query(operation, x => x.ProsumerNIC == nic)
             .SortByDescending(x => x.ReservationDateTime).ThenByDescending(x => x.Id)
             .ToListAsync(cancellationToken);
 
+    // List By Status for Reservation.
     public async Task<List<EnergyReservation>> ListByStatusAsync(ReservationStatus status,
         CancellationToken cancellationToken) =>
         await context.Reservations.Query(operation, x => x.Status == status)
@@ -32,6 +42,7 @@ public sealed class ReservationRepository(MongoDbContext context, MongoOperation
     public async Task<long> CountCompletedAsync(string? prosumerNic, DateTime from, DateTime to,
         CancellationToken cancellationToken)
     {
+        // Count Completed for Reservation.
         var filter = Builders<EnergyReservation>.Filter.Eq(x => x.Status, ReservationStatus.COMPLETED) &
             Builders<EnergyReservation>.Filter.Gte(x => x.CompletedAt, from) &
             Builders<EnergyReservation>.Filter.Lt(x => x.CompletedAt, to);
@@ -43,6 +54,7 @@ public sealed class ReservationRepository(MongoDbContext context, MongoOperation
         string? reservationCode, ObjectId? stationId, ReservationStatus? status, DateTime? from, DateTime? to,
         int page, int pageSize, CancellationToken cancellationToken)
     {
+        // Search for Reservation.
         var f = Builders<EnergyReservation>.Filter;
         var filter = f.Empty;
         if (!string.IsNullOrWhiteSpace(prosumerNic)) filter &= f.Eq(x => x.ProsumerNIC, prosumerNic);
@@ -61,6 +73,7 @@ public sealed class ReservationRepository(MongoDbContext context, MongoOperation
 
     public async Task CreateAsync(EnergyReservation reservation, CancellationToken cancellationToken)
     {
+        // Create for Reservation.
         try { await context.Reservations.Insert(operation, reservation, cancellationToken: cancellationToken); }
         catch (MongoWriteException exception) when (exception.WriteError.Category == ServerErrorCategory.DuplicateKey)
         { throw new InvalidOperationException("A generated reservation code was duplicated.", exception); }
@@ -69,6 +82,7 @@ public sealed class ReservationRepository(MongoDbContext context, MongoOperation
     public async Task<EnergyReservation?> IssueQrTokenAsync(EnergyReservation expected, string tokenHash,
         DateTime updatedAt, CancellationToken cancellationToken)
     {
+        // Issue Qr Token for Reservation.
         var update = Builders<EnergyReservation>.Update
             .Set(x => x.QrTokenHash, tokenHash).Set(x => x.UpdatedAt, updatedAt);
         return await context.Reservations.Change(operation, 
@@ -79,6 +93,7 @@ public sealed class ReservationRepository(MongoDbContext context, MongoOperation
     public async Task<EnergyReservation?> CompleteAsync(EnergyReservation expected, ObjectId operatorId,
         DateTime completedAt, CancellationToken cancellationToken)
     {
+        // Complete for Reservation.
         var update = Builders<EnergyReservation>.Update
             .Set(x => x.Status, ReservationStatus.COMPLETED)
             .Set(x => x.CompletedAt, completedAt)
@@ -92,6 +107,7 @@ public sealed class ReservationRepository(MongoDbContext context, MongoOperation
     public async Task<EnergyReservation?> UpdateAsync(EnergyReservation expected,
         CancellationToken cancellationToken)
     {
+        // Update for Reservation.
         var update = Builders<EnergyReservation>.Update
             .Set(x => x.EnergyAmount, expected.EnergyAmount)
             .Set(x => x.Status, expected.Status)

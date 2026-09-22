@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+        <TextView android:id="@+id/recordTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Card" android:layout_marginBottom="@dimen/space_md" />
+        <com.google.android.material.chip.Chip android:id="@+id/recordStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:clickable="false" />
+        <TextView android:id="@+id/recordBody" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:layout_marginBottom="@dimen/space_md" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/recordAction" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/view_details_action" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

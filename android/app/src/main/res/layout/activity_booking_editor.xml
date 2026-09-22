@@ -1,44 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:fillViewport="true" android:padding="24dp">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView android:id="@+id/titleText" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:paddingVertical="12dp"
-            android:text="@string/booking_details" android:textSize="26sp" />
-        <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:visibility="gone" />
-        <TextView android:id="@+id/messageText" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:paddingVertical="12dp"
-             android:accessibilityLiveRegion="polite" />
-        <TextView android:id="@+id/summaryText" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:paddingVertical="12dp"
-              />
-        <com.google.android.material.textfield.TextInputLayout android:id="@+id/amountLayout"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/energy_kwh" style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-            <com.google.android.material.textfield.TextInputEditText android:id="@+id/amountInput"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:inputType="numberDecimal" android:singleLine="true" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.button.MaterialButton android:id="@+id/saveButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/review_booking"  />
-        <com.google.android.material.button.MaterialButton android:id="@+id/cancelButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/cancel_booking" android:visibility="gone" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/qrButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/show_qr" android:visibility="gone" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/refreshButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/reload_booking"  />
-        <com.google.android.material.button.MaterialButton android:id="@+id/bookingsButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/my_bookings"  />
-        <com.google.android.material.button.MaterialButton android:id="@+id/backButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/back_action"  />
-    </LinearLayout>
-</ScrollView>
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/solar_screen_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/solarToolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="?attr/actionBarSize" android:background="@color/solar_background" app:title="@string/booking_details" app:titleTextAppearance="@style/Solar.ToolbarTitle" />
+    <androidx.core.widget.NestedScrollView android:scrollbars="vertical" android:fadeScrollbars="false" android:scrollbarStyle="insideOverlay" android:scrollbarSize="4dp" android:scrollbarThumbVertical="@drawable/solar_scroll_thumb" android:id="@+id/screenScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:padding="@dimen/screen_padding">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView android:id="@+id/titleText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:text="@string/booking_details" android:layout_marginBottom="@dimen/space_md" android:visibility="gone" />
+            <com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:indeterminate="true" android:visibility="gone" app:indicatorSize="@dimen/progress_size" />
+            <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" android:accessibilityLiveRegion="polite" android:padding="@dimen/space_lg" android:background="@drawable/solar_banner_info" android:visibility="gone" />
+            <com.google.android.material.chip.Chip android:id="@+id/statusChip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" android:clickable="false" />
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                    <TextView android:id="@+id/summaryText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                    <com.google.android.material.textfield.TextInputLayout android:id="@+id/amountLayout" style="@style/Widget.Solar.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/energy_kwh">
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/amountInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/button_height" android:inputType="numberDecimal" android:singleLine="true" android:imeOptions="actionNext" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.button.MaterialButton android:id="@+id/saveButton" style="@style/Widget.Solar.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/review_booking" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.button.MaterialButton android:id="@+id/qrButton" style="@style/Widget.Solar.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/show_qr" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/cancelButton" style="@style/Widget.Solar.Button.Danger" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cancel_booking" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/refreshButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/reload_booking" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/bookingsButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/my_bookings" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/backButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/back_action" android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

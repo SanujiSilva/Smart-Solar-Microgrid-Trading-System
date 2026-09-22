@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="112dp" android:height="112dp" android:viewportWidth="120" android:viewportHeight="120">
+ <path android:fillColor="@android:color/transparent" android:strokeColor="@color/solar_primary" android:strokeWidth="3.5" android:pathData="M58,7 A53,53 0,1 0,70 8" />
+ <path android:fillColor="@color/solar_primary" android:pathData="M35,20 A10,10 0,1 0,35 40 A10,10 0,1 0,35 20 M34,12 h3 v5 h-3z M34,43 h3 v5 h-3z M17,28 h5 v3 h-5z M48,28 h5 v3 h-5z M20,16 l4,-2 3,5 -3,2z M46,39 l4,4 -3,3 -4,-4z" />
+ <path android:fillColor="@color/solar_primary" android:pathData="M76,27 A4,4 0,1 0,76 35 A4,4 0,1 0,76 27 M75,24 L76,2 Q84,7 80,25z M82,33 L101,47 Q94,53 80,38z M72,34 L53,46 Q51,38 69,30z M74,39 L78,39 80,78 73,78z" />
+ <path android:fillColor="@color/solar_primary" android:pathData="M8,54 L52,54 68,80 24,80z M37,82 h5 v8 h15 v4 H24 v-4 h13z" />
+ <path android:fillColor="@android:color/transparent" android:strokeColor="@color/solar_background" android:strokeWidth="1.5" android:pathData="M12,62 H57 M18,71 H62 M22,54 L38,80 M37,54 L53,80" />
+ <path android:fillColor="@android:color/transparent" android:strokeColor="@color/solar_primary" android:strokeWidth="3" android:pathData="M64,57 H104 V89 H86 V102 H59 V91 M87,57 V75 H104 M68,75 H87 M59,101 V112" />
+ <path android:fillColor="@color/solar_primary" android:pathData="M100,53 h8 v8 h-8z M83,71 h8 v8 h-8z M82,98 h8 v8 h-8z M55,88 h8 v8 h-8z" />
+</vector>

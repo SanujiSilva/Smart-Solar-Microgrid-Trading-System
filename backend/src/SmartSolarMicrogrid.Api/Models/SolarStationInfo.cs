@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Models/SolarStationInfo.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Persistence model definitions for Solar Station Info.
+ */
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.GeoJsonObjectModel;

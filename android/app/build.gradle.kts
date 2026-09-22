@@ -1,6 +1,13 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+}
+
+val localSettings = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 
 android {
@@ -14,7 +21,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         manifestPlaceholders["MAPS_API_KEY"] =
-            (providers.gradleProperty("SMART_SOLAR_MAPS_API_KEY").orNull ?: "")
+            (providers.gradleProperty("SMART_SOLAR_MAPS_API_KEY").orNull
+                ?: localSettings.getProperty("SMART_SOLAR_MAPS_API_KEY", ""))
     }
 
     buildFeatures { viewBinding = true }
@@ -38,6 +46,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     implementation("androidx.core:core-ktx:1.15.0")

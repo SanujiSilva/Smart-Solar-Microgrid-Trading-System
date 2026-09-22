@@ -17,6 +17,26 @@ class RegisterActivity : AccountActivity() {
     }
 
     private fun register() {
+        if (requestBusy) return
+        val inputs = listOf(binding.nicInput to binding.nicLayout, binding.fullNameInput to binding.nameLayout,
+            binding.emailInput to binding.emailLayout, binding.phoneInput to binding.phoneLayout,
+            binding.passwordInput to binding.passwordLayout, binding.confirmPasswordInput to binding.confirmLayout)
+        inputs.forEach { (_, layout) -> layout.error = null }
+        val missing = inputs.filter { (input, _) -> input.text.isNullOrBlank() }
+        if (missing.isNotEmpty()) {
+            missing.forEach { (_, layout) -> layout.error = getString(R.string.field_required) }
+            missing.first().first.requestFocus()
+            return
+        }
+        if (!Regex("(?:[0-9]{12}|[0-9]{9}[vVxX])").matches(binding.nicInput.text.toString().trim())) {
+            binding.nicLayout.error = getString(R.string.nic_format_error); return
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(binding.emailInput.text.toString().trim()).matches()) {
+            binding.emailLayout.error = getString(R.string.email_format_error); return
+        }
+        if (binding.passwordInput.text.toString().length !in 12..128) {
+            binding.passwordLayout.error = getString(R.string.password_length_error); return
+        }
         val password = binding.passwordInput.text.toString()
         val values = listOf(binding.nicInput, binding.fullNameInput, binding.emailInput, binding.phoneInput)
             .map { it.text.toString().trim() }
@@ -25,11 +45,11 @@ class RegisterActivity : AccountActivity() {
             return
         }
         if (password != binding.confirmPasswordInput.text.toString()) {
-            binding.messageText.setText(R.string.password_mismatch)
+            binding.confirmLayout.error = getString(R.string.password_mismatch)
             return
         }
         request(binding.progressBar, binding.messageText,
-            listOf(binding.registerButton, binding.backButton), authenticated = false) {
+            listOf(binding.registerButton, binding.backButton, binding.nicInput, binding.fullNameInput, binding.emailInput, binding.phoneInput, binding.passwordInput, binding.confirmPasswordInput), authenticated = false) {
             account.register(RegisterProsumerRequest(values[0], values[1], values[2], values[3], password))
             binding.passwordInput.text?.clear()
             binding.confirmPasswordInput.text?.clear()

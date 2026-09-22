@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Services/AuthService.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Server-side application rules and orchestration for Auth Service.
+ */
 using Microsoft.AspNetCore.Identity;
 using SmartSolarMicrogrid.Api.Configuration;
 using SmartSolarMicrogrid.Api.DTOs.Auth;
@@ -11,6 +16,7 @@ public sealed class AuthService(IUserRepository users, PasswordService passwords
 {
     public async Task<AuthUserResponse> RegisterAsync(RegisterProsumerRequest request, CancellationToken cancellationToken)
     {
+        // Normalize the prosumer identity, hash the password, and create a pending account.
         var now = clock.GetUtcNow().UtcDateTime;
         var user = new User
         {
@@ -26,6 +32,7 @@ public sealed class AuthService(IUserRepository users, PasswordService passwords
 
     public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
     {
+        // Validate account credentials and status before issuing an access token.
         var user = await users.FindByIdentifierAsync(request.Identifier, cancellationToken);
         var result = passwords.Verify(user, request.Password);
         if (user is null || result == PasswordVerificationResult.Failed)

@@ -18,10 +18,10 @@ The emulator API base is `http://10.0.2.2:5080/api/`; update `ApiConfig.BASE_URL
 The SQLite database stores only server-returned display/session reference data and station cache data with fetch timestamps. It never stores passwords, MongoDB data access, reservation authorization decisions, or bearer tokens. Phase 17 adds Retrofit authentication and secure token handling. Phase 18 adds prosumer registration, a live home dashboard, profile editing, deactivation requests and sign-out. See [the Phase 18 walkthrough](../docs/phase-18.md).
 
 Build with the included Gradle 8.9 wrapper and a compatible JDK (Android Studio's bundled JDK was used). Set `ANDROID_HOME` to the full Android SDK; if `ANDROID_SDK_ROOT` is present it must point to the same SDK, not the separate platform-tools directory. Run `.\android\gradlew.bat -p android assembleDebug testDebugUnitTest lintDebug` from the repository root, or use Android Studio. The [Phase 18 record](../docs/phase-18.md#verification) includes environment setup commands.
-
+20
 Phase 19 adds native station/slot selection, booking confirmation, current/pending/history views, search, details, energy modification and cancellation. See [the Phase 19 walkthrough](../docs/phase-19.md) for test coverage, network recovery behavior and manual steps.
 
-Phase 20 adds Google Maps to the nearby-station workflow. Set `SMART_SOLAR_MAPS_API_KEY` in `android/gradle.properties` or the user-level Gradle properties file before installing an app build that should render map tiles. Keep the key out of source control and restrict it to package `com.smartsolar.microgrid` plus the signing certificate for the build. See [the Phase 20 walkthrough](../docs/phase-20.md).
+Phase 20 adds Google Maps to the nearby-station workflow. Set `SMART_SOLAR_MAPS_API_KEY` in the ignored `android/local.properties` file or the user-level Gradle properties file before installing an app build that should render map tiles. Keep the key out of source control and restrict it to package `com.smartsolar.microgrid` plus the signing certificate for the build. See [the Phase 20 walkthrough](../docs/phase-20.md).
 
 Phase 21 adds approved-booking QR display for prosumers and Grid Operator QR verification/completion. The app renders server-issued opaque tokens as QR codes, scans QR codes with ZXing, and keeps manual token entry available for camera-denied or camera-less devices. See [the Phase 21 walkthrough](../docs/phase-21.md).
 

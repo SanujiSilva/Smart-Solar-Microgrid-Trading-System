@@ -2,6 +2,11 @@ package com.smartsolar.microgrid
 
 import android.Manifest
 import android.os.Bundle
+import android.view.View
+import androidx.core.widget.doAfterTextChanged
+import com.smartsolar.microgrid.databinding.ItemSolarRecordBinding
+import java.io.IOException
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +32,9 @@ import java.util.Locale
 class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityNearbyStationsBinding
     private var map: GoogleMap? = null
+    private var loadedStations: List<StationSummary> = emptyList()
+    private var cachedResults = false
+    private var hasSearched = false
     private var stationsByMarker = mutableMapOf<Marker, StationSummary>()
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationPermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
@@ -44,11 +52,49 @@ class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
         binding = ActivityNearbyStationsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applyAccountInsets()
+        configurePrimaryNavigation(R.id.nav_stations)
         binding.backButton.setOnClickListener { finish() }
         binding.searchButton.setOnClickListener { search() }
         binding.useLocationButton.setOnClickListener { requestDeviceLocation() }
+        binding.directoryButton.setOnClickListener { startActivity(Intent(this, StationDirectoryActivity::class.java)) }
+        binding.mapListToggle.addOnButtonCheckedListener { _, id, checked ->
+            if (checked) binding.mapPanel.visibility = if (id == R.id.mapViewButton) View.VISIBLE else View.GONE
+        }
+        binding.filterButton.setOnClickListener {
+            binding.locationFilters.visibility = if (binding.locationFilters.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
+        binding.nearbySearchInput.doAfterTextChanged { renderResults() }
+        if (savedInstanceState != null) {
+            binding.latitudeInput.setText(savedInstanceState.getString("latitude"))
+            binding.longitudeInput.setText(savedInstanceState.getString("longitude"))
+            binding.radiusInput.setText(savedInstanceState.getString("radius"))
+            cachedResults = savedInstanceState.getBoolean("cached")
+            hasSearched = savedInstanceState.getBoolean("searched")
+            loadedStations = savedInstanceState.getString("stations")?.let {
+                com.google.gson.Gson().fromJson(it, Array<StationSummary>::class.java).toList()
+            }.orEmpty()
+            binding.nearbyStateText.text = savedInstanceState.getString("state_message")
+            binding.mapListToggle.check(if (savedInstanceState.getBoolean("list")) R.id.listViewButton else R.id.mapViewButton)
+            binding.locationFilters.visibility = if (savedInstanceState.getBoolean("filters", true)) View.VISIBLE else View.GONE
+            renderResults()
+        }
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (::binding.isInitialized) {
+            outState.putString("latitude", binding.latitudeInput.text.toString())
+            outState.putString("longitude", binding.longitudeInput.text.toString())
+            outState.putString("radius", binding.radiusInput.text.toString())
+            outState.putBoolean("cached", cachedResults)
+            outState.putBoolean("searched", hasSearched)
+            outState.putBoolean("list", binding.mapListToggle.checkedButtonId == R.id.listViewButton)
+            outState.putBoolean("filters", binding.locationFilters.visibility == View.VISIBLE)
+            outState.putString("stations", com.google.gson.Gson().toJson(loadedStations))
+            outState.putString("state_message", binding.nearbyStateText.text.toString())
+        }
+        super.onSaveInstanceState(outState)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -58,11 +104,18 @@ class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
                 fillCoordinates(point.latitude, point.longitude)
                 animateCamera(CameraUpdateFactory.newLatLngZoom(point, DEFAULT_ZOOM))
             }
+            setOnMarkerClickListener { marker ->
+                stationsByMarker[marker]?.let { station ->
+                    binding.selectedStationText.text = getString(R.string.station_card_body, station.stationCode, station.address, station.capacityKWh.toString(), station.availableBatterySlots)
+                }
+                false
+            }
             setOnInfoWindowClickListener { marker ->
                 stationsByMarker[marker]?.let { showStation(it) }
             }
         }
         enableMyLocationLayer()
+        renderResults()
     }
 
     private fun search() {
@@ -75,21 +128,42 @@ class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
             binding.messageText.setText(R.string.coordinates_required)
             return
         }
-        binding.results.removeAllViews()
-        map?.clear()
-        stationsByMarker.clear()
-        request(binding.progressBar, binding.messageText, listOf(binding.searchButton)) {
-            val response = account.nearby(input.latitude, input.longitude, input.radiusKm)
-            if (response.items.isEmpty()) binding.messageText.setText(R.string.no_stations)
-            renderMap(input.latitude, input.longitude, response.items)
-            response.items.forEach { station ->
-                binding.results.addView(MaterialButton(this).apply {
-                    text = resources.getQuantityString(R.plurals.station_map_result_plural,
-                        station.availableBatterySlots, station.name, station.availableBatterySlots)
-                    setOnClickListener { showStation(station) }
-                })
+        request(binding.progressBar, binding.messageText,
+            listOf(binding.searchButton, binding.useLocationButton, binding.latitudeInput, binding.longitudeInput, binding.radiusInput)) {
+            cachedResults = false
+            try {
+                loadedStations = account.nearby(input.latitude, input.longitude, input.radiusKm).items
+                binding.nearbyStateText.text = ""
+            } catch (error: IOException) {
+                val cache = account.cachedStations()
+                if (cache.isEmpty()) throw error
+                cachedResults = true
+                loadedStations = cache.map { StationSummary(it.stationId, it.stationCode, it.name, it.address, it.latitude, it.longitude, it.capacityKWh, it.availableBatterySlots, it.status) }
+                val time = java.text.DateFormat.getDateTimeInstance().format(java.util.Date(cache.minOf { it.fetchedAtEpochMillis }))
+                binding.nearbyStateText.text = getString(R.string.cached_stations_notice, time)
+                binding.nearbyStateText.solarBanner(SolarTone.WARNING)
             }
+            hasSearched = true
+            renderResults()
         }
+    }
+
+    private fun renderResults() {
+        val query = binding.nearbySearchInput.text.toString().trim()
+        val stations = loadedStations.filter { query.isBlank() || (it.name + " " + it.stationCode + " " + it.address).contains(query, ignoreCase = true) }
+        binding.results.removeAllViews()
+        binding.selectedStationText.setText(R.string.nearby_preview_hint)
+        if (hasSearched && stations.isEmpty() && !cachedResults) binding.nearbyStateText.setText(if (loadedStations.isEmpty()) R.string.no_stations else R.string.no_loaded_matches)
+        else if (hasSearched && !cachedResults) binding.nearbyStateText.text = ""
+        stations.forEach { station ->
+            val row = ItemSolarRecordBinding.inflate(layoutInflater, binding.results, false)
+            row.bindSolarRecord(SolarRecord(station.id, station.name,
+                getString(R.string.station_card_body, station.stationCode, station.address, station.capacityKWh.toString(), station.availableBatterySlots),
+                station.status, getString(if (cachedResults) R.string.cached_station_action else R.string.view_details_action)) { showStation(station) })
+            binding.results.addView(row.root)
+        }
+        val input = StationMapPresentation.parseCoordinates(binding.latitudeInput.text.toString(), binding.longitudeInput.text.toString(), binding.radiusInput.text.toString())
+        if (input != null) renderMap(input.latitude, input.longitude, stations)
     }
 
     private fun requestDeviceLocation() {
@@ -134,6 +208,8 @@ class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
 
     private fun renderMap(latitude: Double, longitude: Double, stations: List<StationSummary>) {
         val googleMap = map ?: return
+        googleMap.clear()
+        stationsByMarker.clear()
         val origin = LatLng(latitude, longitude)
         googleMap.addMarker(MarkerOptions().position(origin).title(getString(R.string.search_center)))
         if (stations.isEmpty()) {
@@ -144,7 +220,7 @@ class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
         stations.forEach { station ->
             val marker = StationMapPresentation.markerFor(station)
             val point = LatLng(marker.latitude, marker.longitude)
-            googleMap.addMarker(MarkerOptions().position(point).title(marker.title).snippet(marker.snippet))?.let {
+            googleMap.addMarker(MarkerOptions().position(point).title(marker.title).snippet(getString(R.string.map_marker_slots, station.stationCode, station.availableBatterySlots)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)))?.let {
                 stationsByMarker[it] = station
             }
             bounds.include(point)
@@ -163,7 +239,8 @@ class NearbyStationsActivity : AccountActivity(), OnMapReadyCallback {
             .setMessage(getString(R.string.station_details, station.stationCode, station.address,
                 station.status, station.capacityKWh.toString(), station.availableBatterySlots,
                 station.latitude.toString(), station.longitude.toString()))
-            .setNeutralButton(R.string.available_slots) { _, _ ->
+            .setNeutralButton(if (cachedResults) R.string.retry_action else R.string.available_slots) { _, _ ->
+                if (cachedResults) { search(); return@setNeutralButton }
                 startActivity(Intent(this@NearbyStationsActivity, StationDetailsActivity::class.java)
                     .putExtra(StationDirectoryActivity.STATION_ID, station.id))
             }

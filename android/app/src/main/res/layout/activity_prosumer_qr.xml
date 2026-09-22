@@ -1,47 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="24dp">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/booking_qr"
-            android:textSize="26sp" />
-        <TextView
-            android:id="@+id/summaryText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="16dp" />
-        <ImageView
-            android:id="@+id/qrImage"
-            android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/booking_qr" />
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-        <TextView
-            android:id="@+id/messageText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:accessibilityLiveRegion="polite" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/refreshButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/reissue_qr" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/backButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/back_action" />
-    </LinearLayout>
-</ScrollView>
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/solar_screen_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/solarToolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="?attr/actionBarSize" android:background="@color/solar_background" app:title="@string/booking_qr" app:titleTextAppearance="@style/Solar.ToolbarTitle" />
+    <androidx.core.widget.NestedScrollView android:scrollbars="vertical" android:fadeScrollbars="false" android:scrollbarStyle="insideOverlay" android:scrollbarSize="4dp" android:scrollbarThumbVertical="@drawable/solar_scroll_thumb" android:id="@+id/screenScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:padding="@dimen/screen_padding">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/qr_instructions" android:layout_marginBottom="@dimen/space_md" />
+            <com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:indeterminate="true" android:visibility="gone" app:indicatorSize="@dimen/progress_size" />
+            <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" android:accessibilityLiveRegion="polite" android:padding="@dimen/space_lg" android:background="@drawable/solar_banner_info" android:visibility="gone" />
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                    <ImageView android:id="@+id/qrImage" android:layout_width="match_parent" android:layout_height="@dimen/qr_size" android:adjustViewBounds="true" android:scaleType="fitCenter" android:padding="@dimen/space_lg" android:background="@color/solar_surface" android:contentDescription="@string/booking_qr" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                    <TextView android:id="@+id/summaryText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.button.MaterialButton android:id="@+id/refreshButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/reissue_qr" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/backButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/back_action" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

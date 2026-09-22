@@ -1,3 +1,8 @@
+/*
+ * File: tests/SmartSolarMicrogrid.Api.Tests/ApiFoundationTests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Automated verification and test support for Api Foundation Tests.
+ */
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http.Json;
@@ -19,6 +24,7 @@ public sealed class ApiFoundationTests
     [Fact]
     public async Task Health_returns_live_utc_response()
     {
+        // Verify that health returns live utc response.
         await using var factory = CreateFactory();
         using var client = CreateClient(factory);
         var before = DateTimeOffset.UtcNow;
@@ -33,6 +39,7 @@ public sealed class ApiFoundationTests
     [Fact]
     public async Task Unknown_route_returns_problem_details_with_trace_id()
     {
+        // Verify that unknown route returns problem details with trace id.
         await using var factory = CreateFactory();
         using var client = CreateClient(factory);
         using var response = await client.GetAsync("/api/missing");
@@ -45,6 +52,7 @@ public sealed class ApiFoundationTests
     [InlineData("{bad json")]
     public async Task Invalid_input_returns_structured_validation_errors(string json)
     {
+        // Verify that invalid input returns structured validation errors.
         await using var factory = CreateFactory(includeTestController: true);
         using var client = CreateClient(factory);
         using var response = await client.PostAsync("/test-probe/validate",
@@ -60,6 +68,7 @@ public sealed class ApiFoundationTests
     [InlineData("Production", "text/html")]
     public async Task Unhandled_exception_returns_safe_problem_details(string environment, string accept)
     {
+        // Verify that unhandled exception returns safe problem details.
         await using var factory = CreateFactory(environment, includeTestController: true);
         using var client = CreateClient(factory);
         client.DefaultRequestHeaders.Accept.ParseAdd(accept);
@@ -73,6 +82,7 @@ public sealed class ApiFoundationTests
     [Fact]
     public async Task Development_exposes_OpenApi_and_Swagger()
     {
+        // Verify that development exposes openapi and swagger.
         await using var factory = CreateFactory();
         using var client = CreateClient(factory);
         using var response = await client.GetAsync("/openapi/v1.json");
@@ -90,6 +100,7 @@ public sealed class ApiFoundationTests
     [InlineData("/swagger/index.html")]
     public async Task Production_does_not_expose_API_documentation(string path)
     {
+        // Verify that production does not expose api documentation.
         await using var factory = CreateFactory("Production");
         using var client = CreateClient(factory);
         using var response = await client.GetAsync(path);
@@ -101,6 +112,7 @@ public sealed class ApiFoundationTests
     [InlineData("https://untrusted.example", false)]
     public async Task Cors_only_allows_configured_browser_origins(string origin, bool allowed)
     {
+        // Verify that cors only allows configured browser origins.
         await using var factory = CreateFactory();
         using var client = CreateClient(factory);
         using var request = new HttpRequestMessage(HttpMethod.Options, "/api/health");
@@ -114,6 +126,7 @@ public sealed class ApiFoundationTests
         }
     }
 
+    // Create Factory for Api Foundation Tests.
     private static WebApplicationFactory<Program> CreateFactory(
         string environment = "Development", bool includeTestController = false) =>
         new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
@@ -134,6 +147,7 @@ public sealed class ApiFoundationTests
             }
         });
 
+    // Create Client for Api Foundation Tests.
     private static HttpClient CreateClient(WebApplicationFactory<Program> factory) =>
         factory.CreateClient(new WebApplicationFactoryClientOptions
         {
@@ -141,11 +155,13 @@ public sealed class ApiFoundationTests
             AllowAutoRedirect = false
         });
 
+    // Read Json for Api Foundation Tests.
     private static async Task<JsonElement> ReadJson(HttpResponseMessage response) =>
         await response.Content.ReadFromJsonAsync<JsonElement>();
 
     private static async Task<JsonElement> AssertProblem(HttpResponseMessage response, HttpStatusCode status)
     {
+        // Assert Problem for Api Foundation Tests.
         Assert.Equal(status, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         var body = await ReadJson(response);
@@ -161,9 +177,11 @@ public sealed class ApiFoundationTests
 [Route("test-probe")]
 public sealed class FoundationProbeController : ControllerBase
 {
+    // Throw for Api Foundation Tests.
     [HttpGet("throw")]
     public IActionResult Throw() => throw new InvalidOperationException("sensitive-test-exception");
 
+    // Validate for Api Foundation Tests.
     [HttpPost("validate")]
     public IActionResult Validate(ProbeRequest request) => Ok();
 }

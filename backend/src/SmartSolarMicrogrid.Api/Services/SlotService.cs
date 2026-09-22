@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Services/SlotService.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Server-side application rules and orchestration for Slot Service.
+ */
 using MongoDB.Bson;
 using SmartSolarMicrogrid.Api.DTOs.Slots;
 using SmartSolarMicrogrid.Api.Helpers;
@@ -12,6 +17,7 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
     public async Task<SlotListResponse> ListAsync(string stationId, SlotListQuery query,
         CancellationToken cancellationToken)
     {
+        // List for Slot.
         currentUser.Get();
         var id = ParseId(stationId, "Station ID");
         await RequireStation(id, cancellationToken);
@@ -22,6 +28,7 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
     public async Task<SlotResponse> CreateAsync(string stationId, CreateSlotRequest request,
         CancellationToken cancellationToken)
     {
+        // Create for Slot.
         currentUser.Require(UserRole.BACKOFFICE);
         var id = ParseId(stationId, "Station ID");
         var station = await RequireStation(id, cancellationToken);
@@ -44,6 +51,7 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
 
     public async Task<SlotResponse> GetAsync(string id, CancellationToken cancellationToken)
     {
+        // Get for Slot.
         currentUser.Get();
         return SlotResponse.From(await Find(id, cancellationToken));
     }
@@ -51,6 +59,7 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
     public async Task<SlotResponse> UpdateAsync(string id, UpdateSlotRequest request,
         CancellationToken cancellationToken)
     {
+        // Update for Slot.
         currentUser.Require(UserRole.BACKOFFICE);
         var slot = await Find(id, cancellationToken);
         if (slot.Status == SlotStatus.CANCELLED) throw new ApiException(409, "A cancelled slot cannot be updated.");
@@ -80,6 +89,7 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
 
     public async Task<SlotResponse> CancelAsync(string id, CancellationToken cancellationToken)
     {
+        // Cancel for Slot.
         currentUser.Require(UserRole.BACKOFFICE);
         var slot = await Find(id, cancellationToken);
         if (slot.Status == SlotStatus.CANCELLED) return SlotResponse.From(slot);
@@ -94,6 +104,7 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
 
     private async Task<EnergyBookingSlot> Find(string id, CancellationToken cancellationToken)
     {
+        // Find for Slot.
         var objectId = ParseId(id, "Slot ID");
         return await slots.FindAsync(objectId, cancellationToken)
             ?? throw new ApiException(404, "The slot was not found.");
@@ -102,6 +113,7 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
     public async Task<SlotResponse> UpdateAvailabilityAsync(string id, SlotAvailabilityRequest request,
         CancellationToken cancellationToken)
     {
+        // Update Availability for Slot.
         var actor = currentUser.Get();
         if (actor.Role is not (UserRole.BACKOFFICE or UserRole.GRID_OPERATOR))
             throw new ApiException(403, "Staff access is required.");
@@ -120,25 +132,30 @@ public sealed class SlotService(ISlotRepository slots, IStationRepository statio
 
     private static void ValidateStationSlot(SolarStationInfo station, SlotDetails details)
     {
+        // Validate Station Slot for Slot.
         if (details.Capacity > station.CapacityKWh) throw new ApiException(409, "Slot capacity exceeds station capacity.");
         StationBookingRules.RequireSchedule(station, details.StartTime, details.EndTime);
     }
 
+    // Require Station for Slot.
     private async Task<SolarStationInfo> RequireStation(ObjectId id, CancellationToken cancellationToken) =>
         await stations.FindAsync(id, cancellationToken)
         ?? throw new ApiException(404, "The station was not found.");
 
     private static void RequireUsableStation(SolarStationInfo station)
     {
+        // Require Usable Station for Slot.
         if (station.Status == StationStatus.DEACTIVATED)
             throw new ApiException(409, "A deactivated station cannot have slots managed.");
     }
 
+    // Parse Id for Slot.
     private static ObjectId ParseId(string value, string name) =>
         ObjectId.TryParse(value, out var id) ? id : throw new ApiException(400, $"{name} must be a valid ObjectId.");
 
     private static SlotDetails ValidateDetails(SlotDetailsRequest request)
     {
+        // Validate Details for Slot.
         if (request.StartTime is null || request.EndTime is null || request.Capacity is null || request.AvailableCapacity is null)
             throw new ApiException(400, "Slot times and capacities are required.");
         var start = request.StartTime.Value.UtcDateTime;

@@ -15,15 +15,17 @@ class ProfileActivity : AccountActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applyAccountInsets()
+        configurePrimaryNavigation(R.id.nav_profile)
+        binding.logoutButton.setOnClickListener { confirmSignOut() }
         binding.backButton.setOnClickListener { finish() }
         binding.retryButton.setOnClickListener { load() }
         binding.saveButton.setOnClickListener { save() }
         binding.deactivateButton.setOnClickListener {
             MaterialAlertDialogBuilder(this)
-                .setTitle("Request account deactivation?")
-                .setMessage("Backoffice will review your request. Your account remains usable until they deactivate it.")
-                .setNegativeButton("Keep account", null)
-                .setPositiveButton("Send request") { _, _ ->
+                .setTitle(R.string.deactivate_title)
+                .setMessage(R.string.deactivate_message)
+                .setNegativeButton(R.string.keep_account, null)
+                .setPositiveButton(R.string.send_request) { _, _ ->
                     runProfileRequest {
                         render(account.requestDeactivation())
                         binding.messageText.setText(R.string.deactivation_pending)
@@ -61,6 +63,9 @@ class ProfileActivity : AccountActivity() {
             return
         }
         binding.profileForm.visibility = View.VISIBLE
+        binding.avatarText.text = user.fullName.take(1).uppercase()
+        binding.profileName.text = user.fullName
+        binding.accountStatusChip.solarStatus(user.status)
         binding.identityText.text = getString(R.string.profile_identity, user.nic, user.role, user.status)
         binding.fullNameInput.setText(user.fullName)
         binding.emailInput.setText(user.email)

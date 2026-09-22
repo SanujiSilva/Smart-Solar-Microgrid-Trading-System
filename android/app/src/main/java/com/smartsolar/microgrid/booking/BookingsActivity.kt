@@ -9,6 +9,9 @@ import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.button.MaterialButton
 import com.smartsolar.microgrid.AccountActivity
+import com.smartsolar.microgrid.SolarRecord
+import com.smartsolar.microgrid.bindSolarRecord
+import com.smartsolar.microgrid.databinding.ItemSolarRecordBinding
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.applyAccountInsets
 import com.smartsolar.microgrid.data.remote.ApiClient
@@ -40,6 +43,7 @@ class BookingsActivity : AccountActivity() {
         binding = ActivityBookingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applyAccountInsets()
+        configurePrimaryNavigation(R.id.nav_bookings)
         page = savedInstanceState?.getInt("page") ?: 1
         mode = savedInstanceState?.getInt("mode") ?: 0
         stationId = savedInstanceState?.getString("station_id")
@@ -73,6 +77,7 @@ class BookingsActivity : AccountActivity() {
             page = 1
             load()
         }
+        binding.swipeRefresh.setOnRefreshListener { page = 1; load() }
         binding.refreshButton.setOnClickListener { page = 1; load() }
         binding.previousButton.setOnClickListener { if (page > 1) { page--; load() } }
         binding.nextButton.setOnClickListener { page++; load() }
@@ -117,6 +122,7 @@ class BookingsActivity : AccountActivity() {
 
     private fun load() {
         if (mode == 3 && from.isNotEmpty() && through.isNotEmpty() && LocalDate.parse(from) > LocalDate.parse(through)) {
+            binding.swipeRefresh.isRefreshing = false
             binding.messageText.setText(R.string.invalid_date_range)
             return
         }
@@ -124,7 +130,7 @@ class BookingsActivity : AccountActivity() {
         request(binding.progressBar, binding.messageText,
             listOf(binding.refreshButton, binding.modeSpinner, binding.statusSpinner, binding.codeInput,
                 binding.stationButton, binding.fromButton, binding.throughButton, binding.clearButton,
-                binding.previousButton, binding.nextButton)) {
+                binding.previousButton, binding.nextButton), onFinished = { binding.swipeRefresh.isRefreshing = false }) {
             val items: List<com.smartsolar.microgrid.data.remote.Booking>
             val total: Long
             if (mode == 0 || mode == 2) {
@@ -147,14 +153,13 @@ class BookingsActivity : AccountActivity() {
             binding.nextButton.visibility = if (page * 20L < total) View.VISIBLE else View.GONE
             if (items.isEmpty()) binding.messageText.setText(R.string.no_bookings)
             items.forEach { booking ->
-                binding.results.addView(MaterialButton(this).apply {
-                    text = getString(R.string.booking_list_row, booking.reservationCode, booking.status,
-                        BookingPresentation.time(booking.reservationDateTime), booking.energyAmount.toPlainString())
-                    setOnClickListener {
-                        startActivity(Intent(this@BookingsActivity, BookingEditorActivity::class.java)
-                            .putExtra(BookingEditorModel.BOOKING_ID, booking.id))
-                    }
+                val row = ItemSolarRecordBinding.inflate(layoutInflater, binding.results, false)
+                row.bindSolarRecord(SolarRecord(booking.id, booking.reservationCode,
+                    getString(R.string.booking_card_body, booking.stationId, BookingPresentation.time(booking.reservationDateTime), booking.energyAmount.toPlainString()),
+                    booking.status, getString(R.string.view_details_action)) {
+                    startActivity(Intent(this, BookingEditorActivity::class.java).putExtra(BookingEditorModel.BOOKING_ID, booking.id))
                 })
+                binding.results.addView(row.root)
             }
         }
     }

@@ -1,0 +1,55 @@
+/* Common design tokens and controls for every role and page. */
+:root {
+  --ink: #171536;
+  --muted: #647195;
+  --paper: #f6f8ff;
+  --purple: #6531d1;
+  --coral: var(--purple);
+  --line: #dfe5f1;
+  --ui-font: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--ui-font);
+  background: var(--paper);
+}
+body { color: var(--ink); background: var(--paper); font-family: var(--ui-font); }
+.app-frame, .auth-page { font-family: var(--ui-font); }
+.workspace-frame .workspace-actions { margin-left: auto; }
+.workspace-frame .side-link:hover { background: #ffffff14; color: white; }
+.workspace-frame .side-link.is-active { color: white; background: linear-gradient(110deg, #7735dd, #5b2bc5); }
+.workspace-frame .footer-line { display: flex; min-height: 46px; padding-block: 14px; }
+.workspace-frame h1, .auth-page h1 { font-family: var(--ui-font); font-weight: 700; line-height: 1.15; letter-spacing: -.035em; color: var(--ink); }
+.workspace-frame :is(.accounts-heading, .page-heading) h1 { font-size: clamp(28px, 2.8vw, 42px); }
+.workspace-frame :is(.eyebrow, .panel-label), .auth-page :is(.eyebrow, .panel-label) { color: var(--purple); }
+.workspace-frame .btn, .auth-page .btn { border-radius: 8px; min-height: 42px; font-family: var(--ui-font); font-size: 14px; font-weight: 600; }
+.workspace-frame :is(.btn-primary, .btn-dark), .auth-page .auth-submit { background: linear-gradient(120deg, #7234d8, #5827c7); border-color: var(--purple); color: white; }
+.workspace-frame :is(.btn-primary, .btn-dark):hover, .auth-page .auth-submit:hover { background: #5124ad; border-color: #5124ad; }
+.workspace-frame .btn-outline-primary { --bs-btn-color: #6230c9; --bs-btn-border-color: #c9b6f2; --bs-btn-hover-bg: #f0eaff; --bs-btn-hover-color: #5221ab; --bs-btn-hover-border-color: #9a74dd; --bs-btn-active-bg: #6531d1; --bs-btn-active-border-color: #6531d1; }
+.workspace-frame :is(.form-control, .form-select), .auth-page .form-control { min-height: 44px; border: 1px solid #d6deee; border-radius: 8px; background-color: #fcfcff; color: var(--ink); font: 14px/1.5 var(--ui-font); }
+.workspace-frame :is(.form-control, .form-select):focus, .auth-page .form-control:focus { border-color: #9264dc; box-shadow: 0 0 0 3px #6531d122; }
+:is(button, a, input, select, textarea):focus-visible { outline: 3px solid #9060e0; outline-offset: 3px; }
+.workspace-frame .data-panel, .workspace-frame .overview-panel, .auth-card { border: 1px solid var(--line); border-radius: 12px; background: white; box-shadow: 0 4px 20px #24345305; }
+.workspace-frame .status-pill { border-radius: 999px; padding: 6px 12px; font: 600 11px/1.4 var(--ui-font); }
+.workspace-frame :is(.status-pill--active, .status-pill--open, .status-pill--approved, .status-pill--completed) { background: #dff6e9; color: #006637; }
+.workspace-frame :is(.status-pill--pending, .status-pill--deactivation_requested) { background: #fff0cc; color: #855400; }
+.workspace-frame :is(.status-pill--deactivated, .status-pill--cancelled, .status-pill--rejected, .status-pill--closed) { background: #fde4e4; color: #9c2929; }
+.workspace-frame .alert, .auth-page .alert { border-radius: 8px; }
+.workspace-frame .table thead th { background: #f1f4f9; color: #434c72; font-family: var(--ui-font); }
+.operator-dashboard { padding: 28px; }
+.operator-dashboard .page-heading { padding: 0; margin: 0 0 24px; max-width: none; }
+.operator-dashboard .metric-grid { padding: 0; max-width: none; }
+.operator-dashboard .data-panel { max-width: none; }
+.workspace-page { max-width: 1100px; width: 100%; padding: 32px; }
+.workspace-page h1 { font-size: clamp(28px, 2.8vw, 42px); }
+.workspace-page .lead-copy { max-width: 760px; font-size: 16px; }
+.workspace-strip { border: 0; gap: 16px; margin-top: 28px; }
+.workspace-strip > div { background: white; border: 1px solid var(--line); border-radius: 12px; }
+.auth-page { min-height: 100vh; gap: 48px; }
+.auth-intro h1 { font-size: clamp(38px, 5vw, 64px); }
+.auth-intro h1 span { color: var(--purple); }
+.auth-card { border-top: 4px solid var(--purple); }
+.auth-card h2 { color: var(--ink); font-family: var(--ui-font); }
+@media (max-width: 760px) {
+  .operator-dashboard, .workspace-page { padding: 24px 16px; }
+  .auth-page { gap: 24px; padding: 32px 20px; }
+  .auth-card { padding: 24px; min-width: 0; }
+  .workspace-frame .workspace-actions { flex-wrap: wrap; }
+}

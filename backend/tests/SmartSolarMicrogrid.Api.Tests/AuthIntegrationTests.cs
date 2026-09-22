@@ -1,3 +1,8 @@
+/*
+ * File: tests/SmartSolarMicrogrid.Api.Tests/AuthIntegrationTests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Automated verification and test support for Auth Integration Tests.
+ */
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
@@ -29,6 +34,7 @@ public sealed class MongoTheoryAttribute : TheoryAttribute
 {
     public MongoTheoryAttribute()
     {
+        // Initialize Auth Integration Tests dependencies and configuration.
         if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SMARTSOLAR_TEST_MONGODB_URI")))
             Skip = "Set SMARTSOLAR_TEST_MONGODB_URI to run real MongoDB tests.";
     }
@@ -37,7 +43,7 @@ public sealed class MongoTheoryAttribute : TheoryAttribute
 public sealed class AuthIntegrationTests : IAsyncLifetime
 {
     private const string TestPassword = "Phase four test passphrase!";
-    private readonly string databaseName = "smartsolar_tests_" + Guid.NewGuid().ToString("N");
+    private readonly string databaseName = "ss_test_" + Guid.NewGuid().ToString("N")[..24];
     private WebApplicationFactory<Program> factory = null!;
     private HttpClient http = null!;
     private MongoDbContext context = null!;
@@ -45,6 +51,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
 
     public Task InitializeAsync()
     {
+        // Create an isolated test database and initialize the API test clients.
         factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Development");
@@ -67,6 +74,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        // Release owned resources and clean up this test or request scope.
         try
         {
             if (context is not null) await context.Database.Client.DropDatabaseAsync(databaseName);
@@ -81,6 +89,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Registration_creates_pending_prosumer_with_salted_hash_and_no_token()
     {
+        // Verify that registration creates pending prosumer with salted hash and no token.
         using var response = await http.PostAsJsonAsync("/api/auth/prosumer/register", Registration());
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var json = await response.Content.ReadAsStringAsync();
@@ -109,6 +118,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [InlineData("id", "000000000000000000000001")]
     public async Task Registration_rejects_invalid_input_and_privilege_injection(string field, string value)
     {
+        // Verify that registration rejects invalid input and privilege injection.
         var body = Registration();
         body[field] = value;
         using var response = await http.PostAsJsonAsync("/api/auth/prosumer/register", body);
@@ -120,6 +130,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Concurrent_duplicate_registration_returns_one_created_and_one_conflict()
     {
+        // Verify that concurrent duplicate registration returns one created and one conflict.
         var body = Registration();
         var responses = await Task.WhenAll(
             http.PostAsJsonAsync("/api/auth/prosumer/register", body),
@@ -135,6 +146,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Email_unique_index_is_case_insensitive()
     {
+        // Verify that email unique index is case insensitive.
         var first = Registration();
         first["email"] = "MixedCase@example.invalid";
         using var created = await http.PostAsJsonAsync("/api/auth/prosumer/register", first);
@@ -152,6 +164,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [InlineData(UserRole.PROSUMER)]
     public async Task Active_roles_can_login_and_me_uses_authenticated_identity(UserRole role)
     {
+        // Verify that active roles can login and me uses authenticated identity.
         var user = await SeedUser(role);
         var login = await Login(user.Email.ToUpperInvariant());
         Assert.Equal(role.ToString(), login.User.Role);
@@ -175,6 +188,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [InlineData(UserStatus.DEACTIVATED)]
     public async Task Non_active_accounts_cannot_login(UserStatus status)
     {
+        // Verify that non active accounts cannot login.
         var user = await SeedUser(UserRole.PROSUMER, status);
         using var response = await http.PostAsJsonAsync("/api/auth/login", new LoginRequest { Identifier = user.Email, Password = TestPassword });
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -183,6 +197,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Wrong_password_and_unknown_account_return_the_same_generic_401()
     {
+        // Verify that wrong password and unknown account return the same generic 401.
         var user = await SeedUser(UserRole.PROSUMER);
         using var wrong = await http.PostAsJsonAsync("/api/auth/login", new LoginRequest { Identifier = user.Email, Password = "wrong password" });
         using var unknown = await http.PostAsJsonAsync("/api/auth/login", new LoginRequest { Identifier = "missing@example.invalid", Password = TestPassword });
@@ -210,6 +225,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [InlineData(UserRole.PROSUMER, "staff", 403)]
     public async Task Role_policies_enforce_the_permission_matrix(UserRole role, string path, int status)
     {
+        // Verify that role policies enforce the permission matrix.
         var user = await SeedUser(role);
         var login = await Login(user.Email);
         http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login.AccessToken);
@@ -224,6 +240,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [InlineData("/test-auth/backoffice")]
     public async Task Protected_routes_require_a_token(string path)
     {
+        // Verify that protected routes require a token.
         using var response = await http.GetAsync(path);
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -240,6 +257,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [InlineData("future")]
     public async Task Invalid_tokens_are_rejected(string kind)
     {
+        // Verify that invalid tokens are rejected.
         var user = await SeedUser(UserRole.PROSUMER);
         var key = kind == "signature" ? Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)) : AuthTestSettings.SigningKey;
         var claims = new[] { new Claim("sub", user.Id.ToString()), new Claim("ver", "0"),
@@ -263,6 +281,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [InlineData("version")]
     public async Task Existing_token_cannot_bypass_database_changes(string change)
     {
+        // Verify that existing token cannot bypass database changes.
         var user = await SeedUser(UserRole.PROSUMER);
         var login = await Login(user.Email);
         if (change == "deleted") await context.Users.DeleteOneAsync(x => x.Id == user.Id);
@@ -285,6 +304,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Deactivation_requested_account_can_sign_in_until_deactivation_is_approved()
     {
+        // Verify that deactivation requested account can sign in until deactivation is approved.
         var user = await SeedUser(UserRole.PROSUMER, UserStatus.DEACTIVATION_REQUESTED);
         Assert.Equal(user.Id.ToString(), (await Login(user.Email)).User.Id);
     }
@@ -292,6 +312,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Login_upgrades_older_password_hash()
     {
+        // Verify that login upgrades older password hash.
         var user = await SeedUser(UserRole.PROSUMER);
         var legacyHash = new PasswordHasher<User>(Options.Create(new PasswordHasherOptions { IterationCount = 1000 })).HashPassword(user, TestPassword);
         await context.Users.UpdateOneAsync(x => x.Id == user.Id, Builders<User>.Update.Set(x => x.PasswordHash, legacyHash));
@@ -304,6 +325,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Auth_rate_limit_returns_429_with_retry_header()
     {
+        // Verify that auth rate limit returns 429 with retry header.
         for (var i = 0; i < 10; i++)
         {
             using var denied = await http.PostAsJsonAsync("/api/auth/login", new LoginRequest { Identifier = "unknown", Password = "wrong" });
@@ -317,6 +339,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Bootstrap_creates_one_active_backoffice_and_never_overwrites_it()
     {
+        // Verify that bootstrap creates one active backoffice and never overwrites it.
         await using var scope = factory.Services.CreateAsyncScope();
         var bootstrap = scope.ServiceProvider.GetRequiredService<BackofficeBootstrapService>();
         await bootstrap.CreateAsync(CancellationToken.None);
@@ -332,6 +355,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task OpenApi_has_Bearer_security_only_on_protected_operations()
     {
+        // Verify that openapi has bearer security only on protected operations.
         var document = await http.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
         Assert.Equal("bearer", document.GetProperty("components").GetProperty("securitySchemes").GetProperty("Bearer").GetProperty("scheme").GetString());
         var paths = document.GetProperty("paths");
@@ -340,6 +364,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
         Assert.False(paths.TryGetProperty("/test-auth/backoffice", out _));
     }
 
+    // Registration for Auth Integration Tests.
     private static Dictionary<string, string> Registration() => new()
     {
         ["nic"] = "991234567v", ["fullName"] = "Test Prosumer", ["phone"] = "0771234567",
@@ -348,6 +373,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
 
     private async Task<User> SeedUser(UserRole role, UserStatus status = UserStatus.ACTIVE)
     {
+        // Seed User for Auth Integration Tests.
         var user = MongoModelTests.NewUser(role == UserRole.PROSUMER ? "991234567V" : null);
         user.Role = role; user.Status = status; user.PasswordHash = passwords.Hash(user, TestPassword);
         await context.Users.InsertOneAsync(user);
@@ -356,6 +382,7 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
 
     private async Task<LoginResponse> Login(string identifier)
     {
+        // Login for Auth Integration Tests.
         using var response = await http.PostAsJsonAsync("/api/auth/login", new LoginRequest { Identifier = identifier, Password = TestPassword });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         return (await response.Content.ReadFromJsonAsync<LoginResponse>())!;
@@ -366,14 +393,19 @@ public sealed class AuthIntegrationTests : IAsyncLifetime
 [ApiController, Route("test-auth"), ApiExplorerSettings(IgnoreApi = true)]
 public sealed class AuthRoleProbeController : ControllerBase
 {
+    // Default for Auth Integration Tests.
     [HttpGet("default")]
     public IActionResult Default() => Ok();
+    // Backoffice for Auth Integration Tests.
     [HttpGet("backoffice"), Authorize(Policy = AuthPolicies.BackofficeOnly)]
     public IActionResult Backoffice() => Ok();
+    // Operator for Auth Integration Tests.
     [HttpGet("operator"), Authorize(Policy = AuthPolicies.OperatorOnly)]
     public IActionResult Operator() => Ok();
+    // Prosumer for Auth Integration Tests.
     [HttpGet("prosumer"), Authorize(Policy = AuthPolicies.ProsumerOnly)]
     public IActionResult Prosumer() => Ok();
+    // Staff for Auth Integration Tests.
     [HttpGet("staff"), Authorize(Policy = AuthPolicies.Staff)]
     public IActionResult Staff() => Ok();
 }

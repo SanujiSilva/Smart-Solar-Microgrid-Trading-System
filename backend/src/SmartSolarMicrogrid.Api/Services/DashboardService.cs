@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Services/DashboardService.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Server-side application rules and orchestration for Dashboard Service.
+ */
 using MongoDB.Bson;
 using SmartSolarMicrogrid.Api.DTOs.Dashboards;
 using SmartSolarMicrogrid.Api.DTOs.Reservations;
@@ -13,6 +18,7 @@ public sealed class DashboardService(IReservationRepository reservations, IStati
     public async Task<ReservationSearchResponse> SearchAsync(ReservationSearchQuery query,
         CancellationToken cancellationToken)
     {
+        // Search for Dashboard.
         var actor = currentUser.Get();
         var prosumerNic = actor.Role == UserRole.PROSUMER
             ? actor.NIC ?? throw new ApiException(409, "The authenticated account has no prosumer NIC.")
@@ -37,6 +43,7 @@ public sealed class DashboardService(IReservationRepository reservations, IStati
 
     public async Task<ReservationDashboardResponse> GetAsync(CancellationToken cancellationToken)
     {
+        // Get for Dashboard.
         var actor = currentUser.Get();
         var prosumerNic = actor.Role == UserRole.PROSUMER
             ? actor.NIC ?? throw new ApiException(409, "The authenticated account has no prosumer NIC.")
@@ -57,14 +64,17 @@ public sealed class DashboardService(IReservationRepository reservations, IStati
             recent.Select(ReservationResponse.From).ToList(), active);
     }
 
+    // Count for Dashboard.
     private async Task<long> CountAsync(string? prosumerNic, ReservationStatus? status,
         DateTime? from, DateTime? to, CancellationToken cancellationToken) =>
         (await reservations.SearchAsync(prosumerNic, null, null, status, from, to, 1, 1, cancellationToken)).TotalCount;
 
+    // Require Staff for Dashboard.
     private static string? RequireStaff(User actor) => actor.Role is UserRole.BACKOFFICE or UserRole.GRID_OPERATOR
         ? null
         : throw new ApiException(403, "Dashboard and reservation search access is restricted to authenticated users.");
 
+    // Parse Status for Dashboard.
     private static ReservationStatus? ParseStatus(string? status) =>
         string.IsNullOrWhiteSpace(status) ? null : Enum.TryParse<ReservationStatus>(status, out var parsed) && Enum.IsDefined(parsed)
             ? parsed : throw new ApiException(400, "Reservation status is invalid.");

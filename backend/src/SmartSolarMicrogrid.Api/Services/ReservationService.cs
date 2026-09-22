@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Services/ReservationService.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Server-side application rules and orchestration for Reservation Service.
+ */
 using System.Security.Cryptography;
 using MongoDB.Bson;
 using SmartSolarMicrogrid.Api.DTOs.Reservations;
@@ -13,6 +18,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
     public async Task<ReservationResponse> CreateAsync(CreateReservationRequest request,
         CancellationToken cancellationToken)
     {
+        // Create for Reservation.
         var actor = currentUser.Require(UserRole.PROSUMER);
         if (actor.Status != UserStatus.ACTIVE)
             throw new ApiException(403, "Only active prosumers can create reservations.");
@@ -48,6 +54,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
 
     public async Task<ReservationResponse> GetAsync(string id, CancellationToken cancellationToken)
     {
+        // Get for Reservation.
         var reservation = await FindAsync(id, cancellationToken);
         EnsureVisible(reservation);
         return ReservationResponse.From(reservation);
@@ -55,17 +62,20 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
 
     public async Task<ReservationListResponse> MyAsync(CancellationToken cancellationToken)
     {
+        // My for Reservation.
         var actor = currentUser.Require(UserRole.PROSUMER);
         var items = await reservations.ListByProsumerAsync(actor.NIC
             ?? throw new ApiException(409, "The authenticated account has no prosumer NIC."), cancellationToken);
         return new(items.Select(ReservationResponse.From).ToList());
     }
 
+    // Pending for Reservation.
     public Task<ReservationListResponse> PendingAsync(CancellationToken cancellationToken) =>
         ListByStatusAsync(ReservationStatus.PENDING, cancellationToken);
 
     public async Task<ReservationListResponse> HistoryAsync(CancellationToken cancellationToken)
     {
+        // History for Reservation.
         var actor = currentUser.Require(UserRole.PROSUMER);
         var items = await reservations.ListByProsumerAsync(actor.NIC
             ?? throw new ApiException(409, "The authenticated account has no prosumer NIC."), cancellationToken);
@@ -76,6 +86,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
     public async Task<ReservationResponse> UpdateAsync(string id, UpdateReservationRequest request,
         CancellationToken cancellationToken)
     {
+        // Update for Reservation.
         var actor = currentUser.Require(UserRole.PROSUMER);
         var reservation = await FindAsync(id, cancellationToken);
         EnsureOwner(actor, reservation);
@@ -98,6 +109,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
 
     public async Task<ReservationResponse> CancelAsync(string id, CancellationToken cancellationToken)
     {
+        // Cancel for Reservation.
         var actor = currentUser.Get();
         var reservation = await FindAsync(id, cancellationToken);
         if (actor.Role == UserRole.PROSUMER) EnsureOwner(actor, reservation);
@@ -119,6 +131,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
     private async Task<ReservationListResponse> ListByStatusAsync(ReservationStatus status,
         CancellationToken cancellationToken)
     {
+        // List By Status for Reservation.
         var actor = currentUser.Get();
         if (actor.Role is not (UserRole.BACKOFFICE or UserRole.GRID_OPERATOR))
             throw new ApiException(403, "Staff access is required.");
@@ -128,6 +141,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
 
     public async Task<ReservationResponse> ReviewAsync(string id, bool approve, CancellationToken cancellationToken)
     {
+        // Review for Reservation.
         currentUser.Require(UserRole.BACKOFFICE);
         var reservation = await FindAsync(id, cancellationToken);
         if (reservation.Status != ReservationStatus.PENDING)
@@ -155,6 +169,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
             ?? throw new ApiException(409, "The reservation changed. Reload and retry."));
     }
 
+    // Find for Reservation.
     private async Task<EnergyReservation> FindAsync(string id, CancellationToken cancellationToken) =>
         ObjectId.TryParse(id, out var objectId)
             ? await reservations.FindAsync(objectId, cancellationToken)
@@ -163,6 +178,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
 
     private void EnsureVisible(EnergyReservation reservation)
     {
+        // Ensure Visible for Reservation.
         var actor = currentUser.Get();
         if (actor.Role == UserRole.PROSUMER) EnsureOwner(actor, reservation);
         else if (actor.Role is not (UserRole.BACKOFFICE or UserRole.GRID_OPERATOR))
@@ -171,27 +187,32 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
 
     private static void EnsureOwner(User actor, EnergyReservation reservation)
     {
+        // Ensure Owner for Reservation.
         if (!string.Equals(actor.NIC, reservation.ProsumerNIC, StringComparison.OrdinalIgnoreCase))
             throw new ApiException(403, "A prosumer can only access their own reservations.");
     }
 
     private static void EnsureEditable(EnergyReservation reservation)
     {
+        // Ensure Editable for Reservation.
         if (reservation.Status is not (ReservationStatus.PENDING or ReservationStatus.APPROVED))
             throw new ApiException(409, "Only pending or approved reservations can be changed.");
     }
 
     private static void EnsureNotice(EnergyReservation reservation, DateTime now, string action)
     {
+        // Ensure Notice for Reservation.
         if (reservation.ReservationDateTime - now < TimeSpan.FromHours(12))
             throw new ApiException(409, $"Reservations require at least 12 hours notice to be {action}.");
     }
 
     private static void ValidateBookingWindow(DateTime reservationTime, DateTime now)
     {
+        // Validate Booking Window for Reservation.
         if (reservationTime <= now || reservationTime > now.AddDays(7))
             throw new ApiException(400, "Reservations must be scheduled within the next 7 days.");
     }
 
+    // Create Reservation Code for Reservation.
     private static string CreateReservationCode() => $"RSV-{Convert.ToHexString(RandomNumberGenerator.GetBytes(8))}";
 }

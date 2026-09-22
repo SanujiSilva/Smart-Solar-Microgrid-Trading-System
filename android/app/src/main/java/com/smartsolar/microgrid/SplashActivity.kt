@@ -18,7 +18,14 @@ class SplashActivity : AccountActivity() {
 
     private fun restore() {
         if (!account.hasSession()) { openLogin(); return }
-        request(binding.progressBar, binding.messageText, listOf(binding.retryButton, binding.signInButton)) {
+        binding.retryButton.visibility = android.view.View.GONE
+        binding.signInButton.visibility = android.view.View.GONE
+        request(binding.progressBar, binding.messageText, listOf(binding.retryButton, binding.signInButton), onFinished = {
+            if (binding.messageText.text.isNotBlank()) {
+                binding.retryButton.visibility = android.view.View.VISIBLE
+                binding.signInButton.visibility = android.view.View.VISIBLE
+            }
+        }) {
             account.currentUser()
             startActivity(Intent(this, MainActivity::class.java))
             finish()

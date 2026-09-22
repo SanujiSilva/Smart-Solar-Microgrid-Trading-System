@@ -1,0 +1,7 @@
+<resources>
+    <string name="metric_energy">%1$s kWh\nAvailable energy</string>
+    <string name="metric_pending">%1$d\nPending</string>
+    <string name="metric_approved">%1$d\nApproved upcoming</string>
+    <string name="metric_completed">%1$d\nCompleted transfers</string>
+    <string name="dashboard_availability">%1$d active stations · %2$d open slots\n%3$d reservations today</string>
+</resources>

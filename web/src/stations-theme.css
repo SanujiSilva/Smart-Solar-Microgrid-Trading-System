@@ -1,0 +1,51 @@
+.stations-page { padding: 28px 34px 48px; font-family: 'DM Sans', system-ui, sans-serif; color: #181636; max-width: 1800px; margin: auto; }
+.stations-page .accounts-heading { margin-bottom: 32px; }
+.stations-page .accounts-heading h1 { font-size: clamp(28px, 2.8vw, 42px); }
+.stations-page .btn { border-radius: 7px; min-height: 44px; padding: 10px 16px; font-size: 14px; }
+.stations-page .btn-outline-primary { --bs-btn-color: #6433cf; --bs-btn-border-color: #c9b6f2; --bs-btn-hover-bg: #f0eaff; --bs-btn-hover-color: #5221ab; --bs-btn-hover-border-color: #9a74dd; }
+.station-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 28px; }
+.station-metric { display: flex; align-items: center; gap: 22px; padding: 22px; border: 1px solid #e8edf5; border-radius: 12px; background: white; box-shadow: 0 3px 12px #1d315007; min-width: 0; }
+.station-metric strong { display: block; font-size: 28px; line-height: 1.2; margin-top: 5px; overflow-wrap: anywhere; }
+.station-metric > div > span { color: #677c9f; font-size: 13px; }
+.station-metric--0 { color: #6934ce; }
+.station-metric--1 { color: #0c9e6a; }
+.station-metric--1 .account-metric-icon { background: #e5f7ef; }
+.station-browser { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 22px; align-items: start; margin-bottom: 24px; }
+.stations-page .data-panel { background: white; border: 1px solid #dfe7f4; border-radius: 12px; padding: 24px; max-width: none; margin: 0 0 24px; box-shadow: 0 4px 20px #24345304; }
+.station-browser > .data-panel { margin: 0; min-width: 0; }
+.stations-page h2 { font: 700 22px/1.2 'DM Sans', system-ui, sans-serif; color: #171831; margin: 0 0 8px; }
+.station-help { color: #6a7da1; font-size: 14px; margin-bottom: 26px; }
+.station-list-panel .filter-row { gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.station-list-panel .form-control { flex: 2 1 220px; max-width: none; }
+.station-list-panel .form-select { flex: 1 1 140px; max-width: none; }
+.station-list-panel .form-control, .station-list-panel .form-select { min-height: 44px; font-size: 14px; background-color: #f9fbff; border-radius: 7px; border-color: #d7e1ef; }
+.station-card-list { display: grid; gap: 14px; }
+.station-node-card { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; border: 1px solid #e0e6f0; border-radius: 10px; padding: 20px 18px; background: linear-gradient(120deg, white, #fcfcff); }
+.station-node-card.is-selected { border-color: #c9b9ee; }
+.station-card-identity { display: flex; align-items: center; flex: 1 1 240px; gap: 20px; min-width: 0; border: 0; background: none; padding: 0; color: #24233e; text-align: left; border-radius: 8px; }
+.station-card-identity .solar-landscape { width: 96px; height: 90px; flex-shrink: 0; background: linear-gradient(#edf4ff, #ecf7ec); border-radius: 12px; }
+.station-card-identity > span { min-width: 0; overflow-wrap: anywhere; }
+.station-card-identity strong { font-size: 16px; display: block; margin-bottom: 4px; }
+.station-card-identity span span { display: block; color: #5f6883; font-size: 14px; }
+.station-card-identity small { display: block; color: #62708c; margin-top: 12px; font-size: 13px; }
+.station-card-facts { display: flex; gap: 20px; flex: 1 1 320px; justify-content: space-between; }
+.station-card-facts > div { display: flex; align-items: flex-start; gap: 10px; border-left: 1px solid #e1e6f0; padding-left: 15px; }
+.station-card-facts .solar-icon { width: 20px; color: #6935d3; }
+.station-card-facts span { font-size: 12px; color: #66708a; }
+.station-card-facts strong { display: block; font-size: 16px; color: #1b1d37; margin-top: 6px; }
+.station-node-card > .btn { margin-left: auto; font-size: 12px; }
+.stations-page .status-pill--active { color: #008b59; background: #dff7ed; }
+.stations-page .status-pill--inactive, .stations-page .status-pill--maintenance { background: #fff2cc; color: #805b00; }
+.station-overview > .solar-landscape { width: 100%; height: auto; margin: -10px 0 14px; }
+.station-overview h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; overflow-wrap: anywhere; }
+.station-overview > p:not(.station-help) { color: #6e7c9c; font-size: 14px; margin-bottom: 10px; }
+.station-overview dl { border-top: 1px solid #e4e9f3; padding-top: 20px; margin-top: 18px; }
+.station-overview dl > div { display: grid; grid-template-columns: 30px 1fr; column-gap: 12px; margin-bottom: 20px; }
+.station-overview dl .solar-icon { grid-row: span 2; color: #6934d0; }
+.station-overview dt { grid-column: 2; grid-row: 2; font-size: 13px; font-weight: 400; color: #7384a7; }
+.station-overview dd { grid-column: 2; grid-row: 1; margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+.station-address { background: #f1f5fc; color: #566783; font-size: 13px; padding: 16px; border-radius: 8px; overflow-wrap: anywhere; }
+.stations-page > .data-panel form, .stations-page > form { scroll-margin-top: 24px; }
+@media (max-width: 1250px) { .station-browser { grid-template-columns: minmax(0, 1fr) 285px; } .station-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stations-page { padding: 26px 22px; } }
+@media (max-width: 900px) { .station-browser { grid-template-columns: minmax(0, 1fr); } .station-overview > .solar-landscape { max-width: 300px; } .stations-page .accounts-heading { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 560px) { .stations-page { padding: 24px 14px; } .station-metric { padding: 14px; gap: 12px; flex-direction: column; align-items: flex-start; } .station-metric strong { font-size: 25px; } .station-browser > .data-panel { padding: 18px 14px; } .station-card-facts { gap: 8px; flex-basis: 100%; flex-wrap: wrap; } .station-card-facts > div { padding-left: 8px; } .station-node-card { padding: 15px 12px; } .station-list-panel > .d-flex { flex-wrap: wrap; } .stations-page .row { flex-direction: column; } }

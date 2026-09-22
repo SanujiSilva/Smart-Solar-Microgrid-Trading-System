@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Middleware/TradingTransactionFilter.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Request-pipeline behavior for Trading Transaction Filter.
+ */
 using Microsoft.AspNetCore.Mvc.Filters;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -11,6 +16,7 @@ public sealed class TradingTransactionFilter(MongoDbContext database, MongoOpera
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        // Serialize trading mutations in a MongoDB transaction to prevent conflicting writes.
         var request = context.HttpContext.Request;
         var trading = context.Controller is StationsController or SlotsController or ReservationsController or QrController;
         var writes = !HttpMethods.IsGet(request.Method) || request.Path.Value!.EndsWith("/qr", StringComparison.Ordinal);

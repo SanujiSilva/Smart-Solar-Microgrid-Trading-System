@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/JwtBearerEventsHandler.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Jwt Bearer Events Handler.
+ */
 using System.Globalization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MongoDB.Bson;
@@ -12,6 +17,7 @@ public sealed class JwtBearerEventsHandler(IUserRepository users) : JwtBearerEve
 
     public override async Task TokenValidated(TokenValidatedContext context)
     {
+        // Token Validated for Jwt Bearer Events Handler.
         var principal = context.Principal!;
         if (!ObjectId.TryParse(principal.FindFirst("sub")?.Value, out var id))
         { context.Fail("Invalid identity."); return; }

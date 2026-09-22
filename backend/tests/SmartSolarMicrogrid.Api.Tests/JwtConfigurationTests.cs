@@ -1,3 +1,8 @@
+/*
+ * File: tests/SmartSolarMicrogrid.Api.Tests/JwtConfigurationTests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Automated verification and test support for Jwt Configuration Tests.
+ */
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -14,6 +19,7 @@ public sealed class JwtConfigurationTests
     [InlineData("YWJj")]
     public void Invalid_signing_keys_are_rejected_without_exposing_values(string key)
     {
+        // Verify that invalid signing keys are rejected without exposing values.
         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         { ["Jwt:Issuer"] = "test", ["Jwt:Audience"] = "test", ["Jwt:SigningKey"] = key }).Build();
         var services = new ServiceCollection().AddApiAuthentication(config);

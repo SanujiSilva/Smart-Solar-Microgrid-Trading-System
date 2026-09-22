@@ -27,6 +27,10 @@ class LoginActivity : AppCompatActivity() {
         binding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+        binding.passwordInput.imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_DONE
+        binding.passwordInput.setOnEditorActionListener { _, action, _ ->
+            if (action == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) { submit(); true } else false
+        }
         restoreExistingSession()
     }
 
@@ -47,9 +51,14 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun submit() {
+        if (!binding.loginButton.isEnabled) return
+        binding.identifierLayout.error = null
+        binding.passwordLayout.error = null
         val identifier = binding.identifierInput.text?.toString()?.trim().orEmpty()
         val password = binding.passwordInput.text?.toString().orEmpty()
         if (identifier.isBlank() || password.isBlank()) {
+            if (identifier.isBlank()) binding.identifierLayout.error = getString(R.string.field_required)
+            if (password.isBlank()) binding.passwordLayout.error = getString(R.string.field_required)
             showError(getString(R.string.login_fields_required))
             return
         }
@@ -68,6 +77,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setLoading(loading: Boolean) {
+        binding.identifierInput.isEnabled = !loading
+        binding.passwordInput.isEnabled = !loading
         binding.loginButton.isEnabled = !loading
         binding.registerButton.isEnabled = !loading
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE

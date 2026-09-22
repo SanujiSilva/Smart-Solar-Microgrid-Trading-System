@@ -16,6 +16,7 @@ import com.smartsolar.microgrid.AccountActivity
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.accountError
 import com.smartsolar.microgrid.applyAccountInsets
+import com.smartsolar.microgrid.solarStatus
 import com.smartsolar.microgrid.data.remote.ApiClient
 import com.smartsolar.microgrid.databinding.ActivityBookingEditorBinding
 import com.smartsolar.microgrid.qr.ProsumerQrActivity
@@ -81,6 +82,9 @@ class BookingEditorActivity : AccountActivity() {
         binding.bookingsButton.isEnabled = !state.busy
         if (binding.amountInput.text.toString() != state.draft) binding.amountInput.setText(state.draft)
         val booking = state.booking
+        binding.statusChip.visibility = if (booking == null) View.GONE else View.VISIBLE
+        binding.statusChip.text = booking?.status
+        booking?.let { binding.statusChip.solarStatus(it.status) }
         binding.titleText.setText(if (booking == null) R.string.create_booking else R.string.booking_details)
         val slot = state.slot
         val station = state.station
@@ -100,7 +104,7 @@ class BookingEditorActivity : AccountActivity() {
         binding.saveButton.visibility = if (editableStatus) View.VISIBLE else View.GONE
         binding.amountLayout.visibility = if (editableStatus) View.VISIBLE else View.GONE
         binding.saveButton.setText(if (booking == null) R.string.review_booking else R.string.modify_booking)
-        binding.saveButton.isEnabled = !state.busy && !state.uncertain && slot != null && station != null
+        binding.saveButton.isEnabled = !state.busy && !state.uncertain && slot != null && station != null && BookingPresentation.energy(state.draft) != null
         binding.cancelButton.visibility = if (booking != null && editableStatus) View.VISIBLE else View.GONE
         binding.cancelButton.isEnabled = !state.busy && !state.uncertain
         binding.qrButton.visibility = if (booking?.status == "APPROVED") View.VISIBLE else View.GONE

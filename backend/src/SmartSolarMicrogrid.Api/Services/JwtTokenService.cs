@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Services/JwtTokenService.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Server-side application rules and orchestration for Jwt Token Service.
+ */
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -13,6 +18,7 @@ public sealed class JwtTokenService(IOptions<JwtSettings> options, TimeProvider 
 {
     public LoginResponse Issue(User user)
     {
+        // Issue for Jwt Token.
         var settings = options.Value;
         var now = clock.GetUtcNow();
         var expires = now.AddMinutes(settings.AccessTokenMinutes);

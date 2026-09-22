@@ -25,7 +25,8 @@ function DashboardView() {
 function ReservationTable({ items }: { items: Reservation[] }) { return <div className="table-wrap"><table className="table management-table"><thead><tr><th>Code</th><th>Prosumer</th><th>Scheduled</th><th>Energy</th><th>Status</th></tr></thead><tbody>{items.map((item) => <tr key={item.id}><td><strong>{item.reservationCode}</strong></td><td>{item.prosumerNIC}</td><td>{formatDate(item.reservationDateTime)}</td><td>{item.energyAmount} kWh</td><td><StatusPill value={item.status} /></td></tr>)}</tbody></table>{items.length === 0 && <div className="empty-state">No reservations are currently visible.</div>}</div> }
 
 export function OperatorPage() {
-  const path = useLocation().pathname
-  const view = path.startsWith('/stations') ? <StationManagement operator /> : path.startsWith('/reservations') ? <ReservationManagement operator /> : <DashboardView />
+  const location = useLocation()
+  const path = location.pathname
+  const view = path.startsWith('/stations') ? <StationManagement key={location.search} operator /> : path.startsWith('/reservations') ? <ReservationManagement key={location.search} operator /> : <div className="operator-dashboard"><DashboardView /></div>
   return <>{view}</>
 }

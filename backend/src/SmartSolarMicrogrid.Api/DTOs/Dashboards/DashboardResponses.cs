@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/DTOs/Dashboards/DashboardResponses.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: API request/response contracts and validation for Dashboard Responses.
+ */
 using SmartSolarMicrogrid.Api.DTOs.Reservations;
 
 namespace SmartSolarMicrogrid.Api.DTOs.Dashboards;

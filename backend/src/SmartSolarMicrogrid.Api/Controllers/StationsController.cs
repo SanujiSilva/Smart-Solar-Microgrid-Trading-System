@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Controllers/StationsController.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: HTTP endpoints and authorization boundaries for Stations.
+ */
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartSolarMicrogrid.Api.Configuration;
@@ -10,14 +15,17 @@ namespace SmartSolarMicrogrid.Api.Controllers;
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class StationsController(StationService stations) : ControllerBase
 {
+    // List for Stations.
     [HttpGet]
     public async Task<ActionResult<StationPageResponse>> List([FromQuery] StationListQuery query, CancellationToken cancellationToken) =>
         Ok(await stations.ListAsync(query, cancellationToken));
 
+    // Nearby for Stations.
     [HttpGet("nearby")]
     public async Task<ActionResult<NearbyStationsResponse>> Nearby([FromQuery] NearbyStationsQuery query, CancellationToken cancellationToken) =>
         Ok(await stations.NearbyAsync(query, cancellationToken));
 
+    // Get for Stations.
     [HttpGet("{id}")]
     public async Task<ActionResult<StationResponse>> Get(string id, CancellationToken cancellationToken) =>
         Ok(await stations.GetAsync(id, cancellationToken));
@@ -25,26 +33,40 @@ public sealed class StationsController(StationService stations) : ControllerBase
     [HttpPost, Authorize(Policy = AuthPolicies.BackofficeOnly), ProducesResponseType<StationResponse>(201)]
     public async Task<ActionResult<StationResponse>> Create(CreateStationRequest request, CancellationToken cancellationToken)
     {
+        // Create for Stations.
         var station = await stations.CreateAsync(request, cancellationToken);
         return CreatedAtAction(nameof(Get), new { id = station.Id }, station);
     }
 
+    // Update for Stations.
     [HttpPut("{id}"), Authorize(Policy = AuthPolicies.BackofficeOnly)]
     public async Task<ActionResult<StationResponse>> Update(string id, UpdateStationRequest request, CancellationToken cancellationToken) =>
         Ok(await stations.UpdateAsync(id, request, cancellationToken));
 
+    [HttpDelete("{id}"), Authorize(Policy = AuthPolicies.BackofficeOnly)]
+    public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+    {
+        // Delete for Stations.
+        await stations.DeleteAsync(id, cancellationToken);
+        return NoContent();
+    }
+
+    // Deactivate for Stations.
     [HttpPatch("{id}/deactivate"), Authorize(Policy = AuthPolicies.BackofficeOnly)]
     public async Task<ActionResult<StationResponse>> Deactivate(string id, CancellationToken cancellationToken) =>
         Ok(await stations.DeactivateAsync(id, cancellationToken));
 
+    // Schedule for Stations.
     [HttpGet("{id}/schedule")]
     public async Task<ActionResult<OperatingScheduleResponse>> Schedule(string id, CancellationToken cancellationToken) =>
         Ok((await stations.GetAsync(id, cancellationToken)).OperatingSchedule);
 
+    // Update Schedule for Stations.
     [HttpPut("{id}/schedule"), Authorize(Policy = AuthPolicies.BackofficeOnly)]
     public async Task<ActionResult<StationResponse>> UpdateSchedule(string id, OperatingScheduleRequest request, CancellationToken cancellationToken) =>
         Ok(await stations.UpdateScheduleAsync(id, request, cancellationToken));
 
+    // Availability for Stations.
     [HttpPatch("{id}/availability"), Authorize(Policy = AuthPolicies.Staff)]
     public async Task<ActionResult<StationResponse>> Availability(string id, StationAvailabilityRequest request, CancellationToken cancellationToken) =>
         Ok(await stations.UpdateAvailabilityAsync(id, request, cancellationToken));

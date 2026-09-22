@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Program.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: API startup and application composition.
+ */
 using SmartSolarMicrogrid.Api.Configuration;
 using SmartSolarMicrogrid.Api.Services;
 

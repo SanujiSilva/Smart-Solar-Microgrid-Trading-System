@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Models/EnergyReservation.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Persistence model definitions for Energy Reservation.
+ */
 using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

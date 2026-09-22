@@ -3,6 +3,9 @@ package com.smartsolar.microgrid.booking
 import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.button.MaterialButton
+import com.smartsolar.microgrid.SolarRecord
+import com.smartsolar.microgrid.bindSolarRecord
+import com.smartsolar.microgrid.databinding.ItemSolarRecordBinding
 import com.smartsolar.microgrid.AccountActivity
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.applyAccountInsets
@@ -43,17 +46,19 @@ class StationDetailsActivity : AccountActivity() {
                 station.operatingSchedule.weeklyPeriods.joinToString("\n") {
                     getString(R.string.schedule_period, it.day, minute(it.openMinuteOfDay), minute(it.closeMinuteOfDay))
                 })
-            val slots = api.slots(id).items.filter { it.status == "OPEN" }
-            if (slots.isEmpty()) binding.messageText.setText(R.string.no_open_slots)
+            val slots = api.slots(id).items
+            val available = slots.filter { it.status == "OPEN" && it.availableCapacity.signum() > 0 }
+            binding.slotSummaryText.text = getString(R.string.slot_capacity_summary, available.fold(java.math.BigDecimal.ZERO) { total, slot -> total + slot.availableCapacity }.toPlainString(), available.size)
+            if (available.isEmpty()) binding.messageText.setText(R.string.no_open_slots)
             slots.forEach { slot ->
-                binding.slots.addView(MaterialButton(this).apply {
-                    text = getString(R.string.slot_list_row, BookingPresentation.time(slot.startTime),
-                        BookingPresentation.time(slot.endTime), slot.availableCapacity.toPlainString())
-                    setOnClickListener {
-                        startActivity(Intent(this@StationDetailsActivity, BookingEditorActivity::class.java)
-                            .putExtra(BookingEditorModel.SLOT_ID, slot.id))
-                    }
+                val canBook = station.status == "ACTIVE" && slot.status == "OPEN" && slot.availableCapacity.signum() > 0
+                val row = ItemSolarRecordBinding.inflate(layoutInflater, binding.slots, false)
+                row.bindSolarRecord(SolarRecord(slot.id, getString(R.string.available_slots),
+                    getString(R.string.slot_card_body, BookingPresentation.time(slot.startTime), BookingPresentation.time(slot.endTime), slot.availableCapacity.toPlainString()),
+                    slot.status, getString(if (canBook) R.string.book_slot_action else R.string.slot_unavailable), canBook) {
+                    startActivity(Intent(this, BookingEditorActivity::class.java).putExtra(BookingEditorModel.SLOT_ID, slot.id))
                 })
+                binding.slots.addView(row.root)
             }
         }
     }

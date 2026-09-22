@@ -20,11 +20,61 @@ import java.io.IOException
 
 abstract class AccountActivity : AppCompatActivity() {
     protected lateinit var account: AuthRepository
-    private var busy = false
+    protected var requestBusy = false
+        private set
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         account = AuthRepository(this)
         lifecycleScope.coroutineContext[Job]?.invokeOnCompletion { account.close() }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        if (!account.hasSession() || this is RegisterActivity) return
+        findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.solarToolbar)?.let { toolbar ->
+            toolbar.menu.add(getString(R.string.sign_out)).apply {
+                setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS)
+                setOnMenuItemClickListener {
+                    if (!requestBusy) confirmSignOut()
+                    true
+                }
+            }
+        }
+    }
+
+    protected fun confirmSignOut() {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.sign_out_title).setMessage(R.string.sign_out_message)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.sign_out) { _, _ -> signOut() }.show()
+    }
+
+    protected fun configurePrimaryNavigation(selected: Int) {
+        val navigation = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation) ?: return
+        lifecycleScope.launch {
+            val role = account.cachedUser()?.role ?: return@launch
+            if (role !in listOf("PROSUMER", "GRID_OPERATOR")) return@launch
+            navigation.menu.findItem(R.id.nav_bookings).isVisible = role == "PROSUMER"
+            navigation.menu.findItem(R.id.nav_profile).isVisible = role == "PROSUMER"
+            navigation.menu.findItem(R.id.nav_scan).isVisible = role == "GRID_OPERATOR"
+            navigation.selectedItemId = selected
+            navigation.visibility = View.VISIBLE
+            navigation.setOnItemSelectedListener { item ->
+                if (requestBusy) return@setOnItemSelectedListener false
+                if (item.itemId != selected) {
+                    val target = when (item.itemId) {
+                        R.id.nav_home -> MainActivity::class.java
+                        R.id.nav_stations -> NearbyStationsActivity::class.java
+                        R.id.nav_bookings -> com.smartsolar.microgrid.booking.BookingsActivity::class.java
+                        R.id.nav_profile -> ProfileActivity::class.java
+                        else -> com.smartsolar.microgrid.qr.OperatorQrActivity::class.java
+                    }
+                    startActivity(Intent(this@AccountActivity, target).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                    if (this@AccountActivity !is MainActivity) finish()
+                }
+                true
+            }
+        }
     }
 
     protected fun protectSession(): Boolean {
@@ -49,10 +99,10 @@ abstract class AccountActivity : AppCompatActivity() {
 
     protected fun request(
         progress: View, message: TextView, controls: List<View>,
-        authenticated: Boolean = true, action: suspend () -> Unit,
+        authenticated: Boolean = true, onFinished: () -> Unit = {}, action: suspend () -> Unit,
     ) {
-        if (busy) return
-        busy = true
+        if (requestBusy) return
+        requestBusy = true
         controls.forEach { it.isEnabled = false }
         progress.visibility = View.VISIBLE
         message.text = ""
@@ -67,23 +117,26 @@ abstract class AccountActivity : AppCompatActivity() {
                     openLogin()
                 } else {
                     message.text = accountError(error)
+                    message.solarBanner(SolarTone.ERROR)
                 }
             } finally {
-                busy = false
+                requestBusy = false
                 progress.visibility = View.GONE
                 controls.forEach { it.isEnabled = true }
+                onFinished()
             }
         }
     }
 }
 
 fun View.applyAccountInsets() {
+    polishSolarScreen()
     val left = paddingLeft
     val top = paddingTop
     val right = paddingRight
     val bottom = paddingBottom
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime())
+        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime() or WindowInsetsCompat.Type.displayCutout())
         view.setPadding(left + bars.left, top + bars.top, right + bars.right, bottom + bars.bottom)
         insets
     }

@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/DTOs/Stations/StationResponses.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: API request/response contracts and validation for Station Responses.
+ */
 using SmartSolarMicrogrid.Api.Models;
 
 namespace SmartSolarMicrogrid.Api.DTOs.Stations;
@@ -5,6 +10,7 @@ namespace SmartSolarMicrogrid.Api.DTOs.Stations;
 public sealed record OperatingPeriodResponse(string Day, int OpenMinuteOfDay, int CloseMinuteOfDay);
 public sealed record OperatingScheduleResponse(string TimeZoneId, IReadOnlyList<OperatingPeriodResponse> WeeklyPeriods)
 {
+    // Map the stored model to the public response without exposing internal state.
     public static OperatingScheduleResponse From(OperatingSchedule schedule) => new(schedule.TimeZoneId,
         schedule.WeeklyPeriods.Select(x => new OperatingPeriodResponse(x.Day.ToString(), x.OpenMinuteOfDay, x.CloseMinuteOfDay)).ToList());
 }
@@ -13,6 +19,7 @@ public sealed record StationResponse(string Id, string StationCode, string Name,
     double Latitude, double Longitude, decimal CapacityKWh, int AvailableBatterySlots,
     string Status, OperatingScheduleResponse OperatingSchedule, DateTime CreatedAt, DateTime UpdatedAt)
 {
+    // Map the stored model to the public response without exposing internal state.
     public static StationResponse From(SolarStationInfo station) => new(station.Id.ToString(), station.StationCode,
         station.Name, station.Address, station.Latitude, station.Longitude, station.CapacityKWh,
         station.AvailableBatterySlots, station.Status.ToString(), OperatingScheduleResponse.From(station.OperatingSchedule),

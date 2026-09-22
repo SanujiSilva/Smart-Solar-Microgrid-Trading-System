@@ -1,6 +1,8 @@
 package com.smartsolar.microgrid.qr
 
 import android.os.Bundle
+import com.smartsolar.microgrid.solarBanner
+import com.smartsolar.microgrid.SolarTone
 import com.smartsolar.microgrid.AccountActivity
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.applyAccountInsets
@@ -28,11 +30,14 @@ class ProsumerQrActivity : AccountActivity() {
             binding.messageText.setText(R.string.booking_not_found)
             return
         }
+        binding.qrImage.setImageDrawable(null)
+        binding.summaryText.text = ""
         request(binding.progressBar, binding.messageText, listOf(binding.refreshButton, binding.backButton)) {
             val response = api.issue(reservationId)
-            binding.summaryText.text = QrPresentation.reservationSummary(response.reservation)
+            binding.summaryText.text = getString(R.string.reservation_summary, response.reservation.reservationCode, response.reservation.status, com.smartsolar.microgrid.booking.BookingPresentation.time(response.reservation.reservationDateTime), response.reservation.energyAmount.toPlainString(), response.reservation.prosumerNIC) + "\n" + getString(R.string.qr_station_reference, response.reservation.stationId)
             binding.qrImage.setImageBitmap(QrPresentation.qrBitmap(response.qrToken))
             binding.messageText.setText(R.string.qr_ready)
+            binding.messageText.solarBanner(SolarTone.SUCCESS)
         }
     }
 

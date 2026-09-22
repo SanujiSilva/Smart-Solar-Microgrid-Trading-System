@@ -1,3 +1,8 @@
+/*
+ * File: tests/SmartSolarMicrogrid.Api.Tests/UserManagementIntegrationTests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Automated verification and test support for User Management Integration Tests.
+ */
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -20,7 +25,7 @@ namespace SmartSolarMicrogrid.Api.Tests;
 public sealed class UserManagementIntegrationTests : IAsyncLifetime
 {
     private const string TestPassword = "Phase five test passphrase!";
-    private readonly string databaseName = "smartsolar_tests_" + Guid.NewGuid().ToString("N");
+    private readonly string databaseName = "ss_test_" + Guid.NewGuid().ToString("N")[..24];
     private WebApplicationFactory<Program> factory = null!;
     private HttpClient admin = null!;
     private User backoffice = null!;
@@ -29,6 +34,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        // Create an isolated test database and initialize the API test clients.
         factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Development");
@@ -51,6 +57,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        // Release owned resources and clean up this test or request scope.
         try { if (context is not null) await context.Database.Client.DropDatabaseAsync(databaseName); }
         finally
         {
@@ -62,6 +69,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Full_lifecycle_registration_approval_profile_deactivation_and_reactivation()
     {
+        // Verify that full lifecycle registration approval profile deactivation and reactivation.
         using var anonymous = factory.CreateClient();
         using var registration = await anonymous.PostAsJsonAsync("/api/auth/prosumer/register", new
         { nic = "991234567v", fullName = "New Prosumer", email = "prosumer@example.invalid", phone = "0771234567", password = TestPassword });
@@ -103,6 +111,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [InlineData("GRID_OPERATOR")]
     public async Task Backoffice_creates_active_staff_with_safe_response_and_valid_location(string role)
     {
+        // Verify that backoffice creates active staff with safe response and valid location.
         using var created = await admin.PostAsJsonAsync("/api/users", new
         { fullName = "New Staff", email = "new-staff@example.invalid", phone = "0771234567", password = TestPassword, role });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
@@ -124,6 +133,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Staff_profile_edit_preserves_role_hash_and_normalizes_contacts()
     {
+        // Verify that staff profile edit preserves role hash and normalizes contacts.
         var user = await Seed(UserRole.GRID_OPERATOR);
         using var result = await admin.PutAsJsonAsync($"/api/users/{user.Id}", Profile("  New Name  ", " New.Email@Example.Invalid "));
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -155,6 +165,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [InlineData(UserRole.PROSUMER, "PATCH", "/api/prosumers/991234567V/activate")]
     public async Task Non_backoffice_cannot_access_administration(UserRole role, string method, string path)
     {
+        // Verify that non backoffice cannot access administration.
         var user = await Seed(role);
         using var caller = await LoginClient(user.Email);
         using var request = new HttpRequestMessage(new HttpMethod(method), path.Replace("{id}", backoffice.Id.ToString()))
@@ -168,6 +179,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [InlineData("/api/prosumers")]
     public async Task Administration_requires_authentication(string path)
     {
+        // Verify that administration requires authentication.
         using var caller = factory.CreateClient();
         using var response = await caller.GetAsync(path);
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -182,6 +194,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [InlineData("tokenVersion")]
     public async Task Prosumer_cannot_inject_identity_credentials_or_privileges(string field)
     {
+        // Verify that prosumer cannot inject identity credentials or privileges.
         var user = await Seed(UserRole.PROSUMER);
         using var caller = await LoginClient(user.Email);
         var body = new Dictionary<string, string>
@@ -194,6 +207,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Own_profile_and_deactivation_ignore_another_users_query_identity()
     {
+        // Verify that own profile and deactivation ignore another users query identity.
         var first = await Seed(UserRole.PROSUMER);
         var other = await Seed(UserRole.PROSUMER);
         using var caller = await LoginClient(first.Email);
@@ -213,6 +227,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [InlineData(UserRole.GRID_OPERATOR)]
     public async Task Staff_cannot_use_prosumer_self_service(UserRole role)
     {
+        // Verify that staff cannot use prosumer self service.
         var user = role == UserRole.BACKOFFICE ? backoffice : await Seed(role);
         using var caller = await LoginClient(user.Email);
         using var profile = await caller.PutAsJsonAsync("/api/prosumers/me", Profile("Some Name", user.Email));
@@ -224,6 +239,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task List_supports_pagination_role_status_and_literal_search_without_secrets()
     {
+        // Verify that list supports pagination role status and literal search without secrets.
         await Seed(UserRole.PROSUMER, UserStatus.PENDING);
         await Seed(UserRole.PROSUMER, UserStatus.PENDING);
         await Seed(UserRole.GRID_OPERATOR);
@@ -255,6 +271,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [InlineData("/api/prosumers?role=BACKOFFICE", 400)]
     public async Task Invalid_queries_and_missing_accounts_return_meaningful_errors(string path, int status)
     {
+        // Verify that invalid queries and missing accounts return meaningful errors.
         using var response = await admin.GetAsync(path);
         Assert.Equal(status, (int)response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -263,6 +280,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Duplicate_email_is_conflict_on_staff_creation_and_profile_update()
     {
+        // Verify that duplicate email is conflict on staff creation and profile update.
         using var duplicate = await admin.PostAsJsonAsync("/api/users", new
         { fullName = "Duplicate Staff", email = backoffice.Email.ToUpperInvariant(), phone = "0771234567", password = TestPassword, role = "GRID_OPERATOR" });
         Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
@@ -276,6 +294,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Staff_creation_rejects_prosumer_role_and_weak_password()
     {
+        // Verify that staff creation rejects prosumer role and weak password.
         using var prosumer = await admin.PostAsJsonAsync("/api/users", new
         { fullName = "Invalid Role", email = "invalid@example.invalid", phone = "0771234567", password = TestPassword, role = "PROSUMER" });
         Assert.Equal(HttpStatusCode.BadRequest, prosumer.StatusCode);
@@ -287,6 +306,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Self_deactivation_and_invalid_status_targets_are_rejected()
     {
+        // Verify that self deactivation and invalid status targets are rejected.
         using var self = await admin.PatchAsJsonAsync($"/api/users/{backoffice.Id}/status", new { status = "DEACTIVATED" });
         Assert.Equal(HttpStatusCode.Conflict, self.StatusCode);
         using var invalid = await admin.PatchAsJsonAsync($"/api/users/{backoffice.Id}/status", new { status = "PENDING" });
@@ -299,6 +319,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Staff_deactivation_revokes_tokens_and_reactivation_requires_new_login()
     {
+        // Verify that staff deactivation revokes tokens and reactivation requires new login.
         var user = await Seed(UserRole.GRID_OPERATOR);
         using var caller = await LoginClient(user.Email);
         using var deactivated = await admin.PatchAsJsonAsync($"/api/users/{user.Id}/status", new { status = "DEACTIVATED" });
@@ -317,6 +338,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Pending_rejection_and_deactivation_request_decline_are_supported()
     {
+        // Verify that pending rejection and deactivation request decline are supported.
         var pending = await Seed(UserRole.PROSUMER, UserStatus.PENDING);
         using var rejected = await admin.PatchAsJsonAsync($"/api/users/{pending.Id}/status", new { status = "DEACTIVATED" });
         Assert.Equal(HttpStatusCode.OK, rejected.StatusCode);
@@ -334,6 +356,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Pending_and_active_prosumers_cannot_use_reactivation_and_admin_cannot_edit_their_profile()
     {
+        // Verify that pending and active prosumers cannot use reactivation and admin cannot edit their profile.
         var pending = await Seed(UserRole.PROSUMER, UserStatus.PENDING);
         using var invalid = await admin.PatchAsync($"/api/prosumers/{pending.NIC}/activate", null);
         Assert.Equal(HttpStatusCode.Conflict, invalid.StatusCode);
@@ -347,6 +370,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Atomic_revision_checks_prevent_overwriting_concurrent_account_changes_and_support_legacy_documents()
     {
+        // Verify that atomic revision checks prevent overwriting concurrent account changes and support legacy documents.
         var user = await Seed(UserRole.PROSUMER);
         await context.Users.UpdateOneAsync(x => x.Id == user.Id, Builders<User>.Update.Unset(x => x.Revision));
         var repository = new UserRepository(context);
@@ -362,6 +386,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
 
     private async Task<User> Seed(UserRole role, UserStatus status = UserStatus.ACTIVE)
     {
+        // Seed for User Management Integration Tests.
         var user = MongoModelTests.NewUser(role == UserRole.PROSUMER ? Random.Shared.NextInt64(100000000000, 999999999999).ToString() : null);
         user.Role = role; user.Status = status; user.PasswordHash = passwords.Hash(user, TestPassword);
         await context.Users.InsertOneAsync(user);
@@ -370,6 +395,7 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
 
     private async Task<HttpClient> LoginClient(string email)
     {
+        // Login Client for User Management Integration Tests.
         var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
         using var login = await client.PostAsJsonAsync("/api/auth/login", new { identifier = email, password = TestPassword });
         Assert.Equal(HttpStatusCode.OK, login.StatusCode);
@@ -378,11 +404,13 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
         return client;
     }
 
+    // Profile for User Management Integration Tests.
     private static UpdateProfileRequest Profile(string name, string email) => new()
     { FullName = name, Email = email, Phone = "0771234567" };
 
     private static async Task AssertSafe(HttpResponseMessage response)
     {
+        // Assert Safe for User Management Integration Tests.
         var json = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("passwordHash", json, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("tokenVersion", json, StringComparison.OrdinalIgnoreCase);

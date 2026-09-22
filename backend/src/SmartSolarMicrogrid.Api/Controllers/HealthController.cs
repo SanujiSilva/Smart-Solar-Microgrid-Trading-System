@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Controllers/HealthController.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: HTTP endpoints and authorization boundaries for Health.
+ */
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -18,6 +23,7 @@ public sealed class HealthController(
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<ActionResult<HealthResponse>> Get(CancellationToken cancellationToken)
     {
+        // Get for Health.
         var report = await healthChecks.CheckHealthAsync(x => !x.Tags.Contains("ready"), cancellationToken);
         var response = new HealthResponse(report.Status.ToString(), timeProvider.GetUtcNow());
         return StatusCode(report.Status == HealthStatus.Unhealthy
@@ -32,6 +38,7 @@ public sealed class HealthController(
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<ActionResult<HealthResponse>> Ready(CancellationToken cancellationToken)
     {
+        // Ready for Health.
         var report = await healthChecks.CheckHealthAsync(x => x.Tags.Contains("ready"), cancellationToken);
         return StatusCode(report.Status == HealthStatus.Healthy
             ? StatusCodes.Status200OK : StatusCodes.Status503ServiceUnavailable,

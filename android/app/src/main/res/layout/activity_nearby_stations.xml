@@ -1,29 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:padding="24dp">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nearby_stations" android:textSize="26sp" />
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nearby_help" android:paddingVertical="16dp" />
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="280dp" />
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/map_help" android:paddingTop="12dp" android:paddingBottom="8dp" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/useLocationButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/use_my_location" />
-        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/latitude">
-            <com.google.android.material.textfield.TextInputEditText android:id="@+id/latitudeInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal|numberSigned" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/longitude">
-            <com.google.android.material.textfield.TextInputEditText android:id="@+id/longitudeInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal|numberSigned" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/radius_km">
-            <com.google.android.material.textfield.TextInputEditText android:id="@+id/radiusInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:text="@string/default_radius_km" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" />
-        <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityLiveRegion="polite" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/searchButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/find_stations" />
-        <LinearLayout android:id="@+id/results" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/backButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/back_to_home" />
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/solar_screen_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/solarToolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="?attr/actionBarSize" android:background="@color/solar_background" app:title="@string/nearby_stations" app:titleTextAppearance="@style/Solar.ToolbarTitle" />
+    <androidx.core.widget.NestedScrollView android:scrollbars="vertical" android:fadeScrollbars="false" android:scrollbarStyle="insideOverlay" android:scrollbarSize="4dp" android:scrollbarThumbVertical="@drawable/solar_scroll_thumb" android:id="@+id/screenScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:padding="@dimen/screen_padding">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/nearby_help" android:layout_marginBottom="@dimen/space_md" />
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Solar.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nearby_filter_hint">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/nearbySearchInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/button_height" android:inputType="text" android:singleLine="true" android:imeOptions="actionNext" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButtonToggleGroup android:id="@+id/mapListToggle" android:layout_width="match_parent" android:layout_height="wrap_content" app:singleSelection="true" app:selectionRequired="true" app:checkedButton="@id/mapViewButton">
+                <com.google.android.material.button.MaterialButton android:id="@+id/mapViewButton" style="@style/Widget.Solar.Button.Toggle" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/map_view" android:layout_weight="1" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/listViewButton" style="@style/Widget.Solar.Button.Toggle" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/list_view" android:layout_weight="1" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+            <LinearLayout android:id="@+id/mapPanel" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <androidx.fragment.app.FragmentContainerView android:id="@+id/map" android:name="com.google.android.gms.maps.SupportMapFragment" android:layout_width="match_parent" android:layout_height="@dimen/map_height" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/map_help" android:layout_marginBottom="@dimen/space_md" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/useLocationButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/use_my_location" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/filterButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/location_filters" />
+            <LinearLayout android:id="@+id/locationFilters" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Section" android:text="@string/map_filter_title" android:layout_marginBottom="@dimen/space_md" />
+                        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Solar.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/latitude">
+                            <com.google.android.material.textfield.TextInputEditText android:id="@+id/latitudeInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/button_height" android:inputType="numberDecimal|numberSigned" android:singleLine="true" android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Solar.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/longitude">
+                            <com.google.android.material.textfield.TextInputEditText android:id="@+id/longitudeInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/button_height" android:inputType="numberDecimal|numberSigned" android:singleLine="true" android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Solar.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/radius_km">
+                            <com.google.android.material.textfield.TextInputEditText android:id="@+id/radiusInput" android:text="@string/default_radius_km" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/button_height" android:inputType="numberDecimal" android:singleLine="true" android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/searchButton" style="@style/Widget.Solar.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/find_stations" />
+            <com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:indeterminate="true" android:visibility="gone" app:indicatorSize="@dimen/progress_size" />
+            <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" android:accessibilityLiveRegion="polite" android:padding="@dimen/space_lg" android:background="@drawable/solar_banner_info" android:visibility="gone" />
+            <TextView android:id="@+id/nearbyStateText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/nearby_initial" android:layout_marginBottom="@dimen/space_md" />
+            <TextView android:id="@+id/selectedStationText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/nearby_preview_hint" android:layout_marginBottom="@dimen/space_md" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Section" android:text="@string/station_results" android:layout_marginBottom="@dimen/space_md" />
+            <LinearLayout android:id="@+id/results" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/directoryButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/directory_action" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/backButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/back_to_home" android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <com.google.android.material.bottomnavigation.BottomNavigationView android:id="@+id/bottomNavigation" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/solar_surface" android:visibility="gone" app:labelVisibilityMode="labeled" app:itemIconTint="@color/solar_navigation" app:itemTextColor="@color/solar_navigation" app:menu="@menu/solar_navigation" />
+</LinearLayout>

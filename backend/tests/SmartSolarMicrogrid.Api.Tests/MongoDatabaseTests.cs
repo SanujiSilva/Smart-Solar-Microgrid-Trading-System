@@ -1,3 +1,8 @@
+/*
+ * File: tests/SmartSolarMicrogrid.Api.Tests/MongoDatabaseTests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Automated verification and test support for Mongo Database Tests.
+ */
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -18,6 +23,7 @@ public sealed class MongoFactAttribute : FactAttribute
 {
     public MongoFactAttribute()
     {
+        // Initialize Mongo Database Tests dependencies and configuration.
         if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SMARTSOLAR_TEST_MONGODB_URI")))
             Skip = "Set SMARTSOLAR_TEST_MONGODB_URI to run real MongoDB tests.";
     }
@@ -25,13 +31,14 @@ public sealed class MongoFactAttribute : FactAttribute
 
 public sealed class MongoDatabaseTests : IAsyncLifetime
 {
-    private readonly string databaseName = "smartsolar_tests_" + Guid.NewGuid().ToString("N");
+    private readonly string databaseName = "ss_test_" + Guid.NewGuid().ToString("N")[..24];
     private MongoClient client = null!;
     private MongoDbContext context = null!;
     private MongoIndexInitializer indexes = null!;
 
     public async Task InitializeAsync()
     {
+        // Create an isolated test database and initialize the API test clients.
         var settings = MongoClientSettings.FromConnectionString(
             Environment.GetEnvironmentVariable("SMARTSOLAR_TEST_MONGODB_URI"));
         settings.ServerSelectionTimeout = TimeSpan.FromSeconds(5);
@@ -43,6 +50,7 @@ public sealed class MongoDatabaseTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        // Release owned resources and clean up this test or request scope.
         if (client is not null)
         {
             try
@@ -57,6 +65,7 @@ public sealed class MongoDatabaseTests : IAsyncLifetime
     [MongoFact]
     public async Task Initialization_creates_four_collections_and_is_repeatable()
     {
+        // Verify that initialization creates four collections and is repeatable.
         await indexes.InitializeAsync();
         using var cursor = await context.Database.ListCollectionNamesAsync();
         var collections = await cursor.ToListAsync();
@@ -71,6 +80,7 @@ public sealed class MongoDatabaseTests : IAsyncLifetime
     [MongoFact]
     public async Task NIC_unique_index_rejects_normalized_duplicates_but_allows_staff_without_NIC()
     {
+        // Verify that nic unique index rejects normalized duplicates but allows staff without nic.
         await context.Users.InsertOneAsync(MongoModelTests.NewUser(" 991234567v "));
         var error = await Assert.ThrowsAsync<MongoWriteException>(() =>
             context.Users.InsertOneAsync(MongoModelTests.NewUser("991234567V")));
@@ -84,6 +94,7 @@ public sealed class MongoDatabaseTests : IAsyncLifetime
     [MongoFact]
     public async Task Station_and_reservation_codes_are_unique()
     {
+        // Verify that station and reservation codes are unique.
         await context.Stations.InsertOneAsync(MongoModelTests.NewStation("TEST-S1"));
         var stationError = await Assert.ThrowsAsync<MongoWriteException>(() =>
             context.Stations.InsertOneAsync(MongoModelTests.NewStation("TEST-S1")));
@@ -103,6 +114,7 @@ public sealed class MongoDatabaseTests : IAsyncLifetime
     [MongoFact]
     public async Task Geo_index_and_decimal_slot_roundtrip_work_on_the_server()
     {
+        // Verify that geo index and decimal slot roundtrip work on the server.
         var station = MongoModelTests.NewStation("TEST-S1");
         await context.Stations.InsertOneAsync(station);
         var filter = Builders<SolarStationInfo>.Filter.NearSphere(x => x.Location,

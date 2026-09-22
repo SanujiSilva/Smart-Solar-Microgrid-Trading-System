@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/MongoServiceRegistration.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Mongo Service Registration.
+ */
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.Api.Repositories;
@@ -8,6 +13,7 @@ public static class MongoServiceRegistration
 {
     public static IServiceCollection AddMongoDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        // Add Mongo Database for Mongo Registration.
         services.AddOptions<MongoDbSettings>()
             .Bind(configuration.GetSection(MongoDbSettings.SectionName))
             .Validate(x => MongoDbSettings.IsValidConnectionString(x.ConnectionString),

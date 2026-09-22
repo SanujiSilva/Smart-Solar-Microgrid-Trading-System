@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Repositories/MongoDbContext.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: MongoDB persistence and query operations for Mongo Db Context.
+ */
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.Api.Configuration;

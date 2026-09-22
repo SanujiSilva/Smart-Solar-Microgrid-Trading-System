@@ -1,3 +1,8 @@
+/*
+ * File: tests/SmartSolarMicrogrid.Api.Tests/MongoConfigurationTests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Automated verification and test support for Mongo Configuration Tests.
+ */
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -11,6 +16,7 @@ namespace SmartSolarMicrogrid.Api.Tests;
 
 public sealed class MongoConfigurationTests
 {
+    // Verify that connection string validation.
     [Theory]
     [InlineData("", false)]
     [InlineData("http://localhost:27017", false)]
@@ -19,6 +25,7 @@ public sealed class MongoConfigurationTests
     public void Connection_string_validation(string uri, bool valid) =>
         Assert.Equal(valid, MongoDbSettings.IsValidConnectionString(uri));
 
+    // Verify that database name validation.
     [Theory]
     [InlineData("SmartSolarMicrogrid", true)]
     [InlineData("smartsolar_tests_123", true)]
@@ -33,6 +40,7 @@ public sealed class MongoConfigurationTests
     [Fact]
     public void Invalid_configuration_errors_do_not_include_connection_secrets()
     {
+        // Verify that invalid configuration errors do not include connection secrets.
         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["MongoDb:ConnectionString"] = "http://private-user:private-password@localhost",
@@ -51,6 +59,7 @@ public sealed class MongoConfigurationTests
     [Fact]
     public async Task Database_outage_does_not_break_liveness_and_returns_safe_503_readiness()
     {
+        // Verify that database outage does not break liveness and returns safe 503 readiness.
         await using var factory = CreateUnavailableFactory(skipInitialization: true);
         using var client = factory.CreateClient();
         using var live = await client.GetAsync("/api/health");
@@ -66,12 +75,14 @@ public sealed class MongoConfigurationTests
     [Fact]
     public async Task Unreachable_database_prevents_application_startup()
     {
+        // Verify that unreachable database prevents application startup.
         await using var factory = CreateUnavailableFactory(skipInitialization: false);
         var exception = Assert.Throws<InvalidOperationException>(() => factory.CreateClient());
         Assert.Contains("MongoDB initialization failed", exception.Message);
         Assert.DoesNotContain("127.0.0.1", exception.Message);
     }
 
+    // Create Unavailable Factory for Mongo Configuration Tests.
     private static WebApplicationFactory<Program> CreateUnavailableFactory(bool skipInitialization) =>
         new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {

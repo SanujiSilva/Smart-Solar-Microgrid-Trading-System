@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/AuthServiceRegistration.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Auth Service Registration.
+ */
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -14,6 +19,7 @@ public static class AuthServiceRegistration
 
     public static IServiceCollection AddApiAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
+        // Add Api Authentication for Auth Registration.
         services.AddOptions<JwtSettings>().Bind(configuration.GetSection("Jwt"))
             .Validate(x => !string.IsNullOrWhiteSpace(x.Issuer) && !string.IsNullOrWhiteSpace(x.Audience), "Jwt:Issuer and Jwt:Audience are required.")
             .Validate(x => JwtSettings.HasValidKey(x.SigningKey), "Jwt:SigningKey must be a Base64-encoded random key of at least 32 bytes. Configure it outside source control.")

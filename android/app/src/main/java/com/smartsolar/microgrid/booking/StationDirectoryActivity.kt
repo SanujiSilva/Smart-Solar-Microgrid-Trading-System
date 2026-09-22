@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.View
 import com.google.android.material.button.MaterialButton
 import com.smartsolar.microgrid.AccountActivity
+import com.smartsolar.microgrid.SolarRecord
+import com.smartsolar.microgrid.SolarRecordAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.applyAccountInsets
 import com.smartsolar.microgrid.data.remote.ApiClient
@@ -14,6 +17,7 @@ class StationDirectoryActivity : AccountActivity() {
     private lateinit var binding: ActivityStationDirectoryBinding
     private val api by lazy { ApiClient.bookingService(applicationContext) }
     private var page = 1
+    private val rows = SolarRecordAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +26,8 @@ class StationDirectoryActivity : AccountActivity() {
         binding = ActivityStationDirectoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applyAccountInsets()
+        binding.results.layoutManager = LinearLayoutManager(this)
+        binding.results.adapter = rows
         binding.searchInput.setText(savedInstanceState?.getString("search").orEmpty())
         binding.searchButton.setOnClickListener { page = 1; load() }
         binding.previousButton.setOnClickListener { if (page > 1) { page--; load() } }
@@ -36,7 +42,7 @@ class StationDirectoryActivity : AccountActivity() {
     }
 
     private fun load() {
-        binding.results.removeAllViews()
+        rows.submitList(emptyList())
         request(binding.progressBar, binding.messageText,
             listOf(binding.searchButton, binding.searchInput, binding.previousButton, binding.nextButton)) {
             val result = api.stations(page, binding.searchInput.text.toString().trim().ifBlank { null },
@@ -46,19 +52,16 @@ class StationDirectoryActivity : AccountActivity() {
             binding.previousButton.visibility = if (page > 1) View.VISIBLE else View.GONE
             binding.nextButton.visibility = if (page.toLong() * result.pageSize < result.totalCount) View.VISIBLE else View.GONE
             if (result.items.isEmpty()) binding.messageText.setText(R.string.no_stations)
-            result.items.forEach { station ->
-                binding.results.addView(MaterialButton(this).apply {
-                    text = getString(R.string.station_list_row, station.name, station.address, station.capacityKWh.toPlainString())
-                    setOnClickListener {
-                        if (intent.getBooleanExtra(PICK_STATION, false)) {
-                            setResult(RESULT_OK, Intent().putExtra(STATION_ID, station.id).putExtra(STATION_NAME, station.name))
-                            finish()
-                        } else {
-                            startActivity(Intent(this@StationDirectoryActivity, StationDetailsActivity::class.java).putExtra(STATION_ID, station.id))
-                        }
-                    }
-                })
-            }
+            rows.submitList(result.items.map { station ->
+                SolarRecord(station.id, station.name,
+                    getString(R.string.station_card_body, station.stationCode, station.address, station.capacityKWh.toPlainString(), station.availableBatterySlots),
+                    station.status, getString(if (intent.getBooleanExtra(PICK_STATION, false)) R.string.choose_station_action else R.string.view_details_action)) {
+                    if (intent.getBooleanExtra(PICK_STATION, false)) {
+                        setResult(RESULT_OK, Intent().putExtra(STATION_ID, station.id).putExtra(STATION_NAME, station.name))
+                        finish()
+                    } else startActivity(Intent(this, StationDetailsActivity::class.java).putExtra(STATION_ID, station.id))
+                }
+            })
         }
     }
 

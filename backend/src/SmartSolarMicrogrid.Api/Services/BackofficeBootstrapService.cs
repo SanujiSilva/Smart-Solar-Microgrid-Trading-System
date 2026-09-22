@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Services/BackofficeBootstrapService.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Server-side application rules and orchestration for Backoffice Bootstrap Service.
+ */
 using System.ComponentModel.DataAnnotations;
 using SmartSolarMicrogrid.Api.DTOs.Auth;
 using SmartSolarMicrogrid.Api.Helpers;
@@ -11,6 +16,7 @@ public sealed class BackofficeBootstrapService(IUserRepository users, PasswordSe
 {
     public async Task CreateAsync(CancellationToken cancellationToken)
     {
+        // Create for Backoffice Bootstrap.
         var request = new AccountCredentialsRequest
         {
             FullName = configuration["Bootstrap:FullName"] ?? "",

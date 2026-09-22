@@ -1,12 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:gravity="center" android:padding="24dp">
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="@string/app_name" android:textSize="28sp" android:gravity="center" />
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/checking_session" />
-    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-    <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityLiveRegion="polite" />
-    <com.google.android.material.button.MaterialButton android:id="@+id/retryButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/refresh" />
-    <com.google.android.material.button.MaterialButton android:id="@+id/signInButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sign_in" />
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/solar_screen_background">
+    <androidx.core.widget.NestedScrollView android:scrollbars="vertical" android:fadeScrollbars="false" android:scrollbarStyle="insideOverlay" android:scrollbarSize="4dp" android:scrollbarThumbVertical="@drawable/solar_scroll_thumb" android:id="@+id/screenScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:padding="@dimen/screen_padding">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <ImageView android:layout_width="@dimen/logo_size" android:layout_height="@dimen/logo_size" android:layout_gravity="center_horizontal" android:layout_marginVertical="@dimen/space_xl" android:src="@drawable/ic_solar_brand" android:importantForAccessibility="no" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Title" android:text="@string/app_name" android:layout_marginBottom="@dimen/space_md" android:gravity="center" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/clean_energy_tagline" android:layout_marginBottom="@dimen/space_md" android:gravity="center" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/checking_session" android:layout_marginBottom="@dimen/space_md" android:gravity="center" />
+            <com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:indeterminate="true" android:visibility="gone" app:indicatorSize="@dimen/progress_size" />
+            <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" android:accessibilityLiveRegion="polite" android:padding="@dimen/space_lg" android:background="@drawable/solar_banner_info" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/retryButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/retry_action" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/signInButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sign_in" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

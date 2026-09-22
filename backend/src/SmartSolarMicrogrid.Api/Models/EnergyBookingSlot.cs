@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Models/EnergyBookingSlot.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Persistence model definitions for Energy Booking Slot.
+ */
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 

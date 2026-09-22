@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/DTOs/Users/UserRequests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: API request/response contracts and validation for User Requests.
+ */
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using SmartSolarMicrogrid.Api.DTOs.Auth;

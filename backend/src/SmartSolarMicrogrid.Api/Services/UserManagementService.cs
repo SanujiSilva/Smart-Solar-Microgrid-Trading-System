@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Services/UserManagementService.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Server-side application rules and orchestration for User Management Service.
+ */
 using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using SmartSolarMicrogrid.Api.DTOs.Users;
@@ -12,6 +17,7 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
 {
     public async Task<UserPageResponse> ListAsync(UserListQuery query, bool prosumersOnly, CancellationToken cancellationToken)
     {
+        // List for User Management.
         currentUser.Require(UserRole.BACKOFFICE);
         if (prosumersOnly && query.Role is not null && query.Role != "PROSUMER")
             throw new ApiException(400, "The prosumer list only supports the PROSUMER role.");
@@ -23,18 +29,21 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
 
     public async Task<UserDetailsResponse> GetAsync(string id, CancellationToken cancellationToken)
     {
+        // Get for User Management.
         currentUser.Require(UserRole.BACKOFFICE);
         return UserDetailsResponse.From(await FindById(id, cancellationToken));
     }
 
     public async Task<UserDetailsResponse> GetProsumerAsync(string nic, CancellationToken cancellationToken)
     {
+        // Get Prosumer for User Management.
         currentUser.Require(UserRole.BACKOFFICE);
         return UserDetailsResponse.From(await FindProsumer(nic, cancellationToken));
     }
 
     public async Task<UserDetailsResponse> CreateStaffAsync(CreateStaffRequest request, CancellationToken cancellationToken)
     {
+        // Create Staff for User Management.
         currentUser.Require(UserRole.BACKOFFICE);
         if (!Enum.TryParse<UserRole>(request.Role, out var role) || role is not (UserRole.BACKOFFICE or UserRole.GRID_OPERATOR))
             throw new ApiException(400, "Staff role must be BACKOFFICE or GRID_OPERATOR.");
@@ -51,6 +60,7 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
 
     public async Task<UserDetailsResponse> UpdateStaffAsync(string id, UpdateProfileRequest request, CancellationToken cancellationToken)
     {
+        // Update Staff for User Management.
         currentUser.Require(UserRole.BACKOFFICE);
         var user = await FindById(id, cancellationToken);
         if (user.Role == UserRole.PROSUMER)
@@ -58,11 +68,13 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
         return await UpdateProfile(user, request, cancellationToken);
     }
 
+    // Update My Profile for User Management.
     public Task<UserDetailsResponse> UpdateMyProfileAsync(UpdateProfileRequest request, CancellationToken cancellationToken) =>
         UpdateProfile(currentUser.Require(UserRole.PROSUMER), request, cancellationToken);
 
     public async Task<UserDetailsResponse> ChangeStatusAsync(string id, ChangeUserStatusRequest request, CancellationToken cancellationToken)
     {
+        // Change Status for User Management.
         var actor = currentUser.Require(UserRole.BACKOFFICE);
         var user = await FindById(id, cancellationToken);
         if (!Enum.TryParse<UserStatus>(request.Status, out var status) || status is not (UserStatus.ACTIVE or UserStatus.DEACTIVATED))
@@ -75,6 +87,7 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
 
     public async Task<UserDetailsResponse> ActivateProsumerAsync(string nic, CancellationToken cancellationToken)
     {
+        // Activate Prosumer for User Management.
         currentUser.Require(UserRole.BACKOFFICE);
         var user = await FindProsumer(nic, cancellationToken);
         if (user.Status != UserStatus.DEACTIVATED)
@@ -84,6 +97,7 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
 
     public async Task<UserDetailsResponse> RequestDeactivationAsync(CancellationToken cancellationToken)
     {
+        // Request Deactivation for User Management.
         var user = currentUser.Require(UserRole.PROSUMER);
         if (user.Status == UserStatus.DEACTIVATION_REQUESTED) return UserDetailsResponse.From(user);
         if (user.Status != UserStatus.ACTIVE) throw new ApiException(409, "Only an active prosumer can request deactivation.");
@@ -92,6 +106,7 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
 
     private async Task<UserDetailsResponse> UpdateProfile(User user, UpdateProfileRequest request, CancellationToken cancellationToken)
     {
+        // Update Profile for User Management.
         var updated = await users.UpdateProfileAsync(user, request.FullName.Trim(), request.Email.Trim().ToLowerInvariant(),
             request.Phone.Trim(), clock.GetUtcNow().UtcDateTime, cancellationToken);
         return UserDetailsResponse.From(RequireUnchanged(updated));
@@ -99,20 +114,24 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
 
     private async Task<UserDetailsResponse> SaveStatus(User user, UserStatus status, bool revokeTokens, CancellationToken cancellationToken)
     {
+        // Save Status for User Management.
         var updated = await users.ChangeStatusAsync(user, status, revokeTokens, clock.GetUtcNow().UtcDateTime, cancellationToken);
         return UserDetailsResponse.From(RequireUnchanged(updated));
     }
 
+    // Require Unchanged for User Management.
     private static User RequireUnchanged(User? user) => user ?? throw new ApiException(409, "The account changed during this request. Reload and try again.");
 
     private async Task<User> FindById(string id, CancellationToken cancellationToken)
     {
+        // Find By Id for User Management.
         if (!ObjectId.TryParse(id, out var objectId)) throw new ApiException(400, "User ID must be a valid ObjectId.");
         return await users.FindByIdAsync(objectId, cancellationToken) ?? throw new ApiException(404, "User was not found.");
     }
 
     private async Task<User> FindProsumer(string nic, CancellationToken cancellationToken)
     {
+        // Find Prosumer for User Management.
         var normalized = nic.Trim().ToUpperInvariant();
         if (!Regex.IsMatch(normalized, @"\A(?:[0-9]{9}[VX]|[0-9]{12})\z")) throw new ApiException(400, "NIC format is invalid.");
         return await users.FindProsumerByNicAsync(normalized, cancellationToken) ?? throw new ApiException(404, "Prosumer was not found.");

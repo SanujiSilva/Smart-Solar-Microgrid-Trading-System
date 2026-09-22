@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Models/User.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Persistence model definitions for User.
+ */
 using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/MongoDbSettings.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Mongo Db Settings.
+ */
 using System.Text.RegularExpressions;
 using MongoDB.Driver;
 
@@ -13,6 +18,7 @@ public sealed class MongoDbSettings
 
     public static bool IsValidConnectionString(string? value)
     {
+        // Is Valid Connection String for Mongo Db Settings.
         if (string.IsNullOrWhiteSpace(value) ||
             !(value.StartsWith("mongodb://", StringComparison.Ordinal) ||
               value.StartsWith("mongodb+srv://", StringComparison.Ordinal)))
@@ -23,6 +29,7 @@ public sealed class MongoDbSettings
         { return false; }
     }
 
+    // Is Valid Database Name for Mongo Db Settings.
     public static bool IsValidDatabaseName(string? value) =>
         value is not null && Regex.IsMatch(value, "\\A[A-Za-z0-9][A-Za-z0-9_-]{0,62}\\z") &&
         !new[] { "admin", "local", "config" }.Contains(value, StringComparer.OrdinalIgnoreCase);

@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/JwtSettings.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Jwt Settings.
+ */
 namespace SmartSolarMicrogrid.Api.Configuration;
 
 public sealed class JwtSettings
@@ -9,6 +14,7 @@ public sealed class JwtSettings
 
     public static bool HasValidKey(string? key)
     {
+        // Has Valid Key for Jwt Settings.
         try { return !string.IsNullOrWhiteSpace(key) && Convert.FromBase64String(key).Length >= 32; }
         catch (FormatException) { return false; }
     }

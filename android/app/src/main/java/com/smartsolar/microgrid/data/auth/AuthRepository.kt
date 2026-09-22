@@ -54,6 +54,10 @@ class AuthRepository(context: Context) {
         cacheUser(api.requestDeactivation())
     }
 
+    suspend fun cachedUser() = withContext(Dispatchers.IO) { localRepository.getUser() }
+
+    suspend fun cachedStations() = withContext(Dispatchers.IO) { localRepository.listCachedStations() }
+
     suspend fun dashboard() = api.dashboard()
 
     suspend fun nearby(latitude: Double, longitude: Double, radiusKm: Double) = withContext(Dispatchers.IO) {

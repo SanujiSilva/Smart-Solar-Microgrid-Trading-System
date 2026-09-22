@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Repositories/MongoIndexInitializer.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: MongoDB persistence and query operations for Mongo Index Initializer.
+ */
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.Api.Models;

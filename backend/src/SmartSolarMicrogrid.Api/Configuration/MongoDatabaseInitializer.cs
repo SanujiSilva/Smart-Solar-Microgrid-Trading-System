@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/MongoDatabaseInitializer.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Mongo Database Initializer.
+ */
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using SmartSolarMicrogrid.Api.Repositories;
@@ -10,6 +15,7 @@ public sealed class MongoDatabaseInitializer(
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        // Start for Mongo Database Initializer.
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(options.Value.InitializationTimeoutSeconds));
         try
@@ -30,5 +36,6 @@ public sealed class MongoDatabaseInitializer(
         }
     }
 
+    // Stop for Mongo Database Initializer.
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

@@ -1,3 +1,8 @@
+/*
+ * File: tests/SmartSolarMicrogrid.Api.Tests/MongoModelTests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Automated verification and test support for Mongo Model Tests.
+ */
 using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -12,6 +17,7 @@ public sealed class MongoModelTests
     [Fact]
     public void User_stores_ObjectId_string_enums_and_normalized_NIC_but_never_JSON_password_hash()
     {
+        // Verify that user stores objectid string enums and normalized nic but never json password hash.
         var user = NewUser(" 991234567v ");
         var bson = user.ToBsonDocument();
         Assert.Equal(BsonType.ObjectId, bson["_id"].BsonType);
@@ -27,6 +33,7 @@ public sealed class MongoModelTests
     [Fact]
     public void Reservation_roundtrip_preserves_decimal_references_and_UTC_without_JSON_token_hash()
     {
+        // Verify that reservation roundtrip preserves decimal references and utc without json token hash.
         var time = new DateTime(2026, 9, 16, 10, 30, 0, DateTimeKind.Utc);
         var reservation = new EnergyReservation
         {
@@ -55,6 +62,7 @@ public sealed class MongoModelTests
     [Fact]
     public void Station_has_one_GeoJSON_coordinate_source_and_roundtrips_schedule()
     {
+        // Verify that station has one geojson coordinate source and roundtrips schedule.
         var station = NewStation("TEST-S1");
         station.OperatingSchedule.WeeklyPeriods.Add(new OperatingPeriod
             { Day = DayOfWeek.Monday, OpenMinuteOfDay = 480, CloseMinuteOfDay = 1020 });
@@ -74,6 +82,7 @@ public sealed class MongoModelTests
     [Fact]
     public void Slot_capacity_is_decimal_and_times_are_UTC()
     {
+        // Verify that slot capacity is decimal and times are utc.
         var slot = new EnergyBookingSlot
         {
             StationId = ObjectId.GenerateNewId(), Capacity = 20.123456789m,
@@ -88,12 +97,14 @@ public sealed class MongoModelTests
         Assert.Equal(DateTimeKind.Utc, result.StartTime.Kind);
     }
 
+    // New User for Mongo Model Tests.
     internal static User NewUser(string? nic) => new()
     {
         NIC = nic, FullName = "Test User", Email = $"{Guid.NewGuid():N}@example.invalid", Phone = "0000000000",
         PasswordHash = "test-hash-not-a-password"
     };
 
+    // New Station for Mongo Model Tests.
     internal static SolarStationInfo NewStation(string code) => new()
     {
         StationCode = code, Name = "Test Station", Address = "Test Address",

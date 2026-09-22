@@ -1,3 +1,8 @@
+/*
+ * File: tests/SmartSolarMicrogrid.Api.Tests/TradingIntegrationTests.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Automated verification and test support for Trading Integration Tests.
+ */
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -19,7 +24,7 @@ namespace SmartSolarMicrogrid.Api.Tests;
 
 public sealed class TradingIntegrationTests : IAsyncLifetime
 {
-    private readonly string databaseName = "smartsolar_tests_" + Guid.NewGuid().ToString("N");
+    private readonly string databaseName = "ss_test_" + Guid.NewGuid().ToString("N")[..24];
     private readonly DateTime now = DateTimeOffset.FromUnixTimeMilliseconds(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).UtcDateTime;
     private WebApplicationFactory<Program> factory = null!;
     private MongoDbContext database = null!;
@@ -29,6 +34,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        // Create an isolated test database and initialize the API test clients.
         factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Development");
@@ -59,6 +65,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
 
     private async Task<HttpClient> Client(UserRole role, string? nic)
     {
+        // Client for Trading Integration Tests.
         const string password = "Integration test passphrase 123!";
         var user = new User { FullName = "Test User", Email = Guid.NewGuid() + "@example.invalid", Phone = "0771234567",
             NIC = nic, Role = role, Status = UserStatus.ACTIVE };
@@ -73,10 +80,12 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
 
     private async Task<ReservationResponse> Book(decimal amount = 10)
     {
+        // Book for Trading Integration Tests.
         var response = await owner.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = amount });
         await Expect(response, HttpStatusCode.Created);
         return (await response.Content.ReadFromJsonAsync<ReservationResponse>())!;
     }
+    // Expect for Trading Integration Tests.
     private static async Task Expect(HttpResponseMessage response, HttpStatusCode status) =>
         Assert.True(response.StatusCode == status, $"Expected {status}, got {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
 
@@ -85,6 +94,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [InlineData(8, false)]
     public async Task Seven_day_window_is_server_enforced(int days, bool allowed)
     {
+        // Verify that seven day window is server enforced.
         await database.Slots.UpdateOneAsync(x => x.Id == slot.Id, Builders<EnergyBookingSlot>.Update
             .Set(x => x.StartTime, now.AddDays(days)).Set(x => x.EndTime, now.AddDays(days).AddMinutes(1)));
         await Expect(await owner.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 10 }),
@@ -96,6 +106,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [InlineData(11, false)]
     public async Task Update_and_cancel_enforce_twelve_hours(int hours, bool allowed)
     {
+        // Verify that update and cancel enforce twelve hours.
         var booking = await Book();
         await database.Reservations.UpdateOneAsync(x => x.Id == ObjectId.Parse(booking.Id),
             Builders<EnergyReservation>.Update.Set(x => x.ReservationDateTime, now.AddHours(hours)));
@@ -107,6 +118,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Approval_QR_completion_and_reuse_are_authorized_and_atomic()
     {
+        // Verify that approval qr completion and reuse are authorized and atomic.
         var booking = await Book();
         await Expect(await owner.GetAsync($"/api/reservations/{booking.Id}/qr"), HttpStatusCode.Conflict);
         await Expect(await grid.PatchAsync($"/api/reservations/{booking.Id}/approve", null), HttpStatusCode.Forbidden);
@@ -127,6 +139,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Ownership_and_operator_administration_are_restricted()
     {
+        // Verify that ownership and operator administration are restricted.
         var booking = await Book();
         await Expect(await other.GetAsync($"/api/reservations/{booking.Id}"), HttpStatusCode.Forbidden);
         await Expect(await other.DeleteAsync($"/api/reservations/{booking.Id}"), HttpStatusCode.Forbidden);
@@ -138,6 +151,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Active_reservations_protect_station_slot_and_allocated_energy()
     {
+        // Verify that active reservations protect station slot and allocated energy.
         var booking = await Book(40);
         await Expect(await admin.PatchAsync($"/api/stations/{station.Id}/deactivate", null), HttpStatusCode.Conflict);
         await Expect(await admin.DeleteAsync($"/api/slots/{slot.Id}"), HttpStatusCode.Conflict);
@@ -152,6 +166,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Concurrent_bookings_never_overbook_or_leak_capacity()
     {
+        // Verify that concurrent bookings never overbook or leak capacity.
         var results = await Task.WhenAll(Enumerable.Range(0, 6).Select(_ => owner.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 60 })));
         Assert.Single(results, x => x.StatusCode == HttpStatusCode.Created);
         Assert.All(results.Where(x => x.StatusCode != HttpStatusCode.Created), x => Assert.Equal(HttpStatusCode.Conflict, x.StatusCode));
@@ -162,6 +177,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Concurrent_updates_and_cancellation_keep_capacity_equal_to_ledger()
     {
+        // Verify that concurrent updates and cancellation keep capacity equal to ledger.
         var booking = await Book(20);
         var results = await Task.WhenAll(owner.PutAsJsonAsync($"/api/reservations/{booking.Id}", new { energyAmount = 30 }),
             owner.PutAsJsonAsync($"/api/reservations/{booking.Id}", new { energyAmount = 50 }), owner.DeleteAsync($"/api/reservations/{booking.Id}"));
@@ -174,6 +190,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Unavailable_station_and_insufficient_capacity_are_rejected()
     {
+        // Verify that unavailable station and insufficient capacity are rejected.
         await Expect(await owner.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 101 }), HttpStatusCode.Conflict);
         await database.Stations.UpdateOneAsync(x => x.Id == station.Id, Builders<SolarStationInfo>.Update.Set(x => x.Status, StationStatus.MAINTENANCE));
         await Expect(await owner.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 1 }), HttpStatusCode.Conflict);
@@ -182,6 +199,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        // Release owned resources and clean up this test or request scope.
         owner?.Dispose(); other?.Dispose(); admin?.Dispose(); grid?.Dispose();
         if (database is not null) await database.Database.Client.DropDatabaseAsync(databaseName);
         if (factory is not null) await factory.DisposeAsync();
@@ -190,6 +208,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Failed_reservation_write_rolls_back_capacity()
     {
+        // Verify that failed reservation write rolls back capacity.
         await database.Database.RunCommandAsync<BsonDocument>(new BsonDocument {
             { "collMod", "EnergyReservations" }, { "validator", new BsonDocument("EnergyAmount", new BsonDocument("$lt", 0)) }
         });
@@ -201,6 +220,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Station_deactivation_and_booking_cannot_both_succeed()
     {
+        // Verify that station deactivation and booking cannot both succeed.
         var results = await Task.WhenAll(admin.PatchAsync($"/api/stations/{station.Id}/deactivate", null),
             owner.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 10 }));
         Assert.Single(results, x => x.IsSuccessStatusCode);
@@ -213,6 +233,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Slot_schedule_capacity_overlap_and_operator_permissions_are_checked()
     {
+        // Verify that slot schedule capacity overlap and operator permissions are checked.
         var body = new { startTime = slot.StartTime, endTime = slot.EndTime, capacity = 100, availableCapacity = 100, status = "OPEN" };
         await Expect(await admin.PostAsJsonAsync($"/api/stations/{station.Id}/slots", body), HttpStatusCode.Conflict);
         await Expect(await grid.PostAsJsonAsync($"/api/stations/{station.Id}/slots", body), HttpStatusCode.Forbidden);
@@ -225,6 +246,7 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
     [MongoFact]
     public async Task Dashboard_and_search_are_scoped_to_authenticated_prosumer()
     {
+        // Verify that dashboard and search are scoped to authenticated prosumer.
         var booking = await Book();
         var ownerDashboard = await owner.GetFromJsonAsync<System.Text.Json.JsonElement>("/api/reservations/dashboard");
         var otherDashboard = await other.GetFromJsonAsync<System.Text.Json.JsonElement>("/api/reservations/dashboard");
@@ -234,8 +256,35 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
         Assert.Equal(0, search.GetProperty("totalCount").GetInt32());
     }
 
+    [MongoFact]
+    public async Task Station_deletion_requires_backoffice_and_preserves_references()
+    {
+        // Verify that station deletion requires backoffice and preserves references.
+        await Expect(await grid.DeleteAsync($"/api/stations/{station.Id}"), HttpStatusCode.Forbidden);
+        await Expect(await owner.DeleteAsync($"/api/stations/{station.Id}"), HttpStatusCode.Forbidden);
+        await Expect(await admin.DeleteAsync($"/api/stations/{station.Id}"), HttpStatusCode.Conflict);
+        Assert.True(await database.Stations.Find(x => x.Id == station.Id).AnyAsync());
+        await database.Slots.DeleteOneAsync(x => x.Id == slot.Id);
+        await Expect(await admin.DeleteAsync($"/api/stations/{station.Id}"), HttpStatusCode.NoContent);
+        Assert.False(await database.Stations.Find(x => x.Id == station.Id).AnyAsync());
+        await Expect(await admin.DeleteAsync($"/api/stations/{station.Id}"), HttpStatusCode.NotFound);
+        await Expect(await admin.DeleteAsync("/api/stations/not-an-id"), HttpStatusCode.BadRequest);
+    }
+
+    [MongoFact]
+    public async Task Station_deletion_preserves_cancelled_reservation_history()
+    {
+        // Verify that station deletion preserves cancelled reservation history.
+        var booking = await Book();
+        await Expect(await owner.DeleteAsync($"/api/reservations/{booking.Id}"), HttpStatusCode.OK);
+        await database.Slots.DeleteOneAsync(x => x.Id == slot.Id);
+        await Expect(await admin.DeleteAsync($"/api/stations/{station.Id}"), HttpStatusCode.Conflict);
+        Assert.True(await database.Reservations.Find(x => x.Id == ObjectId.Parse(booking.Id)).AnyAsync());
+    }
+
     private sealed class FixedClock(DateTime value) : TimeProvider
     {
+        // Return the configured UTC clock value for deterministic business-rule checks.
         public override DateTimeOffset GetUtcNow() => new(value, TimeSpan.Zero);
     }
 }

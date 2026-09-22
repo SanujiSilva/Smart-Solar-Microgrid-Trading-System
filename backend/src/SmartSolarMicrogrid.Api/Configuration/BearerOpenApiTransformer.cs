@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/BearerOpenApiTransformer.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Bearer Open Api Transformer.
+ */
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
@@ -8,6 +13,7 @@ public sealed class BearerOpenApiTransformer : IOpenApiDocumentTransformer
 {
     public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
     {
+        // Transform for Bearer Open Api Transformer.
         document.Components ??= new OpenApiComponents();
         document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
         document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme

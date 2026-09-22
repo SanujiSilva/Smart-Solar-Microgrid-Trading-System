@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Middleware/GlobalExceptionHandler.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Request-pipeline behavior for Global Exception Handler.
+ */
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +17,7 @@ public sealed class GlobalExceptionHandler(
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
+        // Try Handle for Global Exception Handler.
         var expected = exception as ApiException;
         if (expected is null)
             logger.LogError(exception, "Unhandled API exception. TraceId: {TraceId}", httpContext.TraceIdentifier);

@@ -1,3 +1,8 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Configuration/MongoReadinessCheck.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Service setup and configuration for Mongo Readiness Check.
+ */
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MongoDB.Bson;
 using SmartSolarMicrogrid.Api.Repositories;
@@ -9,6 +14,7 @@ public sealed class MongoReadinessCheck(MongoDbContext context) : IHealthCheck
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext healthCheckContext, CancellationToken cancellationToken = default)
     {
+        // Check Health for Mongo Readiness Check.
         try
         {
             await context.Database.RunCommandAsync<BsonDocument>(new BsonDocument("ping", 1),

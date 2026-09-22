@@ -5,9 +5,9 @@ const station = { id: 'station-1', stationCode: 'NODE-1', name: 'Colombo Station
 const slot = { id: 'slot-1', startTime: '2030-01-01T08:00:00Z', endTime: '2030-01-01T09:00:00Z', capacity: 100, availableCapacity: 60, status: 'OPEN' }
 const reservation = { id: 'reservation-1', reservationCode: 'RSV-1', prosumerNIC: user.nic, stationId: station.id, slotId: slot.id, energyAmount: 40, reservationDateTime: slot.startTime, status: 'PENDING', createdAt: '2029-12-30T08:00:00Z' }
 
-async function setup(page: Page, role = 'BACKOFFICE') {
+async function setup(page: Page, role = 'BACKOFFICE', accountStatus = 'PENDING') {
   const calls: { path: string; method: string; body: any }[] = []
-  const account = structuredClone(user), node = structuredClone(station), booking = structuredClone(reservation)
+  const account = { ...structuredClone(user), status: accountStatus }, node = structuredClone(station), booking = structuredClone(reservation)
   await page.addInitScript(() => sessionStorage.setItem('smart-solar.access-token', 'test-token'))
   page.on('dialog', dialog => dialog.accept())
   await page.route('**/api/**', async route => {
@@ -53,7 +53,7 @@ test('Backoffice station editing preserves the server schedule and allows slot c
   await page.getByRole('button', { name: 'Details / Manage' }).click()
   await page.getByLabel('Name', { exact: true }).fill('Updated station')
   await page.getByRole('button', { name: 'Save station', exact: true }).click()
-  await expect(page.getByRole('status')).toHaveText('Station saved.')
+  await expect(page.getByRole('status').filter({ hasText: 'Station saved.' })).toBeVisible()
   const update = calls.find(c => c.method === 'PUT' && c.path === '/stations/station-1')!
   expect(update.body.name).toBe('Updated station')
   expect(update.body.operatingSchedule).toEqual(station.operatingSchedule)
@@ -96,6 +96,29 @@ test('reservation detail supports approval and confirmed cancellation', async ({
   expect(calls.some(c => c.path === '/reservations/reservation-1' && c.method === 'DELETE')).toBeTruthy()
 })
 
+test('reservation layout fits desktop and mobile and supports export and clear filters', async ({ page }) => {
+  test.setTimeout(60_000)
+  await setup(page)
+  await page.setViewportSize({ width: 1672, height: 941 })
+  await page.goto('/reservations')
+  await expect(page.locator('.reservation-metrics')).toHaveCSS('display', 'grid')
+  await expect(page.locator('.reservation-workspace')).toHaveCSS('display', 'grid')
+  await page.getByRole('button', { name: 'Details', exact: true }).click()
+  await expect(page.getByRole('complementary', { name: 'Reservation details' })).toContainText('RSV-1')
+  await page.screenshot({ path: 'test-results/reservations-desktop.png', fullPage: true })
+  const download = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Export this page' }).click()
+  expect((await download).suggestedFilename()).toBe('reservations-page-1.csv')
+  await page.getByLabel('Reservation code', { exact: true }).fill('RSV-1')
+  await page.getByRole('button', { name: 'Clear filters' }).click()
+  await expect(page.getByLabel('Reservation code', { exact: true })).toHaveValue('')
+  await page.setViewportSize({ width: 390, height: 844 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.screenshot({ path: 'test-results/reservations-mobile.png', fullPage: true })
+  await page.getByRole('button', { name: 'Close reservation details' }).click()
+  await expect(page.getByRole('complementary', { name: 'Reservation details' })).toContainText('Select a reservation')
+})
+
 test('expired API sessions return to login', async ({ page }) => {
   await setup(page)
   await page.goto('/prosumers')
@@ -104,3 +127,20 @@ test('expired API sessions return to login', async ({ page }) => {
   await page.getByRole('button', { name: 'Refresh', exact: true }).click()
   await expect(page).toHaveURL(/\/login/)
 })
+
+for (const route of ['/prosumers', '/users']) {
+  test(`active prosumer has no deactivation action on ${route}`, async ({ page }) => {
+    await setup(page, 'BACKOFFICE', 'ACTIVE')
+    await page.goto(route)
+    await expect(page.getByRole('cell', { name: 'Test Prosumer', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Deactivate', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Approve deactivation', exact: true })).toHaveCount(0)
+  })
+  test(`requested prosumer deactivation can be approved on ${route}`, async ({ page }) => {
+    const calls = await setup(page, 'BACKOFFICE', 'DEACTIVATION_REQUESTED')
+    await page.goto(route)
+    await page.getByRole('button', { name: 'Approve deactivation', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Reactivate', exact: true })).toBeVisible()
+    expect(calls.find(c => c.path === '/users/user-1/status')?.body).toEqual({ status: 'DEACTIVATED' })
+  })
+}

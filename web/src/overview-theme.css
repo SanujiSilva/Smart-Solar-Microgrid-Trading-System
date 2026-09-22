@@ -1,0 +1,60 @@
+.overview-theme .side-nav, .overview-theme .brand { background: #231d56; }
+.brand-sun { color: #ffdc5a; font: 46px/1 system-ui, sans-serif; flex-shrink: 0; }
+.overview-theme .brand b { color: #d0c8f5; letter-spacing: .12em; font-weight: 400; }
+.overview-theme .header-account-search { max-width: 570px; }
+.overview-theme .header-account-search select { background: #f7f6fd; border: 1px solid #dbe0ef; border-radius: 7px 0 0 7px; max-width: 130px; font: 13px system-ui, sans-serif; padding: 8px; }
+.overview-theme .header-account-search input { border-radius: 0 7px 7px 0; padding-left: 13px; padding-right: 38px; min-width: 0; }
+.overview-theme .header-account-search button { left: auto; right: 6px; }
+.overview-theme .footer-line { display: flex; min-height: 46px; padding-block: 14px; }
+.overview-dashboard { padding: 28px 28px 20px; }
+.overview-dashboard .dashboard-hero { min-height: 125px; align-items: center; gap: 20px; }
+.overview-dashboard .page-heading { max-width: none; }
+.overview-dashboard .page-heading h1 { font-size: clamp(34px, 3vw, 46px); margin: 12px 0 4px; }
+.overview-dashboard .page-heading p { font-size: 14px; max-width: 690px; margin-bottom: 20px; }
+.overview-heading-actions { display: flex; gap: 12px; position: relative; z-index: 2; flex-wrap: wrap; justify-content: flex-end; }
+.overview-dashboard .review-button { margin: 0; font-size: 12px; padding: 12px 14px; }
+.overview-dashboard .btn-outline-primary { --bs-btn-color: #6430cb; --bs-btn-border-color: #d5c2f9; --bs-btn-hover-color: #51229f; --bs-btn-hover-bg: #f2ecfc; --bs-btn-hover-border-color: #a281db; border-radius: 7px; font-size: 12px; padding: 11px 14px; white-space: nowrap; }
+.overview-dashboard .hero-scene { width: 275px; right: 36%; bottom: 6px; opacity: .5; }
+.overview-dashboard .hero-scene > span { display: none; }
+.overview-dashboard .metric-grid { gap: 14px; margin-bottom: 22px; }
+.overview-dashboard .metric-card { min-height: 134px; padding: 18px 22px; border-top-width: 3px; border-radius: 11px; }
+.overview-dashboard .metric-card > .solar-icon { width: 27px; height: 27px; margin-bottom: 8px; }
+.overview-dashboard .metric-card strong { font-size: 30px; margin-top: 8px; color: #0e1230; }
+.overview-dashboard .metric-card span { font-size: 13px; }
+.overview-panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 16px; }
+.overview-panel { background: white; border: 1px solid #e4ebf6; border-radius: 11px; padding: 20px; box-shadow: 0 4px 18px #20325404; min-width: 0; }
+.overview-panel h2, .overview-dashboard .data-panel h2 { display: flex; align-items: center; gap: 12px; color: #16143b; font: 700 18px/1.3 system-ui, sans-serif; margin: 0 0 22px; letter-spacing: -.025em; }
+.overview-panel h2 .solar-icon, .overview-dashboard .data-panel h2 .solar-icon { width: 28px; height: 28px; color: #713ce1; }
+.overview-energy { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 28px 0 20px; color: #171640; }
+.overview-energy .solar-icon { color: #139957; width: 32px; height: 32px; }
+.overview-energy strong { font-size: 27px; }
+.overview-energy span { font-size: 16px; }
+.overview-panel p { font-size: 13px; color: #58678e; }
+.overview-panel a { color: #6633c7; text-decoration: none; font-size: 13px; }
+.overview-panel a:hover { text-decoration: underline; }
+.overview-panel a .solar-icon { width: 18px; height: 18px; }
+.overview-network { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #e6ecf6; border-radius: 9px; padding: 24px 14px; gap: 16px; }
+.overview-network > div { display: flex; align-items: center; gap: 12px; }
+.overview-network > div + div { border-left: 1px solid #dce3f0; padding-left: 16px; }
+.overview-network .solar-icon { color: #168345; width: 30px; height: 30px; }
+.overview-network span { font-size: 12px; color: #4e5b83; }
+.overview-network strong { display: block; color: #151731; font-size: 27px; margin-top: 5px; }
+.overview-quick h2 { margin-bottom: 16px; }
+.overview-quick a { display: flex; align-items: center; gap: 14px; border: 1px solid #e8eafa; border-radius: 8px; padding: 11px 14px; }
+.overview-quick a + a { margin-top: 3px; }
+.overview-quick a .solar-icon:first-child { width: 23px; height: 23px; }
+.overview-quick a .solar-icon:last-child { margin-left: auto; }
+.overview-health { display: flex; flex-wrap: wrap; gap: 18px; background: white; border: 1px solid #e7edf5; border-radius: 10px; padding: 17px 24px; margin-bottom: 16px; font: 12px system-ui, sans-serif; color: #4d5b80; }
+.overview-health span { display: inline-flex; align-items: center; gap: 15px; }
+.overview-health span::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #c68b22; }
+.overview-health .is-healthy::before { background: #159958; }
+.overview-health span + span { border-left: 1px solid #dfe5ef; padding-left: 22px; }
+.overview-dashboard .data-panel { padding: 18px 22px; }
+.overview-dashboard .panel-heading { margin-bottom: 14px; gap: 15px; flex-wrap: wrap; }
+.overview-dashboard .panel-heading h2 { margin: 0; font-size: 20px; }
+.overview-reservation-filters { display: flex; gap: 10px; flex-wrap: wrap; }
+.overview-reservation-filters .form-control, .overview-reservation-filters .form-select { border: 1px solid #dfe5f0; border-radius: 7px; min-height: 42px; font-size: 12px; width: auto; max-width: 100%; }
+.overview-dashboard .management-table th { padding: 16px; font-size: 11px; }
+.overview-dashboard .management-table td { padding: 16px; font-size: 13px; }
+@media (max-width: 1300px) { .overview-dashboard .dashboard-hero { flex-wrap: wrap; } .overview-dashboard .page-heading { flex-basis: 100%; } .overview-heading-actions { margin-bottom: 20px; } .overview-dashboard .hero-scene { right: 0; } .overview-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); } .overview-quick { grid-column: span 2; } }
+@media (max-width: 760px) { .overview-dashboard { padding: 25px 16px; } .overview-panels { grid-template-columns: minmax(0, 1fr); } .overview-quick { grid-column: auto; } .overview-dashboard .metric-card { padding: 15px; } .overview-health { padding: 16px; flex-direction: column; gap: 12px; } .overview-health span + span { border: 0; padding: 0; } .overview-dashboard .data-panel { padding: 18px 14px; } .overview-heading-actions { justify-content: flex-start; } }
