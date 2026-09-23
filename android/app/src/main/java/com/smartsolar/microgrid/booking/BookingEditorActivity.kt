@@ -95,6 +95,7 @@ class BookingEditorActivity : AccountActivity() {
         binding.bookingsButton.isEnabled = !state.busy
         if (binding.amountInput.text.toString() != state.draft) binding.amountInput.setText(state.draft)
         val booking = state.booking
+        binding.bookingCodeText.text = booking?.reservationCode ?: getString(R.string.booking_details)
         binding.statusChip.visibility = if (booking == null) View.GONE else View.VISIBLE
         binding.statusChip.text = booking?.status
         booking?.let { binding.statusChip.solarStatus(it.status) }

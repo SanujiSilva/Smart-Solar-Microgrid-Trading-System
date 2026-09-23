@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="@dimen/card_radius" />
-    <solid android:color="#F9FBFF" />
+    <solid android:color="@color/solar_primary_light" />
     <stroke
         android:width="@dimen/border_width"
         android:color="@color/solar_border" />

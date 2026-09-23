@@ -1,0 +1,53 @@
+<resources>
+<string name="prosumer_home_brand">Solar community</string>
+<string name="prosumer_home_eyebrow">YOUR ENERGY. SHARED.</string>
+<string name="prosumer_home_tagline">A brighter day starts with you.</string>
+<string name="prosumer_home_overview">Your energy overview</string>
+<string name="prosumer_home_overview_hint">Capacity and booking progress, at a glance</string>
+<string name="prosumer_home_explore">Find your next station</string>
+<string name="prosumer_home_explore_hint">Explore nearby stations and reserve an energy slot.</string>
+<string name="quick_actions_hint">Fast paths for today</string>
+<string name="network_active_stations">Active stations</string>
+<string name="network_open_slots">Open slots</string>
+<string name="network_today_reservations">Today</string>
+<string name="recent_active_label">%1$d active bookings</string>
+<string name="recent_energy_label">%1$s kWh</string>
+<string name="stations_hero_title">Find clean energy nearby</string>
+<string name="stations_hero_hint">Use the map, your location, or filters to discover active solar stations.</string>
+<string name="bookings_hero_hint">Track reservations, review statuses, and start a new booking.</string>
+<string name="profile_hero_hint">Keep your prosumer account and contact details ready for every transfer.</string>
+<string name="profile_account_card_hint">Manage account state and deactivation requests.</string>
+<string name="profile_contact_hint">Update the details operators and support teams use to identify your account.</string>
+<string name="profile_identity_heading">Prosumer identity</string>
+<string name="profile_status_active">Your account is active and ready for bookings and QR transfers.</string>
+<string name="profile_session_action">Session</string>
+<string name="booking_details_hint">Review your reservation status, energy amount, QR access, and changes.</string>
+<string name="booking_code_placeholder">Reservation</string>
+<string name="booking_summary_heading">Reservation summary</string>
+<string name="booking_actions_heading">Booking actions</string>
+<string name="booking_energy_heading">Energy request</string>
+<string name="booking_record_caption">Tap below to inspect this reservation.</string>
+<string name="station_directory_hint">Search active solar stations by name, code, or address.</string>
+<string name="station_results_hint">Choose a station to review slots and availability.</string>
+<string name="station_detail_hint">Review capacity, schedule, and available booking slots.</string>
+<string name="qr_pass_heading">Transfer pass</string>
+<string name="qr_pass_hint">Keep the QR code clear and bright for the grid operator.</string>
+<string name="operator_qr_hint">Scan, verify, and complete energy transfers with confidence.</string>
+<string name="manual_token_heading">Manual token</string>
+<string name="app_market_signal">Live solar capacity  •  Smart reservations  •  QR transfer</string>
+<string name="login_market_hint">Reserve clean energy, manage bookings, and complete trusted microgrid transfers.</string>
+<string name="register_hero_title">Join the energy network</string>
+<string name="register_hero_hint">Create a prosumer account for solar reservations and secure transfer verification.</string>
+<string name="registration_review_badge">Backoffice approval required</string>
+<string name="identity_card_hint">Identity</string>
+<string name="contact_card_hint">Contact</string>
+<string name="security_card_hint">Security</string>
+<string name="map_panel_title">Search map</string>
+<string name="location_tools_heading">Location tools</string>
+<string name="search_area_hint">Set coordinates manually when GPS is not available.</string>
+<string name="station_state_heading">Station search status</string>
+<style name="ProsumerHeading" parent="Solar.Text.Section"><item name="android:textColor">@color/solar_primary_dark</item><item name="android:textSize">20sp</item></style>
+<style name="ProsumerMetric" parent="Solar.Text.Section"><item name="android:layout_width">0dp</item><item name="android:layout_height">wrap_content</item><item name="android:layout_weight">1</item><item name="android:minHeight">112dp</item><item name="android:padding">18dp</item><item name="android:gravity">center_vertical</item><item name="android:textSize">17sp</item><item name="android:lineSpacingExtra">7dp</item><item name="android:textColor">@color/solar_primary_dark</item></style>
+<style name="ProsumerAction" parent="Widget.Solar.Button.Secondary"><item name="cornerRadius">18dp</item><item name="android:minHeight">60dp</item><item name="android:textColor">@color/solar_primary</item><item name="iconTint">@color/solar_primary</item><item name="strokeColor">@color/solar_border</item></style>
+<style name="ProsumerActionTile" parent="Widget.Material3.Button.OutlinedButton"><item name="cornerRadius">22dp</item><item name="android:minHeight">104dp</item><item name="android:padding">14dp</item><item name="android:textAllCaps">false</item><item name="android:textColor">@color/solar_primary_dark</item><item name="iconTint">@color/solar_primary</item><item name="strokeColor">@color/solar_border</item><item name="backgroundTint">@color/solar_surface</item></style>
+<style name="ProsumerNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator"><item name="android:color">@color/solar_primary_light</item></style></resources>

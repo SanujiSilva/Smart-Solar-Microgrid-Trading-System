@@ -28,6 +28,9 @@ class BookingsActivity : AccountActivity() {
     private var from = ""
     private var through = ""
     private val statuses = listOf(null, "PENDING", "APPROVED", "CANCELLED", "COMPLETED", "REJECTED")
+    private val modeStatus = mapOf(1 to "PENDING", 2 to "APPROVED", 3 to "COMPLETED", 4 to "REJECTED")
+    private val historyMode = 5
+    private val searchMode = 6
     private val stationPicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             stationId = result.data?.getStringExtra(StationDirectoryActivity.STATION_ID)
@@ -56,11 +59,11 @@ class BookingsActivity : AccountActivity() {
         binding.statusSpinner.adapter = ArrayAdapter.createFromResource(this, R.array.booking_statuses, android.R.layout.simple_spinner_dropdown_item)
         binding.statusSpinner.setSelection(savedInstanceState?.getInt("status") ?: 0)
         binding.modeSpinner.setSelection(mode)
-        binding.filters.visibility = if (mode == 3) View.VISIBLE else View.GONE
+        binding.filters.visibility = if (mode == searchMode) View.VISIBLE else View.GONE
         binding.modeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (mode != position) { mode = position; page = 1; binding.filters.visibility = if (mode == 3) View.VISIBLE else View.GONE; load() }
+                if (mode != position) { mode = position; page = 1; binding.filters.visibility = if (mode == searchMode) View.VISIBLE else View.GONE; load() }
             }
         }
         binding.fromButton.setOnClickListener { pickDate(true) }
@@ -121,7 +124,7 @@ class BookingsActivity : AccountActivity() {
     }
 
     private fun load() {
-        if (mode == 3 && from.isNotEmpty() && through.isNotEmpty() && LocalDate.parse(from) > LocalDate.parse(through)) {
+        if (mode == searchMode && from.isNotEmpty() && through.isNotEmpty() && LocalDate.parse(from) > LocalDate.parse(through)) {
             binding.swipeRefresh.isRefreshing = false
             binding.messageText.setText(R.string.invalid_date_range)
             return
@@ -133,19 +136,19 @@ class BookingsActivity : AccountActivity() {
                 binding.previousButton, binding.nextButton), onFinished = { binding.swipeRefresh.isRefreshing = false }) {
             val items: List<com.smartsolar.microgrid.data.remote.Booking>
             val total: Long
-            if (mode == 0 || mode == 2) {
-                val all = if (mode == 2) api.history().items
+            if (mode == 0 || mode == historyMode) {
+                val all = if (mode == historyMode) api.history().items
                     else api.current().items.filter { it.status == "PENDING" || it.status == "APPROVED" }
                 total = all.size.toLong()
                 page = page.coerceAtMost(((total + 19) / 20).toInt().coerceAtLeast(1))
                 items = all.drop((page - 1) * 20).take(20)
             } else {
                 val result = api.search(page,
-                    if (mode == 3) binding.codeInput.text.toString().trim().ifBlank { null } else null,
-                    if (mode == 3) stationId else null,
-                    if (mode == 1) "PENDING" else statuses[binding.statusSpinner.selectedItemPosition],
-                    if (mode == 3) BookingPresentation.fromDate(from) else null,
-                    if (mode == 3) BookingPresentation.throughDate(through) else null)
+                    if (mode == searchMode) binding.codeInput.text.toString().trim().ifBlank { null } else null,
+                    if (mode == searchMode) stationId else null,
+                    modeStatus[mode] ?: statuses[binding.statusSpinner.selectedItemPosition],
+                    if (mode == searchMode) BookingPresentation.fromDate(from) else null,
+                    if (mode == searchMode) BookingPresentation.throughDate(through) else null)
                 total = result.totalCount; items = result.items; page = result.page
             }
             binding.pageText.text = getString(R.string.page_records, page, total)

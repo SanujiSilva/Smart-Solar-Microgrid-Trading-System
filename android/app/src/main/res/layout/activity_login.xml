@@ -1,30 +1,199 @@
-<?xml version='1.0' encoding='utf-8'?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/solar_screen_background">
-    <androidx.core.widget.NestedScrollView android:scrollbars="vertical" android:fadeScrollbars="false" android:scrollbarStyle="insideOverlay" android:scrollbarSize="4dp" android:scrollbarThumbVertical="@drawable/solar_scroll_thumb" android:id="@+id/screenScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:padding="@dimen/screen_padding">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/solar_hero_card" android:padding="@dimen/space_xl" android:layout_marginTop="@dimen/space_lg" android:layout_marginBottom="@dimen/space_lg">
-                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="@dimen/space_md">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="☀" android:textColor="@color/solar_accent" android:textSize="46sp" android:gravity="center" android:importantForAccessibility="no" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/space_md" android:text="SMART SOLAR&#10;MICROGRID" android:textColor="@color/solar_surface" android:textStyle="bold" android:textSize="15sp" android:letterSpacing=".08" android:lineSpacingExtra="2dp" />
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/solar_screen_background"
+    android:orientation="vertical">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/screenScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fadeScrollbars="true"
+        android:fillViewport="true"
+        android:padding="@dimen/screen_padding"
+        android:scrollbarSize="4dp"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollbarThumbVertical="@drawable/solar_scroll_thumb"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_lg"
+                android:layout_marginBottom="@dimen/space_lg"
+                android:background="@drawable/solar_hero_card"
+                android:orientation="vertical"
+                android:padding="@dimen/space_xl">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/space_md"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="62dp"
+                        android:layout_height="62dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_solar_brand"
+                        app:tint="@color/solar_accent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_md"
+                        android:letterSpacing=".08"
+                        android:lineSpacingExtra="2dp"
+                        android:text="SMART SOLAR&#10;MICROGRID"
+                        android:textColor="@color/solar_surface"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
-                <TextView android:id="@+id/loginTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:textColor="#E8DFFF" android:text="@string/app_name" android:layout_marginBottom="@dimen/space_sm" android:gravity="center" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Hero" android:textColor="@color/solar_surface" android:text="@string/welcome_heading" android:layout_marginBottom="@dimen/space_sm" android:gravity="center" />
-                <TextView android:id="@+id/loginSubtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:textColor="#F1ECFF" android:text="@string/login_subtitle" android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/loginTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_sm"
+                    android:gravity="center"
+                    android:text="@string/app_name"
+                    android:textAppearance="@style/Solar.Text.Support"
+                    android:textColor="#E8DFFF" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_sm"
+                    android:gravity="center"
+                    android:text="@string/welcome_heading"
+                    android:textAppearance="@style/Solar.Text.Hero"
+                    android:textColor="@color/solar_surface" />
+
+                <TextView
+                    android:id="@+id/loginSubtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_md"
+                    android:gravity="center"
+                    android:text="@string/login_subtitle"
+                    android:textAppearance="@style/Solar.Text.Support"
+                    android:textColor="#F1ECFF" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/energy_signal_panel"
+                    android:gravity="center"
+                    android:padding="@dimen/space_md"
+                    android:text="@string/app_market_signal"
+                    android:textAppearance="@style/Solar.Text.Support"
+                    android:textColor="#FFFFFF" />
             </LinearLayout>
-            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_lg">
-                    <com.google.android.material.textfield.TextInputLayout android:id="@+id/identifierLayout" style="@style/Widget.Solar.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/email_or_nic" app:startIconDrawable="@drawable/ic_solar_mail">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/identifierInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/button_height" android:inputType="text" android:singleLine="true" android:imeOptions="actionNext" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout android:id="@+id/passwordLayout" style="@style/Widget.Solar.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/password" app:endIconMode="password_toggle" app:startIconDrawable="@drawable/ic_solar_lock">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/passwordInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/button_height" android:inputType="textPassword" android:singleLine="true" android:imeOptions="actionNext" android:saveEnabled="false" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:indeterminate="true" android:visibility="gone" app:indicatorSize="@dimen/progress_size" />
-                    <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" android:accessibilityLiveRegion="polite" android:padding="@dimen/space_lg" android:background="@drawable/solar_banner_info" android:visibility="gone" />
-                    <com.google.android.material.button.MaterialButton android:id="@+id/loginButton" style="@style/Widget.Solar.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sign_in" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-            <com.google.android.material.button.MaterialButton android:id="@+id/registerButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/create_account" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_lg"
+                android:background="@drawable/auth_form_panel"
+                android:orientation="vertical"
+                android:padding="@dimen/space_xl">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_lg"
+                    android:background="@drawable/prosumer_mint"
+                    android:padding="@dimen/space_lg"
+                    android:text="@string/login_market_hint"
+                    android:textAppearance="@style/Solar.Text.Support" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/identifierLayout"
+                    style="@style/Widget.Solar.Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/email_or_nic"
+                    app:startIconDrawable="@drawable/ic_solar_mail">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/identifierInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:minHeight="@dimen/button_height"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/passwordLayout"
+                    style="@style/Widget.Solar.Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/password"
+                    app:endIconMode="password_toggle"
+                    app:startIconDrawable="@drawable/ic_solar_lock">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/passwordInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
+                        android:inputType="textPassword"
+                        android:minHeight="@dimen/button_height"
+                        android:saveEnabled="false"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorSize="@dimen/progress_size" />
+
+                <TextView
+                    android:id="@+id/errorText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_md"
+                    android:accessibilityLiveRegion="polite"
+                    android:background="@drawable/solar_banner_info"
+                    android:padding="@dimen/space_lg"
+                    android:textAppearance="@style/Solar.Text.Body"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/loginButton"
+                    style="@style/Widget.Solar.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sign_in"
+                    app:icon="@drawable/ic_solar_lock"
+                    app:iconGravity="textStart" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/registerButton"
+                style="@style/Widget.Solar.Button.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_account"
+                app:icon="@drawable/ic_solar_profile"
+                app:iconGravity="textStart" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

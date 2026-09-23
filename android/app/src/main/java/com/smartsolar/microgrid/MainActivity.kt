@@ -3,7 +3,11 @@ package com.smartsolar.microgrid
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.smartsolar.microgrid.databinding.ActivityMainBinding
+import com.smartsolar.microgrid.databinding.ActivityProsumerHomeBinding
+import com.smartsolar.microgrid.databinding.ItemHomeActivityBinding
 import com.smartsolar.microgrid.qr.OperatorQrActivity
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -12,13 +16,40 @@ import java.time.format.FormatStyle
 
 class MainActivity : AccountActivity() {
     private lateinit var binding: ActivityMainBinding
+    private var prosumerBinding: ActivityProsumerHomeBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!protectSession()) return
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        lifecycleScope.launch {
+            val layout = if (account.cachedUser()?.role == "PROSUMER") {
+                R.layout.activity_prosumer_home
+            } else {
+                R.layout.activity_main
+            }
+            initializeHome(layout)
+            refresh()
+        }
+    }
+
+    private fun initializeHome(layout: Int) {
+        val root = layoutInflater.inflate(layout, null, false)
+        binding = ActivityMainBinding.bind(root)
+        prosumerBinding = if (layout == R.layout.activity_prosumer_home) {
+            ActivityProsumerHomeBinding.bind(root)
+        } else {
+            null
+        }
+        setContentView(root)
         binding.root.applyAccountInsets()
         configurePrimaryNavigation(R.id.nav_home)
+        binding.solarToolbar.menu.clear()
+        binding.solarToolbar.menu.add(R.string.sign_out).apply {
+            setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS)
+            setOnMenuItemClickListener {
+                if (!requestBusy) confirmSignOut()
+                true
+            }
+        }
         binding.refreshButton.setOnClickListener { refresh() }
         binding.profileButton.setOnClickListener { startActivity(Intent(this, ProfileActivity::class.java)) }
         binding.logoutButton.setOnClickListener { confirmSignOut() }
@@ -41,6 +72,13 @@ class MainActivity : AccountActivity() {
         binding.summaryText.text = ""
         binding.metricsPanel.visibility = View.GONE
         binding.activityText.text = ""
+        prosumerBinding?.apply {
+            activeStationsText.text = ""
+            openSlotsText.text = ""
+            todayReservationsText.text = ""
+            activeBookingsText.text = ""
+            recentActivityList.removeAllViews()
+        }
         request(binding.progressBar, binding.messageText,
             listOf(binding.refreshButton, binding.profileButton, binding.logoutButton)) {
             val user = account.currentUser()
@@ -75,6 +113,47 @@ class MainActivity : AccountActivity() {
             } ?: getString(R.string.no_recent_bookings)
             binding.activityText.text = getString(R.string.home_activity_summary,
                 getString(R.string.active_bookings, dashboard.activeReservations), recent)
+            prosumerBinding?.apply {
+                activeStationsText.text = dashboard.activeStations.toString()
+                openSlotsText.text = dashboard.openSlots.toString()
+                todayReservationsText.text = dashboard.todayReservations.toString()
+                activeBookingsText.text = getString(R.string.recent_active_label, dashboard.activeReservations)
+                recentActivityList.removeAllViews()
+                if (dashboard.recentReservations.isEmpty()) {
+                    val emptyState = layoutInflater.inflate(
+                        R.layout.item_home_activity,
+                        recentActivityList,
+                        false,
+                    )
+                    ItemHomeActivityBinding.bind(emptyState).apply {
+                        reservationCodeText.setText(R.string.no_recent_bookings)
+                        statusChip.visibility = View.GONE
+                        reservationTimeText.text = ""
+                        energyText.visibility = View.GONE
+                    }
+                    recentActivityList.addView(emptyState)
+                } else {
+                    dashboard.recentReservations.forEach { reservation ->
+                        val item = layoutInflater.inflate(
+                            R.layout.item_home_activity,
+                            recentActivityList,
+                            false,
+                        )
+                        ItemHomeActivityBinding.bind(item).apply {
+                            reservationCodeText.text = reservation.reservationCode
+                            statusChip.solarStatus(reservation.status)
+                            reservationTimeText.text = OffsetDateTime.parse(reservation.reservationDateTime)
+                                .atZoneSameInstant(ZoneId.systemDefault())
+                                .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
+                            energyText.text = getString(
+                                R.string.recent_energy_label,
+                                reservation.energyAmount.toPlainString(),
+                            )
+                        }
+                        recentActivityList.addView(item)
+                    }
+                }
+            }
         }
     }
 }

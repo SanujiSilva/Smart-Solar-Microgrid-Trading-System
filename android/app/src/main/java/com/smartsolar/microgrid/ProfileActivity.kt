@@ -76,6 +76,6 @@ class ProfileActivity : AccountActivity() {
         binding.deactivateButton.visibility =
             if (user.status == "DEACTIVATION_REQUESTED") View.GONE else View.VISIBLE
         binding.statusText.text = if (user.status == "DEACTIVATION_REQUESTED")
-            getString(R.string.deactivation_pending) else ""
+            getString(R.string.deactivation_pending) else getString(R.string.profile_status_active)
     }
 }

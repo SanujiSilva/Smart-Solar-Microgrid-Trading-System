@@ -138,7 +138,7 @@
     <string name="complete_transfer">Complete transfer</string>
     <string name="confirm_complete_transfer">Complete this energy transfer? This action consumes the QR token and cannot be repeated.</string>
     <string name="transfer_completed">Transfer completed.</string>
-    <string-array name="booking_views"><item>Current bookings</item><item>Pending bookings</item><item>Booking history</item><item>Search bookings</item></string-array>
+    <string-array name="booking_views"><item>Current bookings</item><item>Pending bookings</item><item>Approved bookings</item><item>Completed bookings</item><item>Rejected bookings</item><item>Booking history</item><item>Search bookings</item></string-array>
     <string-array name="booking_statuses"><item>All statuses</item><item>PENDING</item><item>APPROVED</item><item>CANCELLED</item><item>COMPLETED</item><item>REJECTED</item></string-array>
     <string name="scan_booking_heading">Scan booking QR</string>
     <string name="qr_step_scan">1 Scan  /  2 Verify  /  3 Complete</string>

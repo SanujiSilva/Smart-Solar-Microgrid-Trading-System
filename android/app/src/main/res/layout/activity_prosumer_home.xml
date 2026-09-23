@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/solar_background">
+<com.google.android.material.appbar.MaterialToolbar android:id="@+id/solarToolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:paddingHorizontal="8dp" app:title="@string/prosumer_home_brand" app:titleTextColor="@color/solar_primary_dark" app:titleTextAppearance="@style/Solar.ToolbarTitle"/>
+<androidx.core.widget.NestedScrollView android:id="@+id/screenScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:paddingHorizontal="20dp" android:paddingTop="12dp" android:paddingBottom="24dp">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/prosumer_hero" android:padding="24dp">
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/prosumer_home_eyebrow" android:textColor="@color/solar_accent" android:textSize="11sp" android:letterSpacing="0.14" android:textStyle="bold"/>
+<TextView android:id="@+id/welcomeText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/app_name" android:textColor="#FFFFFF" android:textSize="28sp" android:fontFamily="sans-serif-medium"/>
+<TextView android:id="@+id/accountText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="@color/solar_primary_light" android:textSize="13sp"/>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="16dp">
+<TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/prosumer_home_tagline" android:textColor="#FFFFFF" android:textSize="18sp" android:lineSpacingExtra="4dp"/>
+<ImageView android:layout_width="104dp" android:layout_height="88dp" android:layout_marginStart="12dp" android:src="@drawable/prosumer_solar_art" android:importantForAccessibility="no"/>
+</LinearLayout></LinearLayout>
+<com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:indeterminate="true" android:visibility="gone" app:indicatorColor="@color/solar_primary"/>
+<TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:padding="16dp" android:accessibilityLiveRegion="polite" android:visibility="gone"/>
+<LinearLayout android:id="@+id/metricsPanel" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginTop="28dp">
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/prosumer_home_overview" android:textAppearance="@style/ProsumerHeading"/>
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:layout_marginBottom="16dp" android:text="@string/prosumer_home_overview_hint" android:textAppearance="@style/Solar.Text.Support"/>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:baselineAligned="false" android:layout_marginBottom="12dp">
+<TextView android:id="@+id/energyMetric" style="@style/ProsumerMetric" android:layout_marginStart="0dp" android:layout_marginEnd="6dp" android:background="@drawable/prosumer_mint"/>
+<TextView android:id="@+id/pendingMetric" style="@style/ProsumerMetric" android:layout_marginStart="6dp" android:layout_marginEnd="0dp" android:background="@drawable/prosumer_cream"/>
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:baselineAligned="false" android:layout_marginBottom="12dp">
+<TextView android:id="@+id/approvedMetric" style="@style/ProsumerMetric" android:layout_marginStart="0dp" android:layout_marginEnd="6dp" android:background="@drawable/prosumer_blue"/>
+<TextView android:id="@+id/completedMetric" style="@style/ProsumerMetric" android:layout_marginStart="6dp" android:layout_marginEnd="0dp" android:background="@drawable/prosumer_card"/>
+</LinearLayout>
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="16dp" android:background="@drawable/prosumer_card" android:padding="20dp">
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/prosumer_home_explore" android:textAppearance="@style/ProsumerHeading"/>
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:layout_marginBottom="12dp" android:text="@string/prosumer_home_explore_hint" android:textAppearance="@style/Solar.Text.Support"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/stationsButton" style="@style/ProsumerAction" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/find_station_action" android:textColor="#FFFFFF" app:backgroundTint="@color/solar_primary" app:icon="@drawable/ic_solar_station" app:iconTint="#FFFFFF"/>
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="26dp">
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/quick_actions_heading" android:textAppearance="@style/ProsumerHeading"/>
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/quick_actions_hint" android:textAppearance="@style/Solar.Text.Support"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/newBookingButton" style="@style/ProsumerActionTile" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:background="@drawable/prosumer_action_primary" android:gravity="start|center_vertical" android:paddingHorizontal="20dp" android:text="@string/new_booking" android:textColor="#FFFFFF" app:backgroundTint="@null" app:icon="@drawable/ic_solar_booking" app:iconGravity="textStart" app:iconPadding="14dp" app:iconTint="#FFFFFF" app:strokeWidth="0dp" android:visibility="gone"/>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:baselineAligned="false">
+<com.google.android.material.button.MaterialButton android:id="@+id/bookingsButton" style="@style/ProsumerActionTile" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:layout_weight="1" android:gravity="center" android:text="@string/my_bookings" app:icon="@drawable/ic_solar_booking" app:iconGravity="top" app:iconPadding="10dp" android:visibility="gone"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/profileButton" style="@style/ProsumerActionTile" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:layout_weight="1" android:gravity="center" android:text="@string/my_profile" app:icon="@drawable/ic_solar_profile" app:iconGravity="top" app:iconPadding="10dp" android:visibility="gone"/>
+</LinearLayout>
+</LinearLayout>
+<com.google.android.material.button.MaterialButton android:id="@+id/operatorQrButton" style="@style/ProsumerAction" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="start|center_vertical" android:paddingHorizontal="20dp" android:text="@string/transfer_title" app:icon="@drawable/ic_solar_qr" android:visibility="gone"/>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="22dp" android:padding="20dp" android:background="@drawable/prosumer_network_panel">
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/network_heading" android:textAppearance="@style/ProsumerHeading" android:textColor="#FFFFFF"/>
+<TextView android:id="@+id/summaryText" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:baselineAligned="false">
+<LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/prosumer_stat_overlay" android:orientation="vertical" android:padding="14dp">
+<TextView android:id="@+id/activeStationsText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="26sp" android:fontFamily="sans-serif-medium"/>
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/network_active_stations" android:textAppearance="@style/Solar.Text.Support" android:textColor="@color/solar_primary_light"/>
+</LinearLayout>
+<LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/prosumer_stat_overlay" android:orientation="vertical" android:padding="14dp">
+<TextView android:id="@+id/openSlotsText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="26sp" android:fontFamily="sans-serif-medium"/>
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/network_open_slots" android:textAppearance="@style/Solar.Text.Support" android:textColor="@color/solar_primary_light"/>
+</LinearLayout>
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:background="@drawable/prosumer_stat_overlay" android:gravity="center_vertical" android:padding="14dp">
+<TextView android:id="@+id/todayReservationsText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="24sp" android:fontFamily="sans-serif-medium"/>
+<TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="@string/network_today_reservations" android:textAppearance="@style/Solar.Text.Support" android:textColor="@color/solar_primary_light"/>
+</LinearLayout>
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="20dp" android:padding="20dp" android:background="@drawable/prosumer_card">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:baselineAligned="false">
+<TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/recent_activity_heading" android:textAppearance="@style/ProsumerHeading"/>
+<TextView android:id="@+id/activeBookingsText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/prosumer_blue" android:paddingHorizontal="12dp" android:paddingVertical="7dp" android:textAppearance="@style/Solar.Text.Support" android:textColor="@color/solar_primary"/>
+</LinearLayout>
+<TextView android:id="@+id/activityText" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+<LinearLayout android:id="@+id/recentActivityList" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:orientation="vertical"/>
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:baselineAligned="false">
+<com.google.android.material.button.MaterialButton android:id="@+id/refreshButton" style="@style/ProsumerAction" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginHorizontal="4dp" android:text="@string/refresh"/>
+<com.google.android.material.button.MaterialButton android:id="@+id/logoutButton" style="@style/ProsumerAction" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginHorizontal="4dp" android:text="@string/sign_out"/>
+</LinearLayout></LinearLayout></androidx.core.widget.NestedScrollView>
+<com.google.android.material.bottomnavigation.BottomNavigationView android:id="@+id/bottomNavigation" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#FFFFFF" app:backgroundTint="#FFFFFF" android:elevation="0dp" android:visibility="gone" app:itemIconTint="@color/prosumer_navigation" app:itemTextColor="@color/prosumer_navigation" app:itemActiveIndicatorStyle="@style/ProsumerNavIndicator" app:labelVisibilityMode="labeled" app:menu="@menu/solar_navigation"/>
+</LinearLayout>
