@@ -48,7 +48,7 @@ Non-secret settings in appsettings.json:
   "Jwt": {
     "Issuer": "SmartSolarMicrogrid.Api",
     "Audience": "SmartSolarMicrogrid.Clients",
-    "AccessTokenMinutes": 30
+    "AccessTokenMinutes": 60
   }
 }
 ```
