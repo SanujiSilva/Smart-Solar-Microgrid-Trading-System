@@ -1,14 +1,15 @@
 package com.smartsolar.microgrid.data.local
 
 import android.content.ContentValues
-import android.database.sqlite.SQLiteDatabase
 
 class LocalRepository(private val helper: LocalDatabaseHelper) {
     fun saveUser(user: LocalUser, updatedAtEpochMillis: Long = System.currentTimeMillis()) {
         val values = ContentValues().apply {
+            val nic = user.nic?.trim()?.uppercase(java.util.Locale.ROOT)
+            put("principal_key", if (user.role == "PROSUMER") requireNotNull(nic) else user.userId)
             put("singleton_id", SINGLETON_ID)
             put("user_id", user.userId)
-            putNullable("nic", user.nic)
+            putNullable("nic", nic)
             put("full_name", user.fullName)
             put("email", user.email)
             put("phone", user.phone)
@@ -16,12 +17,13 @@ class LocalRepository(private val helper: LocalDatabaseHelper) {
             put("status", user.status)
             put("updated_at_epoch_millis", updatedAtEpochMillis)
         }
-        helper.writableDatabase.insertWithOnConflict(
-            "authenticated_user",
-            null,
-            values,
-            SQLiteDatabase.CONFLICT_REPLACE,
-        )
+        val database = helper.writableDatabase
+        database.beginTransaction()
+        try {
+            database.delete("authenticated_user", null, null)
+            database.insertOrThrow("authenticated_user", null, values)
+            database.setTransactionSuccessful()
+        } finally { database.endTransaction() }
     }
 
     fun getUser(): LocalUser? = helper.readableDatabase.query(

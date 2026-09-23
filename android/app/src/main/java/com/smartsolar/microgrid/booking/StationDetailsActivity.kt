@@ -56,7 +56,10 @@ class StationDetailsActivity : AccountActivity() {
                 row.bindSolarRecord(SolarRecord(slot.id, getString(R.string.available_slots),
                     getString(R.string.slot_card_body, BookingPresentation.time(slot.startTime), BookingPresentation.time(slot.endTime), slot.availableCapacity.toPlainString()),
                     slot.status, getString(if (canBook) R.string.book_slot_action else R.string.slot_unavailable), canBook) {
-                    startActivity(Intent(this, BookingEditorActivity::class.java).putExtra(BookingEditorModel.SLOT_ID, slot.id))
+                    if (intent.getBooleanExtra(PICK_SLOT, false)) {
+                        setResult(RESULT_OK, Intent().putExtra(BookingEditorModel.SLOT_ID, slot.id))
+                        finish()
+                    } else startActivity(Intent(this, BookingEditorActivity::class.java).putExtra(BookingEditorModel.SLOT_ID, slot.id))
                 })
                 binding.slots.addView(row.root)
             }
@@ -64,4 +67,6 @@ class StationDetailsActivity : AccountActivity() {
     }
 
     private fun minute(value: Int) = String.format(Locale.ROOT, "%02d:%02d", value / 60, value % 60)
+
+    companion object { const val PICK_SLOT = "pick_slot" }
 }

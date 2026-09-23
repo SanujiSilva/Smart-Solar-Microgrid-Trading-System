@@ -110,6 +110,10 @@ public sealed class ReservationRepository(MongoDbContext context, MongoOperation
         // Update for Reservation.
         var update = Builders<EnergyReservation>.Update
             .Set(x => x.EnergyAmount, expected.EnergyAmount)
+            .Set(x => x.SlotId, expected.SlotId)
+            .Set(x => x.StationId, expected.StationId)
+            .Set(x => x.ReservationDateTime, expected.ReservationDateTime)
+            .Set(x => x.QrTokenHash, expected.QrTokenHash)
             .Set(x => x.Status, expected.Status)
             .Set(x => x.UpdatedAt, expected.UpdatedAt);
         return await context.Reservations.Change(operation, 

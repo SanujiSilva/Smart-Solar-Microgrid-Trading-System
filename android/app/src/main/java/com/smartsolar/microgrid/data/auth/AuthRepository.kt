@@ -23,8 +23,12 @@ class AuthRepository(context: Context) {
 
     suspend fun login(identifier: String, password: String): LocalUser = withContext(Dispatchers.IO) {
         val response = api.login(LoginRequest(identifier, password))
-        tokenStore.saveToken(response.accessToken)
         val user = response.user.toLocalUser()
+        if (!user.canAccessMobile()) {
+            logout()
+            throw MobileAccessException()
+        }
+        tokenStore.saveToken(response.accessToken)
         localRepository.saveUser(user)
         user
     }
@@ -70,6 +74,10 @@ class AuthRepository(context: Context) {
     }
 
     private fun cacheUser(response: AuthUserResponse): LocalUser = response.toLocalUser().also {
+        if (!it.canAccessMobile()) {
+            logout()
+            throw MobileAccessException()
+        }
         localRepository.saveUser(it)
     }
 
@@ -92,3 +100,7 @@ class AuthRepository(context: Context) {
         status = status,
     )
 }
+
+class MobileAccessException : Exception("Mobile access is available only to Solar Prosumer and Grid Operator accounts. Backoffice users should use the web portal.")
+
+fun LocalUser.canAccessMobile(): Boolean = role == "PROSUMER" || role == "GRID_OPERATOR"

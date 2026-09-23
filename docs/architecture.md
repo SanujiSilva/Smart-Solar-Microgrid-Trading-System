@@ -54,7 +54,7 @@ JWTs carry identity and role claims. Protected endpoints enforce role policies; 
 3. Cancelling a reservation requires at least twelve hours before its scheduled time.
 4. Station deactivation is blocked by active/future reservations.
 5. Only Backoffice may reactivate a deactivated prosumer.
-6. Prosumer NIC is unique and is the business identifier.
+6. Prosumer NIC is the MongoDB primary key and the Android local primary-key value. A stable internal UserId remains for authentication and existing references.
 7. Prosumers may edit or request deactivation only for their own account.
 8. Operators never inherit Backoffice administration permissions.
 9. QR verification and transfer completion always consult the central API.

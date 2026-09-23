@@ -354,14 +354,14 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
     }
 
     [MongoFact]
-    public async Task Pending_and_active_prosumers_cannot_use_reactivation_and_admin_cannot_edit_their_profile()
+    public async Task Pending_and_active_prosumers_cannot_use_reactivation_but_admin_can_edit_their_profile()
     {
         // Verify that pending and active prosumers cannot use reactivation and admin cannot edit their profile.
         var pending = await Seed(UserRole.PROSUMER, UserStatus.PENDING);
         using var invalid = await admin.PatchAsync($"/api/prosumers/{pending.NIC}/activate", null);
         Assert.Equal(HttpStatusCode.Conflict, invalid.StatusCode);
         using var edit = await admin.PutAsJsonAsync($"/api/users/{pending.Id}", Profile("Invalid Edit", pending.Email));
-        Assert.Equal(HttpStatusCode.Conflict, edit.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, edit.StatusCode);
         var active = await Seed(UserRole.PROSUMER);
         using var repeat = await admin.PatchAsync($"/api/prosumers/{active.NIC}/activate", null);
         Assert.Equal(HttpStatusCode.Conflict, repeat.StatusCode);
@@ -382,6 +382,35 @@ public sealed class UserManagementIntegrationTests : IAsyncLifetime
         var stored = await context.Users.Find(x => x.Id == user.Id).SingleAsync();
         Assert.Equal(UserStatus.ACTIVE, stored.Status);
         Assert.Equal("Changed Name", stored.FullName);
+    }
+
+    [MongoFact]
+    public async Task Backoffice_creates_and_edits_active_prosumer_by_NIC_without_changing_identity()
+    {
+        var request = new { nic = "991234567v", fullName = "New Prosumer", email = "new-prosumer@example.invalid", phone = "0771234567", password = TestPassword };
+        using var created = await admin.PostAsJsonAsync("/api/prosumers", request);
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        var user = (await created.Content.ReadFromJsonAsync<UserDetailsResponse>())!;
+        Assert.Equal("ACTIVE", user.Status);
+        Assert.Equal("991234567V", user.NIC);
+        Assert.Equal(HttpStatusCode.OK, (await admin.GetAsync(created.Headers.Location)).StatusCode);
+        using var login = await LoginClient(request.email);
+        Assert.Equal(HttpStatusCode.OK, (await login.GetAsync("/api/auth/me")).StatusCode);
+        var stored = await context.Users.Find(x => x.NIC == user.NIC).SingleAsync();
+        Assert.Equal(user.NIC, stored.PrimaryKey.AsString);
+        using var updated = await admin.PutAsJsonAsync($"/api/prosumers/{user.NIC}", Profile("Edited Prosumer", request.email));
+        Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
+        Assert.Equal(user.Id, (await updated.Content.ReadFromJsonAsync<UserDetailsResponse>())!.Id);
+        using var duplicate = await admin.PostAsJsonAsync("/api/prosumers", request);
+        Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
+        using var grid = await LoginClient((await Seed(UserRole.GRID_OPERATOR)).Email);
+        foreach (var client in new[] { login, grid })
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, (await client.PostAsJsonAsync("/api/prosumers", request)).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await client.PutAsJsonAsync($"/api/prosumers/{user.NIC}", Profile("Denied", request.email))).StatusCode);
+        }
+        using var injection = await admin.PutAsJsonAsync($"/api/prosumers/{user.NIC}", new { fullName = "Bad edit", email = request.email, phone = request.phone, nic = "991234568V" });
+        Assert.Equal(HttpStatusCode.BadRequest, injection.StatusCode);
     }
 
     private async Task<User> Seed(UserRole role, UserStatus status = UserStatus.ACTIVE)

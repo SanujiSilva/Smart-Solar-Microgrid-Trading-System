@@ -15,19 +15,24 @@ namespace SmartSolarMicrogrid.Api.Tests;
 public sealed class MongoModelTests
 {
     [Fact]
-    public void User_stores_ObjectId_string_enums_and_normalized_NIC_but_never_JSON_password_hash()
+    public void Prosumer_uses_NIC_primary_key_and_preserves_authentication_reference()
     {
         // Verify that user stores objectid string enums and normalized nic but never json password hash.
         var user = NewUser(" 991234567v ");
         var bson = user.ToBsonDocument();
-        Assert.Equal(BsonType.ObjectId, bson["_id"].BsonType);
+        Assert.Equal("991234567V", bson["_id"].AsString);
+        Assert.Equal(user.Id, bson["UserId"].AsObjectId);
         Assert.Equal("991234567V", bson["NIC"].AsString);
         Assert.Equal("PROSUMER", bson["Role"].AsString);
         Assert.Equal("PENDING", bson["Status"].AsString);
         Assert.Equal("test-hash-not-a-password", bson["PasswordHash"].AsString);
         Assert.DoesNotContain("test-hash-not-a-password", JsonSerializer.Serialize(user));
-        Assert.False(NewUser(null).ToBsonDocument().Contains("NIC"));
-        Assert.False(NewUser("  ").ToBsonDocument().Contains("NIC"));
+        var restored = BsonSerializer.Deserialize<User>(bson);
+        Assert.Equal(user.Id, restored.Id);
+        Assert.Equal(user.NIC, restored.NIC);
+        var staff = NewUser(null); staff.Role = UserRole.GRID_OPERATOR;
+        Assert.Equal(staff.Id, staff.ToBsonDocument()["_id"].AsObjectId);
+        Assert.False(staff.ToBsonDocument().Contains("NIC"));
     }
 
     [Fact]

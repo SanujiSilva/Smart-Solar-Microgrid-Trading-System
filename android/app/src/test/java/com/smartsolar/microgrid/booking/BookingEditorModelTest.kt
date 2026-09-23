@@ -89,7 +89,24 @@ class BookingEditorModelTest {
         model.draft("2"); model.submit(); advanceUntilIdle(); assertEquals(1, api.creates)
     }
 
+    @Test fun rescheduleSendsSelectedSlotAndRestoresSelection() = runTest(dispatcher) {
+        val api = FakeBookingApi()
+        val saved = SavedStateHandle(mapOf(BookingEditorModel.BOOKING_ID to "reservation"))
+        val model = BookingEditorModel(api, saved)
+        advanceUntilIdle()
+        model.selectSlot("new-slot"); advanceUntilIdle()
+        val restored = BookingEditorModel(api, saved)
+        advanceUntilIdle()
+        assertEquals("new-slot", restored.state.value.slot?.id)
+        restored.draft("4"); restored.submit(); advanceUntilIdle()
+        assertEquals("new-slot", api.lastUpdate?.slotId)
+        assertEquals(BigDecimal("4"), api.lastUpdate?.energyAmount)
+        assertEquals("new-slot", restored.state.value.booking?.slotId)
+        assertNull(saved.get<String>("reschedule_slot_id"))
+    }
+
     private class FakeBookingApi : BookingApiService {
+        var lastUpdate: UpdateBookingRequest? = null
         var creates = 0
         var cancels = 0
         var waitForCreate: CompletableDeferred<Unit>? = null
@@ -107,7 +124,8 @@ class BookingEditorModelTest {
             return booking.copy(energyAmount = request.energyAmount)
         }
         override suspend fun update(id: String, request: UpdateBookingRequest): Booking {
-            writeFailure?.let { throw it }; return booking.copy(energyAmount = request.energyAmount)
+            lastUpdate = request
+            writeFailure?.let { throw it }; return booking.copy(energyAmount = request.energyAmount, slotId = request.slotId ?: booking.slotId)
         }
         override suspend fun cancel(id: String): Booking {
             cancels++; writeFailure?.let { throw it }; return booking.copy(status = "CANCELLED")

@@ -13,7 +13,7 @@ namespace SmartSolarMicrogrid.Api.Repositories;
 public sealed class MongoDbContext(IMongoClient client, IOptions<MongoDbSettings> options)
 {
     public IMongoDatabase Database { get; } = client.GetDatabase(options.Value.DatabaseName);
-    public IMongoCollection<User> Users => Database.GetCollection<User>("Users");
+    public IMongoCollection<User> Users => Database.GetCollection<User>("UsersByIdentity");
     public IMongoCollection<SolarStationInfo> Stations => Database.GetCollection<SolarStationInfo>("SolarStationInfo");
     public IMongoCollection<EnergyBookingSlot> Slots => Database.GetCollection<EnergyBookingSlot>("EnergyBookingSlots");
     public IMongoCollection<EnergyReservation> Reservations => Database.GetCollection<EnergyReservation>("EnergyReservations");

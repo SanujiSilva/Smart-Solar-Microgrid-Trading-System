@@ -68,3 +68,5 @@ For the consolidated Phase 23 automated test pass, run:
 ```
 
 The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Full Android device walkthroughs and IIS deployment remain for later phases.
+
+See [prosumer administration, reservation rescheduling, and NIC identity migration](docs/assignment-compliance-updates.md) for the latest workflow changes and upgrade instructions.

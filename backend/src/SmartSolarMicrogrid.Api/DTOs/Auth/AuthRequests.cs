@@ -39,6 +39,6 @@ public class ContactDetailsRequest
     public string FullName { get => fullName; init => fullName = value?.Trim() ?? ""; }
     [Required, EmailAddress, StringLength(254)]
     public string Email { get => email; init => email = value?.Trim() ?? ""; }
-    [Required, Phone, StringLength(25, MinimumLength = 7)]
+    [Required, RegularExpression(@"(?=.{1,25}\z)(?=(?:\D*\d){10}\D*\z)\+?[0-9() .-]+", ErrorMessage = "Phone must contain exactly 10 digits.")]
     public string Phone { get => phone; init => phone = value?.Trim() ?? ""; }
 }

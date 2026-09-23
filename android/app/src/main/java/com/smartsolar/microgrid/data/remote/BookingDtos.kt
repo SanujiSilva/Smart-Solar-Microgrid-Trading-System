@@ -12,7 +12,7 @@ data class BookingSlots(val items: List<BookingSlot>)
 data class BookingSlot(val id: String, val stationId: String, val startTime: String, val endTime: String,
     val capacity: BigDecimal, val availableCapacity: BigDecimal, val status: String)
 data class CreateBookingRequest(val slotId: String, val energyAmount: BigDecimal)
-data class UpdateBookingRequest(val energyAmount: BigDecimal)
+data class UpdateBookingRequest(val energyAmount: BigDecimal, val slotId: String? = null)
 data class Booking(val id: String, val reservationCode: String, val prosumerNIC: String, val stationId: String,
     val slotId: String, val energyAmount: BigDecimal, val reservationDateTime: String, val status: String,
     val createdAt: String, val updatedAt: String, val completedAt: String?, val completedByOperatorId: String?)

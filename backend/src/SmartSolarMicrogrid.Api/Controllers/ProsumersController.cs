@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartSolarMicrogrid.Api.Configuration;
 using SmartSolarMicrogrid.Api.DTOs.Users;
+using SmartSolarMicrogrid.Api.DTOs.Auth;
 using SmartSolarMicrogrid.Api.Services;
 
 namespace SmartSolarMicrogrid.Api.Controllers;
@@ -15,6 +16,17 @@ namespace SmartSolarMicrogrid.Api.Controllers;
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class ProsumersController(UserManagementService users) : ControllerBase
 {
+    [HttpPost, Authorize(Policy = AuthPolicies.BackofficeOnly)]
+    public async Task<ActionResult<UserDetailsResponse>> Create(RegisterProsumerRequest request, CancellationToken cancellationToken)
+    {
+        var user = await users.CreateProsumerAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(Get), new { nic = user.NIC }, user);
+    }
+
+    [HttpPut("{nic}"), Authorize(Policy = AuthPolicies.BackofficeOnly)]
+    public async Task<ActionResult<UserDetailsResponse>> Update(string nic, UpdateProfileRequest request, CancellationToken cancellationToken) =>
+        Ok(await users.UpdateProsumerAsync(nic, request, cancellationToken));
+
     // List for Prosumers.
     [HttpGet, Authorize(Policy = AuthPolicies.BackofficeOnly)]
     public async Task<ActionResult<UserPageResponse>> List([FromQuery] UserListQuery query, CancellationToken cancellationToken) =>

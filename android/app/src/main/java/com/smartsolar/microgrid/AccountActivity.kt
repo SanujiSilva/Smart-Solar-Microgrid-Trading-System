@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.smartsolar.microgrid.data.auth.AuthRepository
+import com.smartsolar.microgrid.data.auth.MobileAccessException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -112,7 +113,7 @@ abstract class AccountActivity : AppCompatActivity() {
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
-                if (authenticated && error is HttpException && error.code() == 401) {
+                if (authenticated && (error is MobileAccessException || error is HttpException && error.code() == 401)) {
                     withContext(Dispatchers.IO) { account.logout() }
                     openLogin()
                 } else {

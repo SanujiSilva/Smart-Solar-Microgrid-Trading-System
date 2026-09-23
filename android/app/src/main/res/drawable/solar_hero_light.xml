@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/card_radius" />
+    <gradient
+        android:angle="135"
+        android:startColor="#FFFFFF"
+        android:centerColor="#F6F1FF"
+        android:endColor="#EAF7F0" />
+    <stroke
+        android:width="@dimen/border_width"
+        android:color="@color/solar_border" />
+    <padding
+        android:left="@dimen/space_xl"
+        android:top="@dimen/space_xl"
+        android:right="@dimen/space_xl"
+        android:bottom="@dimen/space_xl" />
+</shape>

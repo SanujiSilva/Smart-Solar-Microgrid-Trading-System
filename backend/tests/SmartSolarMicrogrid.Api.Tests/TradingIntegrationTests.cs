@@ -78,6 +78,89 @@ public sealed class TradingIntegrationTests : IAsyncLifetime
         return client;
     }
 
+    [MongoFact]
+    public async Task Staff_book_for_active_prosumers_but_cannot_bypass_identity_or_notice_rules()
+    {
+        foreach (var client in new[] { admin, grid })
+        {
+            var response = await client.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 10, prosumerNIC = "200012345678" });
+            await Expect(response, HttpStatusCode.Created);
+            var booking = (await response.Content.ReadFromJsonAsync<ReservationResponse>())!;
+            Assert.Equal("200012345678", booking.ProsumerNIC);
+            await Expect(await client.PutAsJsonAsync($"/api/reservations/{booking.Id}", new { energyAmount = 12 }), HttpStatusCode.OK);
+            await database.Reservations.UpdateOneAsync(x => x.Id == ObjectId.Parse(booking.Id),
+                Builders<EnergyReservation>.Update.Set(x => x.ReservationDateTime, now.AddHours(11)));
+            await Expect(await client.PutAsJsonAsync($"/api/reservations/{booking.Id}", new { energyAmount = 14 }), HttpStatusCode.Conflict);
+        }
+        await Expect(await admin.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 10 }), HttpStatusCode.BadRequest);
+        await Expect(await owner.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 10, prosumerNIC = "200012345679" }), HttpStatusCode.Forbidden);
+        await database.Users.UpdateOneAsync(x => x.NIC == "200012345679", Builders<User>.Update.Set(x => x.Status, UserStatus.DEACTIVATED));
+        await Expect(await grid.PostAsJsonAsync("/api/reservations", new { slotId = slot.Id.ToString(), energyAmount = 10, prosumerNIC = "200012345679" }), HttpStatusCode.Forbidden);
+    }
+
+    [MongoFact]
+    public async Task Reschedule_moves_capacity_and_invalidates_approval_and_QR()
+    {
+        var booking = await Book();
+        await Expect(await admin.PatchAsync($"/api/reservations/{booking.Id}/approve", null), HttpStatusCode.OK);
+        var qr = (await owner.GetFromJsonAsync<QrTokenResponse>($"/api/reservations/{booking.Id}/qr"))!;
+        var secondStation = MongoModelTests.NewStation("SECOND-STATION");
+        secondStation.Status = StationStatus.ACTIVE; secondStation.AvailableBatterySlots = 5;
+        secondStation.OperatingSchedule = station.OperatingSchedule;
+        await database.Stations.InsertOneAsync(secondStation);
+        var target = new EnergyBookingSlot { StationId = secondStation.Id, StartTime = slot.StartTime.AddDays(1),
+            EndTime = slot.EndTime.AddDays(1), Capacity = 50, AvailableCapacity = 50, Status = SlotStatus.OPEN };
+        await database.Slots.InsertOneAsync(target);
+        await Expect(await other.PutAsJsonAsync($"/api/reservations/{booking.Id}", new { slotId = target.Id.ToString(), energyAmount = 20 }), HttpStatusCode.Forbidden);
+        var response = await owner.PutAsJsonAsync($"/api/reservations/{booking.Id}", new { slotId = target.Id.ToString(), energyAmount = 20 });
+        await Expect(response, HttpStatusCode.OK);
+        var saved = (await response.Content.ReadFromJsonAsync<ReservationResponse>())!;
+        Assert.Equal(target.Id.ToString(), saved.SlotId);
+        Assert.Equal(secondStation.Id.ToString(), saved.StationId);
+        Assert.Equal(target.StartTime, saved.ReservationDateTime);
+        Assert.Equal("PENDING", saved.Status);
+        Assert.Equal(100, (await database.Slots.Find(x => x.Id == slot.Id).SingleAsync()).AvailableCapacity);
+        Assert.Equal(30, (await database.Slots.Find(x => x.Id == target.Id).SingleAsync()).AvailableCapacity);
+        await Expect(await grid.PostAsJsonAsync("/api/operator/verify-qr", new { qrToken = qr.QrToken }), HttpStatusCode.BadRequest);
+        await Expect(await owner.GetAsync($"/api/reservations/{booking.Id}/qr"), HttpStatusCode.Conflict);
+        await Expect(await admin.PatchAsync($"/api/reservations/{booking.Id}/approve", null), HttpStatusCode.OK);
+        await Expect(await owner.GetAsync($"/api/reservations/{booking.Id}/qr"), HttpStatusCode.OK);
+    }
+
+    [MongoTheory]
+    [InlineData(24, 5, "OPEN", HttpStatusCode.Conflict)]
+    [InlineData(11, 50, "OPEN", HttpStatusCode.Conflict)]
+    [InlineData(193, 50, "OPEN", HttpStatusCode.BadRequest)]
+    [InlineData(24, 50, "CLOSED", HttpStatusCode.Conflict)]
+    public async Task Invalid_rescheduling_preserves_original_capacity_and_booking(int hours, int capacity, string status, HttpStatusCode expected)
+    {
+        var booking = await Book();
+        var target = new EnergyBookingSlot { StationId = station.Id, StartTime = now.AddHours(hours),
+            EndTime = now.AddHours(hours).AddMinutes(1), Capacity = capacity, AvailableCapacity = capacity,
+            Status = Enum.Parse<SlotStatus>(status) };
+        await database.Slots.InsertOneAsync(target);
+        await Expect(await grid.PutAsJsonAsync($"/api/reservations/{booking.Id}", new { slotId = target.Id.ToString(), energyAmount = 20 }), expected);
+        Assert.Equal(90, (await database.Slots.Find(x => x.Id == slot.Id).SingleAsync()).AvailableCapacity);
+        Assert.Equal(capacity, (await database.Slots.Find(x => x.Id == target.Id).SingleAsync()).AvailableCapacity);
+        Assert.Equal(slot.Id, (await database.Reservations.Find(x => x.Id == ObjectId.Parse(booking.Id)).SingleAsync()).SlotId);
+    }
+
+    [MongoFact]
+    public async Task Failed_reschedule_write_rolls_back_both_slots()
+    {
+        var booking = await Book();
+        var target = new EnergyBookingSlot { StationId = station.Id, StartTime = slot.StartTime.AddDays(1),
+            EndTime = slot.EndTime.AddDays(1), Capacity = 50, AvailableCapacity = 50, Status = SlotStatus.OPEN };
+        await database.Slots.InsertOneAsync(target);
+        await database.Database.RunCommandAsync<BsonDocument>(new BsonDocument {
+            { "collMod", "EnergyReservations" }, { "validator", new BsonDocument("EnergyAmount", new BsonDocument("$lt", 0)) }
+        });
+        await Expect(await owner.PutAsJsonAsync($"/api/reservations/{booking.Id}", new { slotId = target.Id.ToString(), energyAmount = 20 }), HttpStatusCode.InternalServerError);
+        Assert.Equal(90, (await database.Slots.Find(x => x.Id == slot.Id).SingleAsync()).AvailableCapacity);
+        Assert.Equal(50, (await database.Slots.Find(x => x.Id == target.Id).SingleAsync()).AvailableCapacity);
+        Assert.Equal(slot.Id, (await database.Reservations.Find(x => x.Id == ObjectId.Parse(booking.Id)).SingleAsync()).SlotId);
+    }
+
     private async Task<ReservationResponse> Book(decimal amount = 10)
     {
         // Book for Trading Integration Tests.

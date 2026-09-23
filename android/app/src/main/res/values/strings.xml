@@ -1,4 +1,6 @@
 <resources>
+    <string name="change_booking_slot">Change station or scheduled slot</string>
+    <string name="proposed_booking_slot">New schedule: %1$s\n%2$s – %3$s\nChanges require Backoffice approval again.</string>
     <string name="app_name">Smart Solar Microgrid</string>
     <string name="login_title">Smart Solar\nMicrogrid</string>
     <string name="login_subtitle">Sign in with your server account</string>
@@ -7,6 +9,7 @@
     <string name="login_fields_required">Enter your email or NIC and password.</string>
     <string name="invalid_login">Invalid identifier or password.</string>
     <string name="inactive_login">This account is not active. Contact Backoffice.</string>
+    <string name="mobile_access_denied">Mobile access is available only to Solar Prosumer and Grid Operator accounts. Backoffice users should use the web portal.</string>
     <string name="full_name">Full name</string>
     <string name="email">Email</string>
     <string name="phone">Phone</string>

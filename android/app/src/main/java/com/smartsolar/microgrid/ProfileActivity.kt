@@ -15,6 +15,7 @@ class ProfileActivity : AccountActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applyAccountInsets()
+        attachLiveContactValidation(binding.fullNameInput, binding.emailInput, binding.phoneInput)
         configurePrimaryNavigation(R.id.nav_profile)
         binding.logoutButton.setOnClickListener { confirmSignOut() }
         binding.backButton.setOnClickListener { finish() }
@@ -38,6 +39,8 @@ class ProfileActivity : AccountActivity() {
     private fun load() = runProfileRequest { render(account.currentUser()) }
 
     private fun save() {
+        if (requestBusy) return
+        if (!validateContactInputs(binding.fullNameInput, binding.emailInput, binding.phoneInput)) return
         val values = listOf(binding.fullNameInput, binding.emailInput, binding.phoneInput)
             .map { it.text.toString().trim() }
         if (values.any { it.isBlank() }) {

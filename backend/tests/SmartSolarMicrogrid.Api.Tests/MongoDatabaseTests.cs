@@ -69,7 +69,7 @@ public sealed class MongoDatabaseTests : IAsyncLifetime
         await indexes.InitializeAsync();
         using var cursor = await context.Database.ListCollectionNamesAsync();
         var collections = await cursor.ToListAsync();
-        Assert.Equal(new[] { "EnergyBookingSlots", "EnergyReservations", "SolarStationInfo", "Users" },
+        Assert.Equal(new[] { "EnergyBookingSlots", "EnergyReservations", "SolarStationInfo", "UsersByIdentity" },
             collections.OrderBy(x => x));
         using var reservationIndexes = await context.Reservations.Indexes.ListAsync();
         var definitions = await reservationIndexes.ToListAsync();
@@ -89,6 +89,44 @@ public sealed class MongoDatabaseTests : IAsyncLifetime
         var second = MongoModelTests.NewUser(null); second.Role = UserRole.GRID_OPERATOR;
         await context.Users.InsertManyAsync([first, second]);
         Assert.Equal(3, await context.Users.CountDocumentsAsync(FilterDefinition<User>.Empty));
+    }
+
+    [MongoFact]
+    public async Task Legacy_identity_migration_preserves_source_credentials_and_references_and_is_repeatable()
+    {
+        var user = MongoModelTests.NewUser("991234567V");
+        var staff = MongoModelTests.NewUser(null); staff.Role = UserRole.GRID_OPERATOR;
+        var source = context.Database.GetCollection<BsonDocument>("Users");
+        foreach (var item in new[] { user, staff })
+        {
+            var document = item.ToBsonDocument();
+            document["_id"] = item.Id; document.Remove("UserId");
+            await source.InsertOneAsync(document);
+        }
+        var migration = new UserIdentityMigration(context);
+        await migration.MigrateAsync();
+        await migration.MigrateAsync();
+        var migrated = await context.Users.Find(x => x.Id == user.Id).SingleAsync();
+        Assert.Equal(user.NIC, migrated.PrimaryKey.AsString);
+        Assert.Equal(user.PasswordHash, migrated.PasswordHash);
+        Assert.Equal(staff.Id, (await context.Users.Find(x => x.Id == staff.Id).SingleAsync()).PrimaryKey.AsObjectId);
+        Assert.Equal(2, await context.Users.CountDocumentsAsync(FilterDefinition<User>.Empty));
+        Assert.Equal(2, await source.CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty));
+        Assert.False((await source.Find(new BsonDocument("_id", user.Id)).SingleAsync()).Contains("UserId"));
+    }
+
+    [MongoFact]
+    public async Task Invalid_legacy_NIC_rolls_back_entire_identity_migration()
+    {
+        var source = context.Database.GetCollection<BsonDocument>("Users");
+        var valid = MongoModelTests.NewUser("991234567V").ToBsonDocument();
+        valid["_id"] = valid["UserId"]; valid.Remove("UserId");
+        var invalid = MongoModelTests.NewUser("991234568V").ToBsonDocument();
+        invalid["_id"] = invalid["UserId"]; invalid.Remove("UserId"); invalid["NIC"] = "invalid";
+        await source.InsertManyAsync([valid, invalid]);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => new UserIdentityMigration(context).MigrateAsync());
+        Assert.Equal(0, await context.Users.CountDocumentsAsync(FilterDefinition<User>.Empty));
+        Assert.Equal(2, await source.CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty));
     }
 
     [MongoFact]

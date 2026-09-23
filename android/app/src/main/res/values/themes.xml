@@ -7,6 +7,8 @@
   <item name="android:fontFamily">sans</item><item name="android:windowBackground">@color/solar_background</item>
   <item name="android:statusBarColor">@color/solar_background</item><item name="android:navigationBarColor">@color/solar_surface</item>
   <item name="android:windowLightStatusBar">true</item>
+  <item name="android:colorAccent">@color/solar_primary</item>
+  <item name="bottomNavigationStyle">@style/Widget.Solar.BottomNavigation</item>
   <item name="materialButtonStyle">@style/Widget.Solar.Button</item><item name="textInputStyle">@style/Widget.Solar.Input</item>
   <item name="textAppearanceBodyLarge">@style/Solar.Text.Body</item>
  </style>
@@ -16,21 +18,28 @@
  <style name="Solar.Text.Section" parent="Solar.Text.Title"><item name="android:textSize">@dimen/section_size</item></style>
  <style name="Solar.Text.Card" parent="Solar.Text.Title"><item name="android:textSize">@dimen/card_title_size</item></style>
  <style name="Solar.ToolbarTitle" parent="Solar.Text.Section"/>
+ <style name="Solar.Text.Hero" parent="Solar.Text.Title"><item name="android:textSize">30sp</item><item name="android:lineSpacingExtra">2dp</item></style>
  <style name="Widget.Solar.Button" parent="Widget.Material3.Button">
-  <item name="cornerRadius">@dimen/control_radius</item><item name="android:minHeight">@dimen/button_height</item><item name="android:textSize">@dimen/support_size</item>
+  <item name="cornerRadius">@dimen/control_radius</item><item name="android:minHeight">54dp</item><item name="android:textSize">@dimen/support_size</item>
   <item name="android:textAllCaps">false</item><item name="backgroundTint">@color/solar_button</item><item name="android:textColor">@color/solar_button_text</item>
   <item name="android:layout_marginTop">@dimen/space_xs</item><item name="android:layout_marginBottom">@dimen/space_xs</item>
+  <item name="elevation">2dp</item><item name="pressedTranslationZ">1dp</item>
  </style>
- <style name="Widget.Solar.Button.Secondary" parent="Widget.Solar.Button"><item name="backgroundTint">@color/solar_surface</item><item name="android:textColor">@color/solar_primary</item><item name="strokeColor">@color/solar_border</item><item name="strokeWidth">@dimen/border_width</item></style>
+ <style name="Widget.Solar.Button.Secondary" parent="Widget.Solar.Button"><item name="backgroundTint">@color/solar_surface</item><item name="android:textColor">@color/solar_primary</item><item name="strokeColor">@color/solar_border</item><item name="strokeWidth">@dimen/border_width</item><item name="elevation">0dp</item></style>
  <style name="Widget.Solar.Button.Danger" parent="Widget.Solar.Button.Secondary"><item name="android:textColor">@color/solar_error</item><item name="strokeColor">@color/solar_error</item></style>
  <style name="Widget.Solar.Input" parent="Widget.Material3.TextInputLayout.OutlinedBox">
   <item name="boxCornerRadiusTopStart">@dimen/control_radius</item><item name="boxCornerRadiusTopEnd">@dimen/control_radius</item>
   <item name="boxCornerRadiusBottomStart">@dimen/control_radius</item><item name="boxCornerRadiusBottomEnd">@dimen/control_radius</item>
   <item name="boxBackgroundColor">@color/solar_surface</item><item name="android:layout_marginBottom">@dimen/space_md</item>
+  <item name="boxStrokeColor">@color/solar_primary</item><item name="hintTextColor">@color/solar_primary</item>
  </style>
  <style name="Widget.Solar.Card" parent="Widget.Material3.CardView.Elevated">
   <item name="cardCornerRadius">@dimen/card_radius</item><item name="cardElevation">@dimen/card_elevation</item><item name="strokeColor">@color/solar_border</item><item name="strokeWidth">@dimen/border_width</item><item name="cardBackgroundColor">@color/solar_surface</item>
   <item name="android:layout_marginBottom">@dimen/space_lg</item>
+ </style>
+ <style name="Widget.Solar.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+  <item name="backgroundTint">@color/solar_surface</item>
+  <item name="elevation">10dp</item>
  </style>
  <style name="Solar.Section" parent=""><item name="android:layout_width">match_parent</item><item name="android:layout_height">wrap_content</item><item name="android:orientation">vertical</item><item name="android:padding">@dimen/space_lg</item><item name="android:layout_marginBottom">@dimen/space_lg</item><item name="android:background">@drawable/solar_card</item></style>
  <style name="Solar.Metric" parent="Solar.Text.Section"><item name="android:layout_width">match_parent</item><item name="android:layout_height">wrap_content</item><item name="android:layout_marginBottom">@dimen/space_sm</item><item name="android:padding">@dimen/space_lg</item><item name="android:background">@drawable/solar_card</item></style>

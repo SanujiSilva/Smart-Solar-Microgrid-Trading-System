@@ -34,6 +34,21 @@ class BookingEditorModel(private val api: BookingApiService, private val saved: 
         mutable.value = mutable.value.copy(draft = value)
     }
 
+    fun selectSlot(slotId: String) {
+        if (mutable.value.busy || mutable.value.uncertain) return
+        mutable.value = mutable.value.copy(busy = true, error = null, notice = null)
+        viewModelScope.launch {
+            try {
+                val slot = api.slot(slotId)
+                val station = api.station(slot.stationId)
+                saved["reschedule_slot_id"] = slotId
+                mutable.value = mutable.value.copy(slot = slot, station = station)
+            } catch (error: CancellationException) { throw error
+            } catch (error: Exception) { mutable.value = mutable.value.copy(error = error)
+            } finally { mutable.value = mutable.value.copy(busy = false) }
+        }
+    }
+
     fun refresh() {
         if (mutable.value.busy) return
         mutable.value = mutable.value.copy(busy = true, error = null, notice = null)
@@ -42,11 +57,12 @@ class BookingEditorModel(private val api: BookingApiService, private val saved: 
                 val bookingId: String? = saved[BOOKING_ID]
                 val booking = bookingId?.let { api.booking(it) }
                 if (booking != null) {
+                    if (mutable.value.uncertain) saved.remove<String>("reschedule_slot_id")
                     saved["mutation_pending"] = false
                     mutable.value = mutable.value.copy(booking = booking, uncertain = false)
                     draft(booking.energyAmount.toPlainString())
                 }
-                val slotId = booking?.slotId ?: saved.get<String>(SLOT_ID)
+                val slotId = saved.get<String>("reschedule_slot_id") ?: booking?.slotId ?: saved.get<String>(SLOT_ID)
                     ?: throw IllegalArgumentException("A slot or booking is required.")
                 val slot = api.slot(slotId)
                 val station = api.station(slot.stationId)
@@ -63,7 +79,7 @@ class BookingEditorModel(private val api: BookingApiService, private val saved: 
         val booking = mutable.value.booking
         mutate(if (booking == null) BookingNotice.CREATED else BookingNotice.UPDATED) {
             if (booking == null) api.create(CreateBookingRequest(slot.id, amount))
-            else api.update(booking.id, UpdateBookingRequest(amount))
+            else api.update(booking.id, UpdateBookingRequest(amount, slot.id))
         }
     }
 
@@ -80,6 +96,7 @@ class BookingEditorModel(private val api: BookingApiService, private val saved: 
             try {
                 val booking = action()
                 saved[BOOKING_ID] = booking.id
+                saved.remove<String>("reschedule_slot_id")
                 saved["mutation_pending"] = false
                 draft(booking.energyAmount.toPlainString())
                 mutable.value = mutable.value.copy(booking = booking, uncertain = false, notice = notice)

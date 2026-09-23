@@ -18,6 +18,8 @@ public interface IStationRepository
     Task<bool> DeleteAsync(ObjectId id, CancellationToken cancellationToken);
     // Create for IStation.
     Task CreateAsync(SolarStationInfo station, CancellationToken cancellationToken);
+    // Get the highest numeric suffix used by SOLAR station codes.
+    Task<int> GetHighestSolarCodeNumberAsync(CancellationToken cancellationToken);
     // Search for IStation.
     Task<(List<SolarStationInfo> Items, long TotalCount)> SearchAsync(StationStatus? status, string? search,
         int page, int pageSize, CancellationToken cancellationToken);

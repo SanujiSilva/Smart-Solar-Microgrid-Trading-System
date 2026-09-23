@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.createSavedStateHandle
@@ -28,6 +29,15 @@ class BookingEditorActivity : AccountActivity() {
     private val model: BookingEditorModel by viewModels {
         viewModelFactory { initializer { BookingEditorModel(ApiClient.bookingService(applicationContext), createSavedStateHandle()) } }
     }
+    private val slotPicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) result.data?.getStringExtra(BookingEditorModel.SLOT_ID)?.let(model::selectSlot)
+    }
+    private val stationPicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) result.data?.getStringExtra(StationDirectoryActivity.STATION_ID)?.let { id ->
+            slotPicker.launch(Intent(this, StationDetailsActivity::class.java)
+                .putExtra(StationDirectoryActivity.STATION_ID, id).putExtra(StationDetailsActivity.PICK_SLOT, true))
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +49,9 @@ class BookingEditorActivity : AccountActivity() {
             if (model.state.value.draft != it.toString()) model.draft(it.toString())
         }
         binding.refreshButton.setOnClickListener { model.refresh() }
+        binding.rescheduleButton.setOnClickListener {
+            stationPicker.launch(Intent(this, StationDirectoryActivity::class.java).putExtra(StationDirectoryActivity.PICK_STATION, true))
+        }
         binding.backButton.setOnClickListener { finish() }
         binding.bookingsButton.setOnClickListener {
             startActivity(Intent(this, BookingsActivity::class.java))
@@ -90,7 +103,7 @@ class BookingEditorActivity : AccountActivity() {
         val station = state.station
         binding.summaryText.text = when {
             booking != null -> getString(R.string.booking_detail_summary, booking.reservationCode, booking.status,
-                station?.name ?: booking.stationId, BookingPresentation.time(booking.reservationDateTime),
+                (if (slot?.id == booking.slotId) station?.name else null) ?: booking.stationId, BookingPresentation.time(booking.reservationDateTime),
                 booking.energyAmount.toPlainString(), booking.prosumerNIC,
                 BookingPresentation.time(booking.createdAt), BookingPresentation.time(booking.updatedAt),
                 booking.completedAt?.let { BookingPresentation.time(it) } ?: getString(R.string.not_completed))
@@ -101,6 +114,12 @@ class BookingEditorActivity : AccountActivity() {
         }
         // Status-based presentation only; all eligibility and notice decisions remain with the API.
         val editableStatus = booking == null || booking.status in listOf("PENDING", "APPROVED")
+        binding.rescheduleButton.visibility = if (booking != null && editableStatus) View.VISIBLE else View.GONE
+        binding.rescheduleButton.isEnabled = !state.busy && !state.uncertain
+        if (booking != null && slot != null && slot.id != booking.slotId) {
+            binding.summaryText.append("\n\n" + getString(R.string.proposed_booking_slot,
+                station?.name ?: slot.stationId, BookingPresentation.time(slot.startTime), BookingPresentation.time(slot.endTime)))
+        }
         binding.saveButton.visibility = if (editableStatus) View.VISIBLE else View.GONE
         binding.amountLayout.visibility = if (editableStatus) View.VISIBLE else View.GONE
         binding.saveButton.setText(if (booking == null) R.string.review_booking else R.string.modify_booking)
@@ -119,5 +138,6 @@ class BookingEditorActivity : AccountActivity() {
             state.notice == BookingNotice.CANCELLED -> getString(R.string.booking_cancelled)
             else -> ""
         }
+        binding.messageText.visibility = if (binding.messageText.text.isBlank()) View.GONE else View.VISIBLE
     }
 }

@@ -6,6 +6,7 @@
 using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using SmartSolarMicrogrid.Api.DTOs.Users;
+using SmartSolarMicrogrid.Api.DTOs.Auth;
 using SmartSolarMicrogrid.Api.Helpers;
 using SmartSolarMicrogrid.Api.Models;
 using SmartSolarMicrogrid.Api.Repositories;
@@ -15,6 +16,26 @@ namespace SmartSolarMicrogrid.Api.Services;
 public sealed class UserManagementService(IUserRepository users, CurrentUser currentUser,
     PasswordService passwords, TimeProvider clock)
 {
+    public async Task<UserDetailsResponse> CreateProsumerAsync(RegisterProsumerRequest request, CancellationToken cancellationToken)
+    {
+        currentUser.Require(UserRole.BACKOFFICE);
+        var now = clock.GetUtcNow().UtcDateTime;
+        var user = new User
+        {
+            NIC = request.NIC, FullName = request.FullName.Trim(), Email = request.Email.Trim().ToLowerInvariant(),
+            Phone = request.Phone.Trim(), Role = UserRole.PROSUMER, Status = UserStatus.ACTIVE,
+            CreatedAt = now, UpdatedAt = now
+        };
+        user.PasswordHash = passwords.Hash(user, request.Password);
+        await users.CreateAsync(user, cancellationToken);
+        return UserDetailsResponse.From(user);
+    }
+
+    public async Task<UserDetailsResponse> UpdateProsumerAsync(string nic, UpdateProfileRequest request, CancellationToken cancellationToken)
+    {
+        currentUser.Require(UserRole.BACKOFFICE);
+        return await UpdateProfile(await FindProsumer(nic, cancellationToken), request, cancellationToken);
+    }
     public async Task<UserPageResponse> ListAsync(UserListQuery query, bool prosumersOnly, CancellationToken cancellationToken)
     {
         // List for User Management.
@@ -63,8 +84,6 @@ public sealed class UserManagementService(IUserRepository users, CurrentUser cur
         // Update Staff for User Management.
         currentUser.Require(UserRole.BACKOFFICE);
         var user = await FindById(id, cancellationToken);
-        if (user.Role == UserRole.PROSUMER)
-            throw new ApiException(409, "Prosumer contact details must be updated through their own profile.");
         return await UpdateProfile(user, request, cancellationToken);
     }
 

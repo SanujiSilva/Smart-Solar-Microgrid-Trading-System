@@ -44,10 +44,27 @@ public sealed class StationService(IStationRepository stations, CurrentUser curr
     {
         // Create for Station.
         currentUser.Require(UserRole.BACKOFFICE);
-        var station = MapDetails(request, request.StationCode);
-        station.CreatedAt = station.UpdatedAt = clock.GetUtcNow().UtcDateTime;
-        await stations.CreateAsync(station, cancellationToken);
-        return StationResponse.From(station);
+        var nextSolarNumber = string.IsNullOrWhiteSpace(request.StationCode)
+            ? await stations.GetHighestSolarCodeNumberAsync(cancellationToken) + 1
+            : 0;
+        for (var attempt = 0; attempt < 25; attempt++)
+        {
+            var stationCode = string.IsNullOrWhiteSpace(request.StationCode)
+                ? GenerateSolarStationCode(nextSolarNumber + attempt)
+                : request.StationCode;
+            var station = MapDetails(request, stationCode);
+            station.CreatedAt = station.UpdatedAt = clock.GetUtcNow().UtcDateTime;
+            try
+            {
+                await stations.CreateAsync(station, cancellationToken);
+                return StationResponse.From(station);
+            }
+            catch (ApiException exception) when (exception.StatusCode == 409 && string.IsNullOrWhiteSpace(request.StationCode))
+            {
+                // Generated code collided with an existing station; try the next suffix.
+            }
+        }
+        throw new ApiException(409, "Could not generate a unique station code. Try saving the station again.");
     }
 
     public async Task<StationResponse> UpdateAsync(string id, UpdateStationRequest request, CancellationToken cancellationToken)
@@ -144,6 +161,8 @@ public sealed class StationService(IStationRepository stations, CurrentUser curr
             Status = status, OperatingSchedule = ValidateSchedule(request.OperatingSchedule, status)
         };
     }
+
+    private static string GenerateSolarStationCode(int number) => $"SOLAR{number:000}";
 
     private static void ValidateCoordinates(double latitude, double longitude)
     {

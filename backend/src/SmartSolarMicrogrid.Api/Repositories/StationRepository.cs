@@ -41,6 +41,14 @@ public sealed class StationRepository(MongoDbContext context, MongoOperation ope
         { throw new ApiException(409, "A station with this station code already exists."); }
     }
 
+    public async Task<int> GetHighestSolarCodeNumberAsync(CancellationToken cancellationToken)
+    {
+        // Get the largest numeric suffix in codes such as SOLAR001, SOLAR002, ...
+        var filter = Builders<SolarStationInfo>.Filter.Regex(x => x.StationCode, new BsonRegularExpression("^SOLAR[0-9]+$"));
+        var codes = await context.Stations.Query(operation, filter).Project(x => x.StationCode).ToListAsync(cancellationToken);
+        return codes.Select(code => int.TryParse(code[5..], out var number) ? number : 0).DefaultIfEmpty(0).Max();
+    }
+
     public async Task<(List<SolarStationInfo> Items, long TotalCount)> SearchAsync(StationStatus? status, string? search,
         int page, int pageSize, CancellationToken cancellationToken)
     {

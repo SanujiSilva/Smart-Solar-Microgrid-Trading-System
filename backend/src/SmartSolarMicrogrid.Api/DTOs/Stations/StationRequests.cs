@@ -12,7 +12,7 @@ namespace SmartSolarMicrogrid.Api.DTOs.Stations;
 public sealed class CreateStationRequest : StationDetailsRequest
 {
     private string stationCode = "";
-    [Required, RegularExpression("[A-Z0-9][A-Z0-9_-]{1,29}")]
+    [RegularExpression("[A-Z0-9][A-Z0-9_-]{1,29}")]
     public string StationCode { get => stationCode; init => stationCode = value?.Trim().ToUpperInvariant() ?? ""; }
 }
 

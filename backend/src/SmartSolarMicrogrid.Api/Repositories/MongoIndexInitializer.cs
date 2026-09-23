@@ -15,6 +15,8 @@ public sealed class MongoIndexInitializer(MongoDbContext context)
     {
         // Creating indexes also creates empty collections. Repeating identical named definitions is safe.
         await context.Users.Indexes.CreateManyAsync([
+            new CreateIndexModel<User>(Builders<User>.IndexKeys.Ascending(x => x.Id),
+                new CreateIndexOptions { Name = "ux_users_auth_id", Unique = true }),
             new CreateIndexModel<User>(Builders<User>.IndexKeys.Ascending(x => x.NIC),
                 new CreateIndexOptions<User>
                 {

@@ -12,6 +12,8 @@ class RegisterActivity : AccountActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applyAccountInsets()
+        attachLiveContactValidation(binding.fullNameInput, binding.emailInput, binding.phoneInput)
+        attachLiveNicValidation(binding.nicInput)
         binding.backButton.setOnClickListener { finish() }
         binding.registerButton.setOnClickListener { register() }
     }
@@ -28,9 +30,8 @@ class RegisterActivity : AccountActivity() {
             missing.first().first.requestFocus()
             return
         }
-        if (!Regex("(?:[0-9]{12}|[0-9]{9}[vVxX])").matches(binding.nicInput.text.toString().trim())) {
-            binding.nicLayout.error = getString(R.string.nic_format_error); return
-        }
+        if (!validateContactInputs(binding.fullNameInput, binding.emailInput, binding.phoneInput)) return
+        if (!validateNicInput(binding.nicInput)) return
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(binding.emailInput.text.toString().trim()).matches()) {
             binding.emailLayout.error = getString(R.string.email_format_error); return
         }

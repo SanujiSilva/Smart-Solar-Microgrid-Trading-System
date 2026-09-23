@@ -15,7 +15,7 @@ namespace SmartSolarMicrogrid.Api.Controllers;
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class ReservationsController(ReservationService reservations) : ControllerBase
 {
-    [HttpPost, Authorize(Policy = AuthPolicies.ProsumerOnly)]
+    [HttpPost]
     [ProducesResponseType<ReservationResponse>(201)]
     public async Task<ActionResult<ReservationResponse>> Create(CreateReservationRequest request,
         CancellationToken cancellationToken)
@@ -46,7 +46,7 @@ public sealed class ReservationsController(ReservationService reservations) : Co
         Ok(await reservations.PendingAsync(cancellationToken));
 
     // Update for Reservations.
-    [HttpPut("{id}"), Authorize(Policy = AuthPolicies.ProsumerOnly)]
+    [HttpPut("{id}")]
     public async Task<ActionResult<ReservationResponse>> Update(string id, UpdateReservationRequest request,
         CancellationToken cancellationToken) => Ok(await reservations.UpdateAsync(id, request, cancellationToken));
 

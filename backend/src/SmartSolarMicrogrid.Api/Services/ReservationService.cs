@@ -13,14 +13,29 @@ using SmartSolarMicrogrid.Api.Repositories;
 namespace SmartSolarMicrogrid.Api.Services;
 
 public sealed class ReservationService(IReservationRepository reservations, ISlotRepository slots,
-    IStationRepository stations, CurrentUser currentUser, TimeProvider clock)
+    IStationRepository stations, IUserRepository users, CurrentUser currentUser, TimeProvider clock)
 {
     public async Task<ReservationResponse> CreateAsync(CreateReservationRequest request,
         CancellationToken cancellationToken)
     {
         // Create for Reservation.
-        var actor = currentUser.Require(UserRole.PROSUMER);
-        if (actor.Status != UserStatus.ACTIVE)
+        var actor = currentUser.Get();
+        User prosumer;
+        if (actor.Role == UserRole.PROSUMER)
+        {
+            if (request.ProsumerNIC is not null && !string.Equals(request.ProsumerNIC, actor.NIC, StringComparison.OrdinalIgnoreCase))
+                throw new ApiException(403, "A prosumer can only book for their own NIC.");
+            prosumer = actor;
+        }
+        else
+        {
+            RequireStaff(actor);
+            if (string.IsNullOrWhiteSpace(request.ProsumerNIC))
+                throw new ApiException(400, "A prosumer NIC is required when staff create a reservation.");
+            prosumer = await users.FindProsumerByNicAsync(request.ProsumerNIC.Trim().ToUpperInvariant(), cancellationToken)
+                ?? throw new ApiException(404, "Prosumer was not found.");
+        }
+        if (prosumer.Status != UserStatus.ACTIVE)
             throw new ApiException(403, "Only active prosumers can create reservations.");
         if (!ObjectId.TryParse(request.SlotId, out var slotId))
             throw new ApiException(400, "Slot ID must be a valid ObjectId.");
@@ -42,7 +57,7 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
         var now = clock.GetUtcNow().UtcDateTime;
         var reservation = new EnergyReservation
         {
-            ReservationCode = CreateReservationCode(), ProsumerNIC = actor.NIC
+            ReservationCode = CreateReservationCode(), ProsumerNIC = prosumer.NIC
                 ?? throw new ApiException(409, "The authenticated account has no prosumer NIC."),
             StationId = slot.StationId, SlotId = slot.Id, EnergyAmount = amount,
             ReservationDateTime = slot.StartTime, Status = ReservationStatus.PENDING,
@@ -87,18 +102,57 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
         CancellationToken cancellationToken)
     {
         // Update for Reservation.
-        var actor = currentUser.Require(UserRole.PROSUMER);
+        var actor = currentUser.Get();
         var reservation = await FindAsync(id, cancellationToken);
-        EnsureOwner(actor, reservation);
+        if (actor.Role == UserRole.PROSUMER) EnsureOwner(actor, reservation);
+        else RequireStaff(actor);
         EnsureEditable(reservation);
-        EnsureNotice(reservation, clock.GetUtcNow().UtcDateTime, "updated");
+        var now = clock.GetUtcNow().UtcDateTime;
+        EnsureNotice(reservation, now, "updated");
+        var prosumer = await users.FindProsumerByNicAsync(reservation.ProsumerNIC, cancellationToken)
+            ?? throw new ApiException(404, "Prosumer was not found.");
+        if (prosumer.Status != UserStatus.ACTIVE)
+            throw new ApiException(403, "Only active prosumers can change reservations.");
         if (request.EnergyAmount is null || request.EnergyAmount <= 0)
             throw new ApiException(400, "Energy amount must be greater than zero.");
         var amount = request.EnergyAmount.Value;
-        var delta = reservation.EnergyAmount - amount;
-        if (delta != 0 && !await slots.TryAdjustCapacityAsync(reservation.SlotId, delta, delta < 0, cancellationToken))
-            throw new ApiException(409, "The slot does not have enough available capacity for this update.");
-
+        var targetId = reservation.SlotId;
+        if (request.SlotId is not null && !ObjectId.TryParse(request.SlotId, out targetId))
+            throw new ApiException(400, "Slot ID must be a valid ObjectId.");
+        var target = await slots.FindAsync(targetId, cancellationToken)
+            ?? throw new ApiException(404, "The slot was not found.");
+        var station = await stations.FindAsync(target.StationId, cancellationToken)
+            ?? throw new ApiException(404, "The station was not found.");
+        StationBookingRules.RequireAvailable(station);
+        StationBookingRules.RequireSchedule(station, target.StartTime, target.EndTime);
+        ValidateBookingWindow(target.StartTime, now);
+        if (target.Status != SlotStatus.OPEN)
+            throw new ApiException(409, "The slot is not open.");
+        var moved = targetId != reservation.SlotId;
+        if (moved)
+        {
+            if (target.StartTime - now < TimeSpan.FromHours(12))
+                throw new ApiException(409, "A rescheduled slot requires at least 12 hours notice.");
+            // The trading transaction commits both capacity changes and the reservation together.
+            if (!await slots.TryAdjustCapacityAsync(targetId, -amount, true, cancellationToken))
+                throw new ApiException(409, "The new slot does not have enough available capacity.");
+            if (!await slots.TryAdjustCapacityAsync(reservation.SlotId, reservation.EnergyAmount, false, cancellationToken))
+                throw new ApiException(409, "The previous slot cannot receive the released capacity.");
+            reservation.SlotId = targetId;
+            reservation.StationId = target.StationId;
+            reservation.ReservationDateTime = target.StartTime;
+        }
+        else
+        {
+            var delta = reservation.EnergyAmount - amount;
+            if (delta != 0 && !await slots.TryAdjustCapacityAsync(targetId, delta, delta < 0, cancellationToken))
+                throw new ApiException(409, "The slot does not have enough available capacity for this update.");
+        }
+        if (moved || amount != reservation.EnergyAmount)
+        {
+            reservation.Status = ReservationStatus.PENDING;
+            reservation.QrTokenHash = null;
+        }
         reservation.EnergyAmount = amount;
         reservation.UpdatedAt = clock.GetUtcNow().UtcDateTime;
         var saved = await reservations.UpdateAsync(reservation, cancellationToken)
@@ -190,6 +244,12 @@ public sealed class ReservationService(IReservationRepository reservations, ISlo
         // Ensure Owner for Reservation.
         if (!string.Equals(actor.NIC, reservation.ProsumerNIC, StringComparison.OrdinalIgnoreCase))
             throw new ApiException(403, "A prosumer can only access their own reservations.");
+    }
+
+    private static void RequireStaff(User actor)
+    {
+        if (actor.Role is not (UserRole.BACKOFFICE or UserRole.GRID_OPERATOR))
+            throw new ApiException(403, "Staff access is required.");
     }
 
     private static void EnsureEditable(EnergyReservation reservation)

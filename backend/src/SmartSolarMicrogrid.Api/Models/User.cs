@@ -9,8 +9,31 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace SmartSolarMicrogrid.Api.Models;
 
-public sealed class User : MongoDocument
+public sealed class User
 {
+    // Stable authentication reference, retained across the NIC primary-key migration.
+    [BsonElement("UserId")]
+    public ObjectId Id { get; set; } = ObjectId.GenerateNewId();
+
+    [BsonId, JsonIgnore]
+    public BsonValue PrimaryKey
+    {
+        get => Role == UserRole.PROSUMER
+            ? new BsonString(NIC ?? throw new InvalidOperationException("A prosumer requires a NIC primary key."))
+            : new BsonObjectId(Id);
+        set
+        {
+            if (value.IsString) NIC = value.AsString;
+            else Id = value.AsObjectId;
+        }
+    }
+
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
     private string? nic;
 
     [BsonIgnoreIfNull]

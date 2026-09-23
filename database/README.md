@@ -30,12 +30,12 @@ The application account needs access to the configured database, including creat
 
 | Collection | Fields |
 | --- | --- |
-| Users | Id, NIC, FullName, Email, Phone, PasswordHash, TokenVersion, Revision, Role, Status, CreatedAt, UpdatedAt |
+| UsersByIdentity | _id (NIC for prosumers), UserId, NIC, FullName, Email, Phone, PasswordHash, TokenVersion, Revision, Role, Status, CreatedAt, UpdatedAt |
 | SolarStationInfo | Id, StationCode, Name, Address, Location (derived Latitude/Longitude), CapacityKWh, AvailableBatterySlots, Status, OperatingSchedule, CreatedAt, UpdatedAt |
 | EnergyBookingSlots | Id, StationId, StartTime, EndTime, Capacity, AvailableCapacity, Status, CreatedAt, UpdatedAt |
 | EnergyReservations | Id, ReservationCode, ProsumerNIC, StationId, SlotId, EnergyAmount, ReservationDateTime, Status, QrTokenHash, CreatedAt, UpdatedAt, CompletedAt, CompletedByOperatorId |
 
-Internal IDs and references are BSON ObjectIds. Property names are retained in BSON (PascalCase), except `Id` maps to `_id`. C# timestamps are UTC `DateTime` values, stored as BSON dates with millisecond precision. Energy and slot capacity use `decimal`/BSON Decimal128, measured in kWh; battery slot counts remain integers. Future services must set/update timestamps and enforce valid state and capacity changes.
+Prosumer primary keys in `UsersByIdentity` are normalized NIC strings. Staff primary keys and other entity IDs remain BSON ObjectIds. User `Id` maps to the stable `UserId` authentication reference; other entity `Id` properties map to `_id`. See [identity migration and rollout](../docs/assignment-compliance-updates.md). C# timestamps are UTC `DateTime` values, stored as BSON dates with millisecond precision. Energy and slot capacity use `decimal`/BSON Decimal128, measured in kWh; battery slot counts remain integers. Future services must set/update timestamps and enforce valid state and capacity changes.
 
 NIC and ProsumerNIC setters trim whitespace and uppercase identifiers. Empty/missing staff NICs are omitted from BSON; a partial unique index applies to string NICs. Registration validates prosumer NICs. AuthService normalizes email, and the unique email index/login lookup use case-insensitive collation. Models are persistence objects, not request DTOs; raw database writes bypass model normalization. NIC edits will not be exposed by future profile DTOs. PasswordHash and TokenVersion are excluded from JSON; controllers use explicit response DTOs. Increment TokenVersion in future password/session revocation operations to reject old JWTs.
 
@@ -49,8 +49,9 @@ Stations persist one GeoJSON `Location` with `[longitude, latitude]`; `Latitude`
 
 | Collection | Index name | Fields / behavior |
 | --- | --- | --- |
-| Users | ux_users_nic | NIC ascending, unique, partial filter NIC type string |
-| Users | ux_users_email | Email ascending, unique, collation en/secondary (case insensitive) |
+| UsersByIdentity | ux_users_auth_id | UserId ascending, unique |
+| UsersByIdentity | ux_users_nic | NIC ascending, unique, partial filter NIC type string |
+| UsersByIdentity | ux_users_email | Email ascending, unique, collation en/secondary (case insensitive) |
 | SolarStationInfo | ux_stations_code | StationCode ascending, unique |
 | SolarStationInfo | ix_stations_location | Location 2dsphere |
 | EnergyBookingSlots | ix_slots_station_start | StationId + StartTime ascending |

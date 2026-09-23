@@ -23,6 +23,7 @@ public sealed class MongoDatabaseInitializer(
             await context.Database.RunCommandAsync<BsonDocument>(new BsonDocument("ping", 1),
                 cancellationToken: timeout.Token);
             await indexes.InitializeAsync(timeout.Token);
+            await new UserIdentityMigration(context).MigrateAsync(timeout.Token);
             logger.LogInformation("MongoDB connection and required collection indexes are ready.");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }

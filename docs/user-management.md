@@ -1,4 +1,4 @@
-# Phase 5 user and prosumer management
+# User and prosumer management
 
 ## Routes and access
 
@@ -9,8 +9,10 @@ All routes require JWT authentication. Backoffice policies are checked by contro
 | GET /api/users | BACKOFFICE | Paginated list of all accounts, optionally filtered |
 | POST /api/users | BACKOFFICE | Create an ACTIVE Backoffice or Grid Operator account |
 | GET /api/users/{id} | BACKOFFICE | Get a user by internal ObjectId |
-| PUT /api/users/{id} | BACKOFFICE | Update staff contact details |
+| PUT /api/users/{id} | BACKOFFICE | Update staff or prosumer contact details |
 | PATCH /api/users/{id}/status | BACKOFFICE | Approve, deactivate, reactivate, or decline a deactivation request |
+| POST /api/prosumers | BACKOFFICE | Create an ACTIVE prosumer with NIC primary key |
+| PUT /api/prosumers/{nic} | BACKOFFICE | Edit prosumer contact details without changing NIC |
 | GET /api/prosumers | BACKOFFICE | Paginated prosumer list, including pending accounts |
 | GET /api/prosumers/{nic} | BACKOFFICE | Get a prosumer by business NIC |
 | PUT /api/prosumers/me | PROSUMER | Update own contact details |
@@ -23,7 +25,7 @@ Creation returns 201 with a Location header pointing to the new user. Other succ
 
 Create staff with `fullName`, `email`, `phone`, `password`, and `role` (BACKOFFICE or GRID_OPERATOR). The API assigns ACTIVE status, an ObjectId, and a salted password hash; clients cannot supply status/NIC/ID. Prosumers continue to register through `/api/auth/prosumer/register` and start PENDING.
 
-Both profile update routes accept only `fullName`, `email`, and `phone`. Contact fields are trimmed before validation; emails are normalized to lowercase by the service. Roles, NICs, passwords, and internal session/revision fields are immutable through these routes. Password reset and role reassignment are outside this phase. Backoffice staff cannot edit a prosumer's contact details through the staff update route; prosumers control their own profile. Backoffice can review those accounts and manage their status.
+All profile update routes accept only `fullName`, `email`, and `phone`. Contact fields are trimmed before validation; emails are normalized to lowercase by the service. Roles, NICs, passwords, and internal session/revision fields are immutable through these routes. Password reset and role reassignment are outside this phase. Backoffice can edit prosumer contact details by NIC or internal authentication ID. Prosumers can edit their own profile. NIC cannot be changed. See [migration and booking updates](assignment-compliance-updates.md).
 
 Lists accept `page` (default 1, max 100000), `pageSize` (default 20, max 100), `search` (max 100 characters), `role`, and `status`. The prosumer list only accepts an omitted/PROSUMER role. `search` is a literal, case-insensitive substring match on name, email, or NIC; it is escaped rather than treated as a client-supplied regular expression. Results sort by CreatedAt descending with an ID tie-breaker. The response is `{ items, totalCount, page, pageSize }`. Count and rows are separate reads, so concurrent changes may be reflected between reads.
 
@@ -64,7 +66,7 @@ Reservation-aware account deactivation restrictions have not been introduced: bo
 - 401: missing/invalid/expired/revoked token or inactive authenticated account.
 - 403: role does not permit the operation.
 - 404: valid identifier but no matching account.
-- 409: duplicate email/NIC, overlapping update, self-deactivation, wrong reactivation state, or an attempt to use staff editing for a prosumer profile.
+- 409: duplicate email/NIC, overlapping update, self-deactivation, wrong reactivation state.
 
 Errors use the existing Problem Details structure. MongoDB unique indexes remain authoritative for duplicate prevention, including concurrent operations.
 
