@@ -1,0 +1,174 @@
+/*
+ * File: src/SmartSolarMicrogrid.Api/Services/SlotService.cs
+ * Project: Smart Solar Microgrid Trading System
+ * Purpose: Server-side application rules and orchestration for Slot Service.
+ */
+using MongoDB.Bson;
+using SmartSolarMicrogrid.Api.DTOs.Slots;
+using SmartSolarMicrogrid.Api.Helpers;
+using SmartSolarMicrogrid.Api.Models;
+using SmartSolarMicrogrid.Api.Repositories;
+
+namespace SmartSolarMicrogrid.Api.Services;
+
+public sealed class SlotService(ISlotRepository slots, IStationRepository stations, CurrentUser currentUser,
+    TimeProvider clock)
+{
+    public async Task<SlotListResponse> ListAsync(string stationId, SlotListQuery query,
+        CancellationToken cancellationToken)
+    {
+        // List for Slot.
+        currentUser.Get();
+        var id = ParseId(stationId, "Station ID");
+        await RequireStation(id, cancellationToken);
+        var result = await slots.ListAsync(id, query.IncludeCancelled, cancellationToken);
+        return new(result.Select(SlotResponse.From).ToList());
+    }
+
+    public async Task<SlotResponse> CreateAsync(string stationId, CreateSlotRequest request,
+        CancellationToken cancellationToken)
+    {
+        // Create for Slot.
+        currentUser.Require(UserRole.BACKOFFICE);
+        var id = ParseId(stationId, "Station ID");
+        var station = await RequireStation(id, cancellationToken);
+        RequireUsableStation(station);
+        var details = ValidateDetails(request);
+        ValidateStationSlot(station, details);
+        if (await slots.HasOverlapAsync(id, details.StartTime, details.EndTime, null, cancellationToken))
+            throw new ApiException(409, "The station already has an overlapping active slot.");
+
+        var now = clock.GetUtcNow().UtcDateTime;
+        var slot = new EnergyBookingSlot
+        {
+            StationId = id, StartTime = details.StartTime, EndTime = details.EndTime,
+            Capacity = details.Capacity, AvailableCapacity = details.AvailableCapacity,
+            Status = details.Status, CreatedAt = now, UpdatedAt = now
+        };
+        await slots.CreateAsync(slot, cancellationToken);
+        return SlotResponse.From(slot);
+    }
+
+    public async Task<SlotResponse> GetAsync(string id, CancellationToken cancellationToken)
+    {
+        // Get for Slot.
+        currentUser.Get();
+        return SlotResponse.From(await Find(id, cancellationToken));
+    }
+
+    public async Task<SlotResponse> UpdateAsync(string id, UpdateSlotRequest request,
+        CancellationToken cancellationToken)
+    {
+        // Update for Slot.
+        currentUser.Require(UserRole.BACKOFFICE);
+        var slot = await Find(id, cancellationToken);
+        if (slot.Status == SlotStatus.CANCELLED) throw new ApiException(409, "A cancelled slot cannot be updated.");
+        var station = await RequireStation(slot.StationId, cancellationToken);
+        RequireUsableStation(station);
+        var details = ValidateDetails(request);
+        ValidateStationSlot(station, details);
+        var committed = await slots.CommittedCapacityAsync(slot.Id, cancellationToken);
+        if (details.Capacity - details.AvailableCapacity < committed)
+            throw new ApiException(409, "Available capacity cannot include energy already reserved or transferred.");
+        if ((slot.StartTime != details.StartTime || slot.EndTime != details.EndTime) &&
+            await slots.HasActiveReservationsAsync(slot.Id, cancellationToken))
+            throw new ApiException(409, "A slot with active reservations cannot be rescheduled.");
+        if (await slots.HasOverlapAsync(slot.StationId, details.StartTime, details.EndTime, slot.Id, cancellationToken))
+            throw new ApiException(409, "The station already has an overlapping active slot.");
+
+        slot.StartTime = details.StartTime;
+        slot.EndTime = details.EndTime;
+        slot.Capacity = details.Capacity;
+        slot.AvailableCapacity = details.AvailableCapacity;
+        slot.Status = details.Status;
+        slot.UpdatedAt = clock.GetUtcNow().UtcDateTime;
+        var saved = await slots.UpdateAsync(slot, slot, cancellationToken)
+            ?? throw new ApiException(409, "The slot changed during this request. Reload and try again.");
+        return SlotResponse.From(saved);
+    }
+
+    public async Task<SlotResponse> CancelAsync(string id, CancellationToken cancellationToken)
+    {
+        // Cancel for Slot.
+        currentUser.Require(UserRole.BACKOFFICE);
+        var slot = await Find(id, cancellationToken);
+        if (slot.Status == SlotStatus.CANCELLED) return SlotResponse.From(slot);
+        if (await slots.HasActiveReservationsAsync(slot.Id, cancellationToken))
+            throw new ApiException(409, "A slot with active reservations cannot be cancelled.");
+        slot.Status = SlotStatus.CANCELLED;
+        slot.UpdatedAt = clock.GetUtcNow().UtcDateTime;
+        var saved = await slots.UpdateAsync(slot, slot, cancellationToken)
+            ?? throw new ApiException(409, "The slot changed during this request. Reload and try again.");
+        return SlotResponse.From(saved);
+    }
+
+    private async Task<EnergyBookingSlot> Find(string id, CancellationToken cancellationToken)
+    {
+        // Find for Slot.
+        var objectId = ParseId(id, "Slot ID");
+        return await slots.FindAsync(objectId, cancellationToken)
+            ?? throw new ApiException(404, "The slot was not found.");
+    }
+
+    public async Task<SlotResponse> UpdateAvailabilityAsync(string id, SlotAvailabilityRequest request,
+        CancellationToken cancellationToken)
+    {
+        // Update Availability for Slot.
+        var actor = currentUser.Get();
+        if (actor.Role is not (UserRole.BACKOFFICE or UserRole.GRID_OPERATOR))
+            throw new ApiException(403, "Staff access is required.");
+        var slot = await Find(id, cancellationToken);
+        RequireUsableStation(await RequireStation(slot.StationId, cancellationToken));
+        if (slot.Status == SlotStatus.CANCELLED) throw new ApiException(409, "A cancelled slot cannot be changed.");
+        var committed = await slots.CommittedCapacityAsync(slot.Id, cancellationToken);
+        if (request.AvailableCapacity is null || request.AvailableCapacity < 0 || request.AvailableCapacity > slot.Capacity - committed)
+            throw new ApiException(409, "Availability cannot exceed capacity minus reserved/transferred energy.");
+        slot.AvailableCapacity = request.AvailableCapacity.Value;
+        slot.Status = Enum.Parse<SlotStatus>(request.Status);
+        slot.UpdatedAt = clock.GetUtcNow().UtcDateTime;
+        return SlotResponse.From(await slots.UpdateAsync(slot, slot, cancellationToken)
+            ?? throw new ApiException(409, "Slot changed. Reload and retry."));
+    }
+
+    private static void ValidateStationSlot(SolarStationInfo station, SlotDetails details)
+    {
+        // Validate Station Slot for Slot.
+        if (details.Capacity > station.CapacityKWh) throw new ApiException(409, "Slot capacity exceeds station capacity.");
+        StationBookingRules.RequireSchedule(station, details.StartTime, details.EndTime);
+    }
+
+    // Require Station for Slot.
+    private async Task<SolarStationInfo> RequireStation(ObjectId id, CancellationToken cancellationToken) =>
+        await stations.FindAsync(id, cancellationToken)
+        ?? throw new ApiException(404, "The station was not found.");
+
+    private static void RequireUsableStation(SolarStationInfo station)
+    {
+        // Require Usable Station for Slot.
+        if (station.Status == StationStatus.DEACTIVATED)
+            throw new ApiException(409, "A deactivated station cannot have slots managed.");
+    }
+
+    // Parse Id for Slot.
+    private static ObjectId ParseId(string value, string name) =>
+        ObjectId.TryParse(value, out var id) ? id : throw new ApiException(400, $"{name} must be a valid ObjectId.");
+
+    private static SlotDetails ValidateDetails(SlotDetailsRequest request)
+    {
+        // Validate Details for Slot.
+        if (request.StartTime is null || request.EndTime is null || request.Capacity is null || request.AvailableCapacity is null)
+            throw new ApiException(400, "Slot times and capacities are required.");
+        var start = request.StartTime.Value.UtcDateTime;
+        var end = request.EndTime.Value.UtcDateTime;
+        if (end <= start) throw new ApiException(400, "Slot end time must be after its start time.");
+        if (request.Capacity.Value <= 0 || request.AvailableCapacity.Value < 0 ||
+            request.AvailableCapacity.Value > request.Capacity.Value)
+            throw new ApiException(400, "Available capacity must be between zero and total capacity.");
+        if (!Enum.TryParse<SlotStatus>(request.Status, out var status) || status is SlotStatus.CANCELLED || !Enum.IsDefined(status))
+            throw new ApiException(400, "Slot status must be OPEN or CLOSED.");
+        return new SlotDetails(start, end, request.Capacity.Value, request.AvailableCapacity.Value, status);
+    }
+
+    private sealed record SlotDetails(DateTime StartTime, DateTime EndTime, decimal Capacity,
+        decimal AvailableCapacity, SlotStatus Status);
+}

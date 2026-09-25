@@ -1,0 +1,171 @@
+@baseUrl = http://localhost:5080
+
+### API liveness
+GET {{baseUrl}}/api/health
+Accept: application/json
+
+### OpenAPI document (Development only)
+GET {{baseUrl}}/openapi/v1.json
+
+### MongoDB readiness
+GET {{baseUrl}}/api/health/ready
+Accept: application/json
+
+### Consistent unknown-route response
+GET {{baseUrl}}/api/does-not-exist
+Accept: application/json
+
+### Login: supply loginIdentifier/loginPassword through your REST client's private environment.
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "{{loginIdentifier}}",
+  "password": "{{loginPassword}}"
+}
+
+### Current authenticated user: provide accessToken privately; never commit real credentials/tokens.
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+### Backoffice: pending prosumers (private token/environment variables required)
+GET {{baseUrl}}/api/prosumers?status=PENDING&page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Backoffice: approve the selected user
+PATCH {{baseUrl}}/api/users/{{userId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "status": "ACTIVE"
+}
+
+### Prosumer: request own deactivation
+POST {{baseUrl}}/api/prosumers/me/deactivation-request
+Authorization: Bearer {{prosumerAccessToken}}
+
+### Backoffice: reactivate a deactivated prosumer
+PATCH {{baseUrl}}/api/prosumers/{{prosumerNic}}/activate
+Authorization: Bearer {{accessToken}}
+
+### Backoffice: create a solar station (private token/environment variables required)
+POST {{baseUrl}}/api/stations
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "stationCode": "COLOMBO-01",
+  "name": "Colombo Solar Station",
+  "address": "Colombo, Sri Lanka",
+  "latitude": 6.9271,
+  "longitude": 79.8612,
+  "capacityKWh": 250,
+  "availableBatterySlots": 12,
+  "status": "ACTIVE",
+  "operatingSchedule": {
+    "timeZoneId": "Asia/Colombo",
+    "weeklyPeriods": [
+      { "day": "Monday", "openMinuteOfDay": 480, "closeMinuteOfDay": 1080 }
+    ]
+  }
+}
+
+### Authenticated: find nearby active stations
+GET {{baseUrl}}/api/stations/nearby?latitude=6.9271&longitude=79.8612&radiusKm=10&limit=20
+Authorization: Bearer {{accessToken}}
+
+### Authenticated: list slots for a station
+GET {{baseUrl}}/api/stations/{{stationId}}/slots
+Authorization: Bearer {{accessToken}}
+
+### Backoffice: create an energy booking slot
+POST {{baseUrl}}/api/stations/{{stationId}}/slots
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "startTime": "2026-09-20T08:00:00Z",
+  "endTime": "2026-09-20T09:00:00Z",
+  "capacity": 25,
+  "availableCapacity": 25,
+  "status": "OPEN"
+}
+
+### Backoffice: update a slot
+PUT {{baseUrl}}/api/slots/{{slotId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "startTime": "2026-09-20T08:00:00Z",
+  "endTime": "2026-09-20T09:00:00Z",
+  "capacity": 25,
+  "availableCapacity": 25,
+  "status": "OPEN"
+}
+
+### Backoffice: cancel a slot (soft delete)
+DELETE {{baseUrl}}/api/slots/{{slotId}}
+Authorization: Bearer {{accessToken}}
+
+### Prosumer: create a reservation
+POST {{baseUrl}}/api/reservations
+Authorization: Bearer {{prosumerAccessToken}}
+Content-Type: application/json
+
+{
+  "slotId": "{{slotId}}",
+  "energyAmount": 5.5
+}
+
+### Prosumer: view own reservations
+GET {{baseUrl}}/api/reservations/my
+Authorization: Bearer {{prosumerAccessToken}}
+
+### Prosumer: update a reservation (at least 12 hours before the slot)
+PUT {{baseUrl}}/api/reservations/{{reservationId}}
+Authorization: Bearer {{prosumerAccessToken}}
+Content-Type: application/json
+
+{
+  "energyAmount": 4.25
+}
+
+### Prosumer: cancel a reservation (at least 12 hours before the slot)
+DELETE {{baseUrl}}/api/reservations/{{reservationId}}
+Authorization: Bearer {{prosumerAccessToken}}
+
+### Staff: view pending reservations
+GET {{baseUrl}}/api/reservations/pending
+Authorization: Bearer {{accessToken}}
+
+### Prosumer: issue or reissue the approved reservation QR token
+GET {{baseUrl}}/api/reservations/{{reservationId}}/qr
+Authorization: Bearer {{prosumerAccessToken}}
+
+### Grid Operator: verify a scanned QR token
+POST {{baseUrl}}/api/operator/verify-qr
+Authorization: Bearer {{operatorAccessToken}}
+Content-Type: application/json
+
+{
+  "qrToken": "{{qrToken}}"
+}
+
+### Grid Operator: complete the energy transfer
+POST {{baseUrl}}/api/operator/complete-transfer
+Authorization: Bearer {{operatorAccessToken}}
+Content-Type: application/json
+
+{
+  "qrToken": "{{qrToken}}"
+}
+
+### Authenticated: search reservations
+GET {{baseUrl}}/api/reservations/search?status=APPROVED&page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Authenticated: reservation dashboard
+GET {{baseUrl}}/api/reservations/dashboard
+Authorization: Bearer {{accessToken}}

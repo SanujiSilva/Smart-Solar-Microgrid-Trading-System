@@ -1,0 +1,77 @@
+.accounts-theme { --ink: #141333; --muted: #687297; --purple: #6531d1; }
+.accounts-theme .topbar { min-height: 74px; padding: 12px 24px 12px 247px; }
+.accounts-theme .brand { position: absolute; top: 0; left: 0; width: 218px; height: 74px; padding: 20px; background: #201d48; color: white; border-bottom: 1px solid #ffffff0b; font-size: 13px; line-height: 1.7; }
+.accounts-theme .brand b { display: block; color: #ac78ff; }
+.accounts-theme .brand-symbol { flex-shrink: 0; }
+.header-account-search { display: flex; position: relative; flex: 1; max-width: 490px; margin-right: auto; }
+.header-account-search input { width: 100%; border: 1px solid #dbe0ef; border-radius: 8px; background: #f6f7fb; padding: 10px 16px 10px 42px; font: 14px 'DM Sans', sans-serif; }
+.header-account-search button { position: absolute; left: 3px; top: 0; height: 100%; border: 0; background: none; color: #29264d; font-size: 26px; }
+.accounts-theme .side-nav { flex: 0 0 218px; width: 218px; background: linear-gradient(150deg, #201c48, #1d1d43); padding: 30px 11px 0; border: 0; }
+.accounts-theme .side-caption { display: none; }
+.accounts-theme .side-link { color: #cecaee; padding: 14px 17px; gap: 17px; border-radius: 8px; }
+.accounts-theme .side-link.is-active { background: linear-gradient(110deg, #7735dd, #5b2bc5); }
+.accounts-theme .sidebar-scene { margin-inline: -11px; background: transparent; }
+.accounts-theme .sidebar-scene p { color: #c4bee8; padding-inline: 28px; }
+.accounts-theme .sidebar-scene .solar-landscape { opacity: .65; }
+.accounts-theme .workspace-content { padding-bottom: 0; background: #f6f8ff; }
+.accounts-theme .footer-line { display: none; }
+.accounts-layout { display: grid; grid-template-columns: minmax(0, 1fr); min-height: calc(100vh - 74px); font-family: 'DM Sans', sans-serif; }
+.accounts-layout.with-staff-panel { grid-template-columns: minmax(0, 1fr) 370px; }
+.accounts-main { padding: 24px 28px 50px; min-width: 0; }
+.accounts-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 28px; }
+.accounts-heading .eyebrow { font: 600 11px 'DM Sans', sans-serif; letter-spacing: .05em; }
+.accounts-heading .eyebrow span { padding: 0 12px; color: #8590ae; }
+.accounts-heading h1 { font: 700 36px/1.2 'DM Sans', sans-serif; color: #151234; margin: 18px 0 8px; letter-spacing: -.035em; }
+.accounts-heading p { font-size: 15px; color: #687297; margin: 0; }
+.accounts-heading-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+.accounts-main .btn, .staff-side-panel .btn { font-size: 13px; min-height: 42px; border-radius: 7px; padding: 10px 16px; white-space: nowrap; }
+.accounts-main .btn-dark, .staff-side-panel .btn-dark { background: linear-gradient(120deg, #7234d8, #5827c7); border-color: #6935ce; }
+.accounts-main .btn-outline-primary { --bs-btn-color: #642bd0; --bs-btn-border-color: #d9c8ff; --bs-btn-hover-bg: #f0eaff; --bs-btn-hover-color: #5724b7; --bs-btn-hover-border-color: #ac8ceb; }
+.account-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.account-metric { display: flex; align-items: center; gap: 20px; border: 1px solid #e2e5f5; border-radius: 9px; padding: 21px; min-width: 0; }
+.account-metric--0 { background: linear-gradient(120deg, #f7f3ff, #eee8fc); color: #6322d9; }
+.account-metric--1 { background: linear-gradient(120deg, #f0fcf6, #e2f7ed); color: #008444; }
+.account-metric--2 { background: linear-gradient(120deg, #f5f6f9, #eff1f6); color: #626988; }
+.account-metric-icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 12px; background: #7445ed19; flex-shrink: 0; }
+.account-metric--1 .account-metric-icon { background: #29ce641c; }
+.account-metric--2 .account-metric-icon { background: #52618a15; }
+.account-metric-icon .solar-icon { width: 34px; height: 34px; }
+.account-metric strong { display: block; font-size: 30px; color: #151334; line-height: 1.2; margin-top: 4px; overflow-wrap: anywhere; }
+.account-metric span { font-size: 14px; font-weight: 500; }
+.accounts-main .data-panel { max-width: none; margin: 0 0 24px; background: white; border: 1px solid #e1e7f4; border-radius: 12px; padding: 24px; box-shadow: 0 5px 24px #1b285205; }
+.accounts-main h2 { font: 700 21px 'DM Sans', sans-serif; color: #151334; margin-bottom: 20px; }
+.accounts-main .filter-row { gap: 12px; flex-wrap: wrap; }
+.accounts-main .filter-row .form-control { flex: 2 1 220px; max-width: none; }
+.accounts-main .filter-row .form-select { flex: 1 1 140px; max-width: none; }
+.accounts-main .form-control, .accounts-main .form-select { border: 1px solid #d6deee; border-radius: 7px; background-color: #fcfcff; font-size: 14px; min-height: 44px; }
+.accounts-table { min-width: 760px; --bs-table-border-color: #e3e8f3; margin: 0; }
+.accounts-table thead th { background: #f3f5f9; color: #373456; text-transform: uppercase; font-size: 11px; font-weight: 600; padding: 18px 12px; }
+.accounts-table td { padding: 13px 12px; vertical-align: middle; font-size: 13px; color: #1c2042; }
+.accounts-table td small { display: block; color: #74809e; margin-top: 5px; font-size: 13px; }
+.account-identity { display: flex; align-items: center; gap: 16px; }
+.account-avatar { width: 50px; height: 50px; display: grid; place-items: center; flex-shrink: 0; border-radius: 50%; background: #efe9ff; color: #6a32d1; font-size: 22px; }
+.account-row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.account-row-actions .btn { font-size: 12px; padding: 8px 12px; }
+.accounts-table .status-pill--active { color: #00863a; background: #e2f8eb; }
+.accounts-table .status-pill { font-size: 11px; letter-spacing: .03em; }
+.accounts-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13px; padding-top: 20px; }
+.accounts-pagination > .d-flex { flex-wrap: wrap; margin-top: 0 !important; }
+.staff-side-panel { background: white; border-left: 1px solid #e8ecf4; box-shadow: -5px 0 20px #14284a05; padding: 28px 26px; }
+.staff-side-panel .staff-form { border: 0; box-shadow: none; padding: 0; margin: 0; min-height: calc(100vh - 130px); background: white; gap: 0; }
+.staff-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.staff-panel-heading h2 { font-size: 21px; font-weight: 700; margin: 0; color: #151334; }
+.panel-close { border: 0; background: transparent; font-size: 25px; color: #63708e; width: 40px; height: 40px; }
+.staff-intro { font-size: 14px; color: #707c99; line-height: 1.6; margin: 6px 0 25px; }
+.staff-fields { display: flex; flex-direction: column; gap: 10px; }
+.staff-fields > label { color: #333754; font-size: 13px; margin-bottom: 10px; }
+.staff-fields .form-control, .staff-fields .form-select { font-size: 14px; min-height: 45px; padding: 12px 15px; border: 1px solid #d9e0ed; background: #fbfcfe; border-radius: 7px; margin-top: 7px; }
+.staff-fields label[for="staff-password"] { margin-bottom: -12px; }
+.staff-password { display: flex; position: relative; }
+.staff-password input { padding-right: 60px !important; }
+.staff-password button { position: absolute; right: 8px; top: 12px; bottom: 4px; border: 0; background: transparent; color: #6531bb; font-size: 12px; }
+.staff-info { background: #eef2ff; color: #4b5bbc; border-radius: 7px; padding: 16px; font-size: 13px; line-height: 1.6; margin-top: 24px; }
+.staff-footer { display: flex; gap: 8px; border-top: 1px solid #e8edf4; padding-top: 18px; margin-top: auto; }
+.staff-footer .btn-dark { flex: 1; }
+@media (max-width: 1400px) { .accounts-heading { flex-direction: column; align-items: flex-start; } .accounts-layout.with-staff-panel { grid-template-columns: minmax(0, 1fr) 330px; } .account-metric { padding: 16px 12px; gap: 12px; } .account-metric-icon { width: 42px; height: 48px; } .accounts-main { padding-inline: 20px; } }
+@media (max-width: 1100px) { .accounts-layout.with-staff-panel { grid-template-columns: minmax(0, 1fr); } .staff-side-panel { border-top: 1px solid #e1e7f4; } .staff-side-panel .staff-form { min-height: 0; max-width: 650px; margin: auto; } .staff-footer { margin-top: 20px; } .header-account-search { max-width: 300px; } }
+@media (max-width: 760px) { .accounts-theme .topbar { padding: 14px 16px; } .accounts-theme .brand { position: static; width: auto; height: auto; padding: 10px 14px; border-radius: 8px; } .header-account-search { order: 3; flex-basis: 100%; max-width: none; } .accounts-theme .side-nav { width: 100%; padding: 8px; flex-basis: auto; overflow-x: auto; } .accounts-main { padding: 24px 16px; } .account-metrics { gap: 8px; } .account-metric { flex-direction: column; align-items: flex-start; padding: 12px; gap: 10px; } .account-metric span { font-size: 12px; } .accounts-heading h1 { font-size: 30px; } .accounts-main .data-panel { padding: 18px 14px; } }

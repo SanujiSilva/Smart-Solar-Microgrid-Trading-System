@@ -1,5 +1,31 @@
-# Web client boundary
+# Smart Solar Microgrid web client
 
-Reserved for Phase 11: React, Bootstrap 5, React Router, and Axios.
+Phases 11-12 provide the React + TypeScript foundation using Vite, Bootstrap 5, React Router, and Axios, plus API-backed login, session restoration, protected routing, logout, and role-aware navigation. Backoffice and Grid Operator feature screens begin in Phases 13-14.
 
-Backoffice and Grid Operator screens call the central API. Navigation reflects roles, while permissions and business validation are enforced on the server. There is no runnable web project in Phase 1.
+## Run
+
+```powershell
+npm install
+npm run dev
+```
+
+Copy `.env.example` to `.env.local` when the API is not running at `http://localhost:5080/api`. The web client reads `VITE_API_BASE_URL` and stores only the bearer access-token boundary in session storage; `/api/auth/me` restores and revalidates sessions, while the API remains authoritative for identity, roles, and business rules.
+
+Build and lint:
+
+```powershell
+npm run build
+npm run lint
+```
+
+Browser workflow tests:
+
+```powershell
+npm run test:e2e
+```
+
+The repository-level Phase 23 runner executes the backend, web and Android automated checks together:
+
+```powershell
+..\scripts\test-phase23.ps1
+```

@@ -1,0 +1,25 @@
+<resources>
+    <color name="solar_primary">#6236C5</color>
+    <color name="solar_primary_dark">#171536</color>
+    <color name="solar_primary_light">#F0EAFF</color>
+    <color name="solar_success">#0E8F5A</color>
+    <color name="solar_success_background">#DFF6EA</color>
+    <color name="solar_warning">#805700</color>
+    <color name="solar_warning_background">#FFF3D6</color>
+    <color name="solar_error">#AD3039</color>
+    <color name="solar_error_background">#FCEBED</color>
+    <color name="solar_background">#F7F5FC</color>
+    <color name="solar_background_soft">#EFF8F3</color>
+    <color name="solar_surface_tint">#FBFAFE</color>
+    <color name="solar_surface">#FFFFFF</color>
+    <color name="solar_text_primary">#11152E</color>
+    <color name="solar_text_secondary">#706782</color>
+    <color name="solar_border">#E6E0F1</color>
+    <color name="solar_shadow_key">#1A171536</color>
+    <color name="solar_accent">#FFD95A</color>
+    <color name="solar_disabled">#E4E1EA</color>
+    <color name="solar_disabled_text">#716B7C</color>
+    <color name="ink">@color/solar_text_primary</color>
+    <color name="muted">@color/solar_text_secondary</color>
+    <color name="surface">@color/solar_background</color>
+</resources>

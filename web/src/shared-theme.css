@@ -1,0 +1,513 @@
+/* Common design tokens and controls for every role and page. */
+:root {
+  --ink: #171536;
+  --muted: #647195;
+  --paper: #f6f8ff;
+  --purple: #6531d1;
+  --coral: var(--purple);
+  --line: #dfe5f1;
+  --ui-font: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--ui-font);
+  background: var(--paper);
+}
+body { color: var(--ink); background: var(--paper); font-family: var(--ui-font); }
+.app-frame, .auth-page { font-family: var(--ui-font); }
+.workspace-frame .workspace-actions { margin-left: auto; }
+.workspace-frame .side-link:hover { background: #ffffff14; color: white; }
+.workspace-frame .side-link.is-active { color: white; background: linear-gradient(110deg, #7735dd, #5b2bc5); }
+.workspace-frame .footer-line { display: flex; min-height: 46px; padding-block: 14px; }
+.workspace-frame h1, .auth-page h1 { font-family: var(--ui-font); font-weight: 700; line-height: 1.15; letter-spacing: -.035em; color: var(--ink); }
+.workspace-frame :is(.accounts-heading, .page-heading) h1 { font-size: clamp(28px, 2.8vw, 42px); }
+.workspace-frame :is(.eyebrow, .panel-label), .auth-page :is(.eyebrow, .panel-label) { color: var(--purple); }
+.workspace-frame .btn, .auth-page .btn { border-radius: 8px; min-height: 42px; font-family: var(--ui-font); font-size: 14px; font-weight: 600; }
+.workspace-frame :is(.btn-primary, .btn-dark), .auth-page .auth-submit { background: linear-gradient(120deg, #7234d8, #5827c7); border-color: var(--purple); color: white; }
+.workspace-frame :is(.btn-primary, .btn-dark):hover, .auth-page .auth-submit:hover { background: #5124ad; border-color: #5124ad; }
+.workspace-frame .btn-outline-primary { --bs-btn-color: #6230c9; --bs-btn-border-color: #c9b6f2; --bs-btn-hover-bg: #f0eaff; --bs-btn-hover-color: #5221ab; --bs-btn-hover-border-color: #9a74dd; --bs-btn-active-bg: #6531d1; --bs-btn-active-border-color: #6531d1; }
+.workspace-frame :is(.form-control, .form-select), .auth-page .form-control { min-height: 44px; border: 1px solid #d6deee; border-radius: 8px; background-color: #fcfcff; color: var(--ink); font: 14px/1.5 var(--ui-font); }
+.workspace-frame :is(.form-control, .form-select):focus, .auth-page .form-control:focus { border-color: #9264dc; box-shadow: 0 0 0 3px #6531d122; }
+:is(button, a, input, select, textarea):focus-visible { outline: 3px solid #9060e0; outline-offset: 3px; }
+.workspace-frame .data-panel, .workspace-frame .overview-panel, .auth-card { border: 1px solid var(--line); border-radius: 12px; background: white; box-shadow: 0 4px 20px #24345305; }
+.workspace-frame .status-pill { border-radius: 999px; padding: 6px 12px; font: 600 11px/1.4 var(--ui-font); }
+.workspace-frame :is(.status-pill--active, .status-pill--open, .status-pill--approved, .status-pill--completed) { background: #dff6e9; color: #006637; }
+.workspace-frame :is(.status-pill--pending, .status-pill--deactivation_requested) { background: #fff0cc; color: #855400; }
+.workspace-frame :is(.status-pill--deactivated, .status-pill--cancelled, .status-pill--rejected, .status-pill--closed) { background: #fde4e4; color: #9c2929; }
+.workspace-frame .alert, .auth-page .alert { border-radius: 8px; }
+.workspace-frame .table thead th { background: #f1f4f9; color: #434c72; font-family: var(--ui-font); }
+.operator-dashboard { padding: 28px; }
+.operator-dashboard .page-heading { padding: 0; margin: 0 0 24px; max-width: none; }
+.operator-dashboard .metric-grid { padding: 0; max-width: none; }
+.operator-dashboard .data-panel { max-width: none; }
+.workspace-page { max-width: 1100px; width: 100%; padding: 32px; }
+.workspace-page h1 { font-size: clamp(28px, 2.8vw, 42px); }
+.workspace-page .lead-copy { max-width: 760px; font-size: 16px; }
+.workspace-strip { border: 0; gap: 16px; margin-top: 28px; }
+.workspace-strip > div { background: white; border: 1px solid var(--line); border-radius: 12px; }
+.auth-page { min-height: 100vh; gap: 48px; }
+.auth-intro h1 { font-size: clamp(38px, 5vw, 64px); }
+.auth-intro h1 span { color: var(--purple); }
+.auth-card { border-top: 4px solid var(--purple); }
+.auth-card h2 { color: var(--ink); font-family: var(--ui-font); }
+@media (max-width: 760px) {
+  .operator-dashboard, .workspace-page { padding: 24px 16px; }
+  .auth-page { gap: 24px; padding: 32px 20px; }
+  .auth-card { padding: 24px; min-width: 0; }
+  .workspace-frame .workspace-actions { flex-wrap: wrap; }
+}
+
+/* Experience polish layer. Loaded last so every workspace view gets the same refinement. */
+:root {
+  --surface: #ffffff;
+  --surface-soft: #f7f8fe;
+  --surface-tint: #f1edff;
+  --green: #119a62;
+  --amber: #d28a06;
+  --danger: #c23b3b;
+  --shadow-sm: 0 8px 24px rgba(25, 31, 68, .06);
+  --shadow-md: 0 18px 44px rgba(25, 31, 68, .10);
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(101, 49, 209, .08), transparent 28rem),
+    radial-gradient(circle at 90% 10%, rgba(17, 154, 98, .08), transparent 24rem),
+    var(--paper);
+}
+
+.workspace-frame .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid rgba(216, 224, 240, .88);
+  background: rgba(255, 255, 255, .92);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(21, 28, 62, .05);
+}
+
+.workspace-frame .brand {
+  box-shadow: inset -1px 0 rgba(255, 255, 255, .08);
+}
+
+.brand-sun {
+  filter: drop-shadow(0 0 12px rgba(255, 220, 90, .38));
+}
+
+.workspace-frame .side-nav {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .05), transparent 30%),
+    linear-gradient(150deg, #241a59, #151735 72%);
+  box-shadow: inset -1px 0 rgba(255, 255, 255, .06);
+}
+
+.workspace-frame .side-link {
+  position: relative;
+  transition: transform .16s ease, background-color .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+.workspace-frame .side-link:hover {
+  transform: translateX(3px);
+}
+
+.workspace-frame .side-link.is-active::before {
+  content: '';
+  position: absolute;
+  inset: 10px auto 10px 7px;
+  width: 3px;
+  border-radius: 999px;
+  background: #ffdc5a;
+}
+
+.workspace-frame .workspace-content {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .34), transparent 290px),
+    radial-gradient(circle at 100% 0%, rgba(101, 49, 209, .09), transparent 25rem),
+    radial-gradient(circle at 5% 40%, rgba(17, 154, 98, .08), transparent 22rem),
+    #f5f8fb;
+}
+
+.auth-page {
+  max-width: none;
+  min-height: 100vh;
+  padding-inline: clamp(24px, 6vw, 88px);
+  background:
+    linear-gradient(90deg, rgba(16, 20, 38, .88), rgba(16, 20, 38, .62)),
+    url('./assets/hero.png') center / cover no-repeat;
+}
+
+.auth-intro {
+  color: white;
+}
+
+.auth-intro h1,
+.auth-intro h1 span {
+  color: white;
+  text-shadow: 0 12px 32px rgba(0, 0, 0, .22);
+}
+
+.auth-intro > p,
+.auth-page .eyebrow {
+  color: rgba(255, 255, 255, .82);
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, .94);
+  border-color: rgba(255, 255, 255, .58);
+  box-shadow: 0 26px 70px rgba(5, 8, 26, .28);
+  backdrop-filter: blur(16px);
+}
+
+.auth-card .form-control,
+.workspace-frame :is(.form-control, .form-select) {
+  transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+
+.auth-card .form-control:hover,
+.workspace-frame :is(.form-control, .form-select):hover {
+  border-color: #b9a5e9;
+}
+
+.workspace-frame :is(.data-panel, .overview-panel, .account-metric, .station-metric, .reservation-metric, .station-node-card, .metric-card),
+.auth-card {
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.workspace-frame :is(.data-panel, .overview-panel, .account-metric, .station-metric, .reservation-metric, .station-node-card, .metric-card):hover {
+  border-color: #d4c8f4;
+  box-shadow: var(--shadow-md);
+}
+
+.workspace-frame :is(.account-metric, .station-metric, .reservation-metric, .metric-card):hover,
+.station-node-card:hover {
+  transform: translateY(-2px);
+}
+
+.accounts-heading,
+.page-heading,
+.dashboard-hero {
+  border-radius: 16px;
+}
+
+.accounts-heading h1,
+.page-heading h1,
+.control-room .page-heading h1 {
+  color: #0b1024;
+}
+
+.accounts-heading p,
+.page-heading p,
+.station-help,
+.auth-card-copy {
+  line-height: 1.65;
+}
+
+.accounts-heading-actions .btn,
+.overview-heading-actions .btn,
+.overview-heading-actions a,
+.review-button,
+.logout-button,
+.workspace-frame .btn,
+.auth-submit {
+  transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease, border-color .16s ease;
+}
+
+.workspace-frame :is(.btn-primary, .btn-dark, .auth-submit):hover,
+.auth-submit:hover,
+.review-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(101, 49, 209, .22);
+}
+
+.workspace-frame .btn-outline-primary:hover,
+.workspace-frame .btn-outline-dark:hover,
+.workspace-frame .logout-button:hover {
+  transform: translateY(-1px);
+}
+
+.workspace-frame .table-responsive,
+.table-wrap {
+  border: 1px solid #e7edf6;
+  border-radius: 12px;
+  background: white;
+}
+
+.workspace-frame .table {
+  margin-bottom: 0;
+}
+
+.workspace-frame .table tbody tr {
+  transition: background-color .14s ease, box-shadow .14s ease;
+}
+
+.workspace-frame .table tbody tr:hover td {
+  background: #f7f5ff;
+}
+
+.account-avatar,
+.user-avatar,
+.account-metric-icon {
+  box-shadow: inset 0 0 0 1px rgba(101, 49, 209, .08);
+}
+
+.status-pill {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .44);
+}
+
+.workspace-frame [aria-invalid='true'],
+.auth-page [aria-invalid='true'] {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(194, 59, 59, .13) !important;
+}
+
+.text-danger {
+  display: block;
+  margin-top: 6px;
+  color: var(--danger) !important;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.staff-fields .text-danger {
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+.password-input button {
+  border-radius: 8px;
+  color: #6531d1;
+  transition: background-color .14s ease, color .14s ease;
+}
+
+.password-input button:hover {
+  background: #f0eaff;
+  color: #4f22aa;
+}
+
+.empty-state,
+.reservation-detail-empty {
+  background:
+    linear-gradient(135deg, rgba(101, 49, 209, .05), rgba(17, 154, 98, .05)),
+    #fbfcff;
+}
+
+.station-node-card.is-selected,
+.reservation-table tr.is-selected td {
+  box-shadow: inset 4px 0 #6531d1;
+}
+
+.header-account-search {
+  filter: drop-shadow(0 8px 18px rgba(24, 30, 66, .05));
+}
+
+.header-account-search input,
+.overview-theme .header-account-search select {
+  background: white;
+}
+
+.sidebar-scene {
+  opacity: .9;
+}
+
+.sidebar-scene p {
+  color: #d8d0ff;
+}
+
+.footer-line {
+  border-top-color: #e7edf6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-frame *,
+  .auth-page * {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .auth-page {
+    align-items: stretch;
+    background-position: 40% center;
+  }
+
+  .auth-intro h1 {
+    max-width: 620px;
+  }
+}
+
+@media (max-width: 760px) {
+  .workspace-frame .topbar {
+    position: static;
+  }
+
+  .workspace-frame .side-link:hover {
+    transform: none;
+  }
+
+  .workspace-frame .side-link.is-active::before {
+    inset: auto 12px 6px;
+    width: auto;
+    height: 3px;
+  }
+
+  .auth-page {
+    background:
+      linear-gradient(180deg, rgba(16, 20, 38, .90), rgba(16, 20, 38, .66)),
+      url('./assets/hero.png') center / cover no-repeat;
+  }
+}
+
+@media (max-width: 560px) {
+  .workspace-frame :is(.data-panel, .overview-panel, .account-metric, .station-metric, .reservation-metric, .station-node-card, .metric-card):hover {
+    transform: none;
+  }
+
+  .account-metrics,
+  .station-metrics,
+  .reservation-metrics,
+  .overview-dashboard .metric-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workspace-frame .workspace-actions {
+    width: 100%;
+  }
+
+  .workspace-frame .logout-button {
+    margin-left: auto;
+  }
+}
+
+.form-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(8, 12, 30, .56);
+  backdrop-filter: blur(8px);
+}
+
+.form-modal {
+  position: relative;
+  width: min(640px, 100%);
+  max-height: min(88vh, 900px);
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 30px 90px rgba(6, 10, 30, .34);
+}
+
+.form-modal--wide {
+  width: min(920px, 100%);
+}
+
+.form-modal-close {
+  position: sticky;
+  top: 14px;
+  z-index: 2;
+  float: right;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin: 14px 14px -52px 0;
+  border: 1px solid #dfe5f1;
+  border-radius: 999px;
+  background: white;
+  color: #5d6682;
+  font-size: 18px;
+  line-height: 1;
+  box-shadow: 0 8px 20px rgba(25, 31, 68, .08);
+}
+
+.form-modal-close:hover {
+  background: #f1edff;
+  color: #4f22aa;
+}
+
+.form-modal .data-panel,
+.form-modal .compact-form,
+.form-modal .modal-form-panel {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: none;
+}
+
+.form-modal .data-panel:hover,
+.form-modal .compact-form:hover,
+.form-modal .modal-form-panel:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.form-modal .staff-form {
+  min-height: 0;
+  padding: 30px;
+}
+
+.form-modal .staff-panel-heading .panel-close {
+  display: none;
+}
+
+.form-modal .compact-form:not(.staff-form),
+.form-modal .modal-form-panel {
+  padding: 30px;
+}
+
+.form-modal h2 {
+  padding-right: 48px;
+}
+
+.form-modal fieldset {
+  min-width: 0;
+}
+
+.form-modal .staff-footer,
+.form-modal .reservation-detail-actions {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .86), white 38%);
+  padding-top: 16px;
+}
+
+.form-modal .row {
+  --bs-gutter-y: .65rem;
+}
+
+.form-modal .btn + .btn,
+.form-modal fieldset > .btn + .btn {
+  margin-left: 8px;
+}
+
+.form-modal .alert {
+  margin-right: 48px;
+}
+
+@media (max-width: 760px) {
+  .form-modal-backdrop {
+    align-items: end;
+    padding: 14px;
+  }
+
+  .form-modal,
+  .form-modal--wide {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 18px 18px 10px 10px;
+  }
+
+  .form-modal .staff-form,
+  .form-modal .compact-form:not(.staff-form),
+  .form-modal .modal-form-panel {
+    padding: 24px 18px;
+  }
+
+  .form-modal .btn + .btn,
+  .form-modal fieldset > .btn + .btn {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+}

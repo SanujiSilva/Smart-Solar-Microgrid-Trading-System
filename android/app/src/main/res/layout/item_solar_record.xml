@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content" app:cardUseCompatPadding="false" app:cardBackgroundColor="@color/solar_surface">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/booking_record_card" android:padding="@dimen/space_xl">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:baselineAligned="false" android:layout_marginBottom="@dimen/space_md">
+            <TextView android:id="@+id/recordTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textAppearance="@style/Solar.Text.Card" android:ellipsize="middle" android:maxLines="1" />
+            <com.google.android.material.chip.Chip android:id="@+id/recordStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/space_sm" android:clickable="false" />
+        </LinearLayout>
+        <TextView android:id="@+id/recordBody" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:background="@drawable/prosumer_blue" android:padding="@dimen/space_md" android:layout_marginBottom="@dimen/space_md" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/booking_record_caption" android:textAppearance="@style/Solar.Text.Support" android:layout_marginBottom="@dimen/space_sm" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/recordAction" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/view_details_action" app:icon="@drawable/ic_solar_station" app:iconGravity="textStart" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

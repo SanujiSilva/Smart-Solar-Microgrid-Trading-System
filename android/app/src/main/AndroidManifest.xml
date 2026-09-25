@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher_solar"
+        android:label="Smart Solar Microgrid"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SmartSolarMicrogrid">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".booking.StationDirectoryActivity" android:exported="false" />
+        <activity android:name=".booking.StationDetailsActivity" android:exported="false" />
+        <activity android:name=".booking.BookingsActivity" android:exported="false" />
+        <activity android:name=".booking.BookingEditorActivity" android:exported="false" />
+        <activity android:name=".qr.ProsumerQrActivity" android:exported="false" />
+        <activity android:name=".qr.OperatorQrActivity" android:exported="false" />
+        <activity android:name=".NearbyStationsActivity" android:exported="false" />
+        <activity android:name=".LoginActivity" android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

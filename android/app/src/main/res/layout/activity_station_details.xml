@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/solar_screen_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/solarToolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="?attr/actionBarSize" android:background="@drawable/solar_toolbar_background" android:elevation="0dp" app:title="@string/station_info_heading" app:titleTextAppearance="@style/Solar.ToolbarTitle" />
+    <androidx.core.widget.NestedScrollView android:scrollbars="vertical" android:fadeScrollbars="true" android:scrollbarStyle="insideOverlay" android:scrollbarSize="4dp" android:scrollbarThumbVertical="@drawable/solar_scroll_thumb" android:id="@+id/screenScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:padding="@dimen/screen_padding">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView android:id="@+id/titleText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:text="@string/station_info_heading" android:layout_marginBottom="@dimen/space_md" android:visibility="gone" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/solar_hero_card" android:padding="@dimen/space_xl" android:layout_marginBottom="@dimen/space_lg">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/prosumer_home_eyebrow" android:textColor="@color/solar_accent" android:textSize="11sp" android:letterSpacing="0.14" android:textStyle="bold" android:layout_marginBottom="@dimen/space_md" />
+                <TextView android:textColor="@color/solar_surface" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Hero" android:text="@string/station_info_heading" android:layout_marginBottom="@dimen/space_sm" />
+                <TextView android:textColor="#F1ECFF" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:text="@string/station_detail_hint" />
+            </LinearLayout>
+            <com.google.android.material.progressindicator.CircularProgressIndicator android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:indeterminate="true" android:visibility="gone" app:indicatorSize="@dimen/progress_size" />
+            <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" android:accessibilityLiveRegion="polite" android:padding="@dimen/space_lg" android:background="@drawable/solar_banner_info" android:visibility="gone" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/booking_summary_panel" android:padding="@dimen/space_xl" android:layout_marginBottom="@dimen/space_lg">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Section" android:text="@string/station_info_heading" android:layout_marginBottom="@dimen/space_md" />
+                    <TextView android:id="@+id/detailsText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" />
+            </LinearLayout>
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_xl">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Section" android:text="@string/slot_summary_heading" android:layout_marginBottom="@dimen/space_md" />
+                    <TextView android:id="@+id/slotSummaryText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Body" android:layout_marginBottom="@dimen/space_md" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView style="@style/Widget.Solar.Card" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/space_xl">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Section" android:text="@string/schedule_heading" android:layout_marginBottom="@dimen/space_md" />
+                    <TextView android:id="@+id/scheduleText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:layout_marginBottom="@dimen/space_md" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <TextView android:id="@+id/slotsHeading" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Section" android:text="@string/available_slots" android:layout_marginBottom="@dimen/space_md" />
+            <TextView android:id="@+id/slotHelp" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Solar.Text.Support" android:text="@string/booking_availability_notice" android:layout_marginBottom="@dimen/space_md" />
+            <LinearLayout android:id="@+id/slots" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/prosumer_card" android:padding="@dimen/space_md" android:layout_marginBottom="@dimen/space_md" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/refreshButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/refresh" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/backButton" style="@style/Widget.Solar.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/back_to_stations" android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

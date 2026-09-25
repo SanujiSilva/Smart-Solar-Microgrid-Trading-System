@@ -1,0 +1,1 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"><solid android:color="@color/solar_success_background"/><corners android:radius="@dimen/card_radius"/><stroke android:width="@dimen/border_width" android:color="@color/solar_border"/></shape>
