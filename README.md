@@ -1,72 +1,254 @@
 # Smart Solar Microgrid Trading System
 
-A university enterprise application for managing solar microgrid stations, reserving energy, and verifying energy transfers.
+**Module:** SE4040 – Enterprise Application Development  
+**Assignment:** Assignment 1 – Smart Solar Microgrid Trading System  
+**Institution:** Sri Lanka Institute of Information Technology (SLIIT)
 
-## Current progress
+## Project Repository
 
-**Phases 1-23 implemented.** The API includes MongoDB, secure authentication, account and station management, energy slots, reservations with capacity/rule enforcement, QR transaction verification, and live reservation search/dashboard endpoints. The React + Bootstrap web client includes API-backed role workflows. The native Kotlin/XML Android client includes SQLite reference storage, secure authentication, prosumer account functions, booking workflows, Google Maps nearby-station search, approved-booking QR display, Grid Operator QR transfer completion, integrated Android error/UI polish, and consolidated automated checks. See [Phase 23 verification](docs/phase-23.md).
+GitHub Repository:  
+https://github.com/SanujiSilva/Smart-Solar-Microgrid-Trading-System.git
 
-## Architecture
+## Demo Video
 
-React + Bootstrap 5 and native Android (Kotlin + XML) communicate with an ASP.NET Core Web API using REST/JSON. The API owns all business rules and accesses MongoDB. Android SQLite stores permitted local reference/cache information only.
+OneDrive / SharePoint Demo Video:  
+https://mysliit-my.sharepoint.com/:f:/g/personal/it22167200_my_sliit_lk/IgBA4YZuZjbjT6sVZKYzMe_rAS0ovfWpxWEEmJp8WR_LLBo?e=fvVcLb
 
-See [architecture](docs/architecture.md), [data model](database/README.md), and [implementation phases](docs/phases.md).
+The demo video is kept under five minutes and demonstrates the main end-to-end system workflow.
+
+## Project Overview
+
+The Smart Solar Microgrid Trading System is an enterprise client-server application developed to manage solar microgrid stations, energy reservation workflows, Prosumer accounts and QR-based energy-transfer verification.
+
+The solution consists of:
+
+- ASP.NET Core Web API / C# backend
+- MongoDB server-side database
+- React + TypeScript + Bootstrap 5 web application
+- Native Android application developed with Kotlin and XML
+- SQLite local persistence on Android
+- Retrofit REST API integration
+- Google Maps integration for nearby station discovery
+- ZXing QR generation and scanning
+- JWT-based authentication and role-based authorization
+
+All important business rules are enforced by the central Web API. The web and Android clients communicate with the backend through REST/JSON and do not access MongoDB directly.
+
+## User Roles
+
+### Backoffice
+
+- Manage Backoffice and Grid Operator accounts
+- View and manage Prosumer accounts
+- Approve and reactivate Prosumer accounts
+- Manage solar microgrid stations
+- Configure operating schedules
+- Manage energy slots
+- View and manage reservations
+- Approve or reject reservation requests
+- View operational dashboard information
+
+### Grid Operator
+
+- Access operational information
+- View reservations and station availability
+- Update permitted availability information
+- Scan Prosumer QR codes using the Android application
+- Verify QR transactions through the central API
+- Complete approved energy transfers
+
+### Prosumer
+
+- Register using NIC
+- Login after Backoffice activation
+- Manage profile information
+- Request account deactivation
+- Browse solar stations
+- Find nearby stations using Google Maps
+- View available energy slots
+- Create, modify and cancel reservations
+- View current, pending and historical bookings
+- Display QR codes for approved reservations
+
+## Main Functional Components
+
+### 1. User and Account Management
+
+Responsible for registration, authentication, profile management, account approval, role-based access control, account deactivation and reactivation.
+
+### 2. Station and Energy Slot Management
+
+Responsible for solar station creation and modification, geographic coordinates, operating schedules, slot creation, energy capacity, availability and nearby-station discovery.
+
+### 3. Energy Reservation Management
+
+Responsible for booking creation, approval/rejection, modification, rescheduling, cancellation, booking history, capacity allocation and reservation validation.
+
+### 4. QR Transfer Verification and Monitoring
+
+Responsible for approved-reservation QR generation, Grid Operator verification, one-time transfer completion, completion tracking, reservation monitoring and dashboard information.
+
+## Important Business Rules
+
+- Reservations must be scheduled in the future and within seven days.
+- Reservation updates require at least 12 hours' notice.
+- Reservation cancellations require at least 12 hours' notice.
+- Rescheduled slots must also satisfy the required notice period.
+- Station availability, schedules and slot capacity are validated by the server.
+- Station deactivation is blocked when restricted by active/future reservations.
+- Only Backoffice may reactivate a deactivated Prosumer.
+- Prosumers can manage only their own account and reservation data.
+- QR verification and transfer completion always use the central API.
+- A completed or invalid QR transaction cannot be reused.
+- Reservation capacity and lifecycle changes are handled server-side to reduce double booking.
+
+## Project Structure
 
 ```text
 backend/
   src/SmartSolarMicrogrid.Api/
-    Controllers/  Models/  DTOs/  Services/  Repositories/
-    Configuration/  Middleware/  Helpers/
   tests/SmartSolarMicrogrid.Api.Tests/
+
 web/
+
 android/
+
 database/
+
 docs/
+
+scripts/
 ```
 
-The existing repository is the solution root; no additional nested root is needed. Empty reserved directories contain `.gitkeep` files so Git preserves them.
+## Backend
 
-## Prerequisites and setup plan
+The backend is implemented using ASP.NET Core Web API and follows a layered structure:
 
-- Backend: .NET SDK 10.0.302 or a newer patch in the 10.0.3xx SDK band (`global.json`); targets .NET 10.
-- Database: MongoDB; use a replica set when implementing multi-document transactions for reservations.
-- Web: Node.js/npm; compatible versions will be recorded when React is scaffolded in Phase 11.
-- Android: Android Studio, Android SDK, and its compatible JDK; versions will be recorded in Phase 15.
-- Maps: Google Maps Android API key restricted to the application; configure `SMART_SOLAR_MAPS_API_KEY` as a Gradle property before installing the Android app.
-- Deployment: Windows IIS and a Hosting Bundle matching the backend runtime; setup begins in Phase 24.
+```text
+Controllers
+    ↓
+Services
+    ↓
+Repositories
+    ↓
+MongoDB
+```
 
-### Configuration and execution
+The backend handles:
 
-Configure MongoDB using the [database setup instructions](database/README.md) and JWT using [authentication setup](docs/authentication.md), then run from the repository root. This machine already has Atlas and a generated JWT key in development user secrets.
+- Authentication
+- Authorization
+- User management
+- Station management
+- Energy slot management
+- Reservation management
+- Capacity validation
+- QR token generation and verification
+- Dashboard data
+- Error handling
+
+## Web Application
+
+The web application is implemented using React, TypeScript and Bootstrap 5.
+
+It provides role-specific interfaces for:
+
+- Backoffice administration
+- Grid Operator operational views
+- User and Prosumer management
+- Station and slot management
+- Reservation management
+- Dashboard information
+
+## Android Application
+
+The mobile application is developed as a pure native Android application using Kotlin and XML.
+
+Android functionality includes:
+
+- Registration and login
+- Prosumer profile management
+- SQLite local reference/cache storage
+- Station browsing
+- Google Maps nearby-station discovery
+- Reservation creation and management
+- Booking history
+- Prosumer QR display
+- Grid Operator QR scanning and verification
+
+## Local Persistence
+
+SQLite is used only for permitted Android local information such as authenticated-user reference information and cached station data.
+
+Passwords, reservation authorization and authoritative booking availability are not stored or decided locally. MongoDB through the central Web API remains the authoritative data source.
+
+## Running the Backend
+
+From the repository root:
 
 ```powershell
 dotnet restore backend/SmartSolarMicrogrid.sln
-dotnet build backend/SmartSolarMicrogrid.sln --no-restore --configuration Release
-dotnet test backend/SmartSolarMicrogrid.sln --no-build --configuration Release
-dotnet run --project backend/src/SmartSolarMicrogrid.Api --launch-profile http
+dotnet build backend/SmartSolarMicrogrid.sln --configuration Release
+dotnet run --project backend/src/SmartSolarMicrogrid.Api
 ```
 
-Open `http://localhost:5080/swagger` for interactive documentation, `/api/health` for API liveness, and `/api/health/ready` for MongoDB readiness. MongoDB must be available at startup so required indexes can be created. See [backend instructions](backend/README.md) for configuration, HTTPS, and expected responses.
+MongoDB and the required JWT configuration must be available before running the API.
 
-Development defaults to the non-secret URI `mongodb://127.0.0.1:27017` and database `SmartSolarMicrogrid`, overridden by user secrets when configured. Private MongoDB URIs and `Jwt:SigningKey` belong in user secrets/environment configuration. Both environments require a valid signing key; production also requires an explicit MongoDB URI. See [authentication instructions](docs/authentication.md) to create your first development Backoffice account and test login. Never commit credentials.
+## Running the Web Application
 
-IIS publishing, HTTPS, and production configuration instructions arrive in Phase 24. These are planned deployment deliverables; Phases 1-20 are implemented now.
-
-## Verification
-
-1. Inspect the folder tree above and confirm each reserved directory exists.
-2. Read the architecture and check that both clients reach MongoDB only through the API.
-3. Check the role boundaries and all twelve business rules in the architecture document.
-4. Run `git diff --check` to check tracked changes for whitespace errors; inspect new files with `git status --short`.
-
-5. Run the build/test commands above, then follow the [Phase 5 walkthrough](docs/user-management.md) and the phase completion records through [Phase 10](docs/phase-10.md). Set `SMARTSOLAR_TEST_MONGODB_URI` to enable real MongoDB/authentication/user-management integration tests; otherwise they are explicitly skipped.
-
-For the consolidated Phase 23 automated test pass, run:
+Navigate to the web directory and install dependencies:
 
 ```powershell
-.\scripts\test-phase23.ps1
+cd web
+npm install
+npm run dev
 ```
 
-The [Phase 1](docs/phase-1.md), [Phase 2](docs/phase-2.md), [Phase 3](docs/phase-3.md), and [Phase 4](docs/phase-4.md) notes remain historical records. Full Android device walkthroughs and IIS deployment remain for later phases.
+Configure the web API base URL to point to the running ASP.NET Core Web API.
 
-See [prosumer administration, reservation rescheduling, and NIC identity migration](docs/assignment-compliance-updates.md) for the latest workflow changes and upgrade instructions.
+## Running the Android Application
+
+1. Open the `android` project in Android Studio.
+2. Configure the API base URL.
+3. Configure a restricted Google Maps Android API key.
+4. Build and run the application on an emulator or Android device.
+
+## Testing and Verification
+
+The project contains automated verification across the backend, web and Android layers.
+
+The repository includes:
+
+- Backend xUnit tests
+- Web build and lint verification
+- Playwright end-to-end tests
+- Android unit tests
+- Android lint verification
+- MockWebServer-based Android API tests
+
+## Individual Contributions
+
+| Member | Registration Number | Main Component | Individual Contribution |
+|---|---|---|---|
+| Perera L.K.S.T | IT22167200 | User and Account Management | Contributed to Prosumer registration, authentication, profile management, account approval and status management, staff account management, role-based access control, account deactivation/reactivation, related interfaces, API integration, backend functionality, database operations, validation, testing and documentation. |
+| Perera N.S.G | IT22276346 | Station and Energy Slot Management | Contributed to station creation and modification, geographic coordinates, operating schedules, slot creation and management, capacity and availability management, station browsing, nearby-station discovery using Google Maps, API/database integration, testing and documentation. |
+| Silva K.S.S.G | IT22082374 | Energy Reservation Management | Contributed to reservation creation, slot and energy selection, approval/rejection, modification, rescheduling, cancellation, current reservations, booking history, search, booking-window and 12-hour notice rules, ownership/state validation, capacity handling, integration, testing and documentation. |
+| Alwis L.W.R.T | IT22278708 | QR Transfer Verification and Monitoring | Contributed to approved-reservation QR generation, Grid Operator scanning and verification, transfer completion, QR-reuse prevention, completion tracking, reservation monitoring, search/filtering, dashboard functionality, integration, testing and documentation. |
+
+## Submission Contents
+
+The final assignment submission should contain:
+
+- Complete project source code
+- Detailed project report
+- Main opening-screen screenshot
+- README file
+- Git repository link
+- Individual contribution details
+- Demo video link
+
+## Authors
+
+SE4040 Enterprise Application Development – Group Assignment  
+BSc (Hons) in Information Technology Specialized in Software Engineering  
+Sri Lanka Institute of Information Technology
